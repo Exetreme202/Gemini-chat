@@ -20,48 +20,6 @@
     h1 {
       margin-bottom: 20px;
     }
-    /* Help Button at Top Right */
-    #helpBtn {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background-color: #333;
-      color: #e0e0e0;
-      border: 1px solid #555;
-      border-radius: 5px;
-      padding: 5px 10px;
-      cursor: pointer;
-      z-index: 1000;
-    }
-    /* Help Modal */
-    #helpModal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #1e1e1e;
-      color: #e0e0e0;
-      padding: 20px;
-      border: 1px solid #555;
-      border-radius: 10px;
-      width: 80%;
-      max-width: 500px;
-      z-index: 1001;
-      text-align: left;
-    }
-    #helpModal h2 {
-      margin-top: 0;
-    }
-    #closeHelpBtn {
-      margin-top: 10px;
-      background-color: #333;
-      color: #e0e0e0;
-      border: 1px solid #555;
-      border-radius: 5px;
-      padding: 5px 10px;
-      cursor: pointer;
-    }
     /* Dark themed buttons, inputs and textareas */
     button, input, textarea {
       border-radius: 5px;
@@ -75,132 +33,196 @@
     .glow-green { box-shadow: 0 0 8px 2px green !important; }
     .glow-blue { box-shadow: 0 0 8px 2px blue !important; }
     .glow-red { box-shadow: 0 0 8px 2px red !important; }
+    
+    /* Main Tabs styling */
+    #mainTabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      width: 100%;
+      max-width: 800px;
+      justify-content: center;
+    }
+    #mainTabs button {
+      padding: 5px 10px;
+      cursor: pointer;
+      border: 1px solid #555;
+      background: #333;
+    }
+    #mainTabs button.active {
+      background: #444;
+      font-weight: bold;
+    }
+    /* Join Stream Button */
+    #joinStreamBtn {
+      padding: 5px 10px;
+      cursor: pointer;
+      border: 1px solid #555;
+      background: #333;
+      margin-left: 10px;
+      display: none;
+    }
+    
+    .tab-content {
+      border: 1px solid #555;
+      padding: 10px;
+      margin-bottom: 20px;
+      width: 90%;
+      max-width: 800px;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+    }
+    /* Chat container: height adjusted and rounded */
+    #chatLog {
+      width: 300px;
+      height: 200px;
+      border: 1px solid #555;
+      border-radius: 10px;
+      overflow-y: auto;
+      padding: 5px;
+      background: #2a2a2a;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin: 10px auto;
+    }
+    /* Center file transfer options in Chat tab */
+    #chatInputContainer {
+      margin-top: 10px;
+      text-align: center;
+    }
     /* Chat bubbles */
     .chat-bubble {
-      margin: 5px;
+      display: inline-block;
       padding: 8px 12px;
+      margin: 4px;
       border-radius: 15px;
-      max-width: 70%;
+      max-width: 50%;
       word-wrap: break-word;
     }
     .chat-bubble.me {
-      background-color: #2d5c88;
-      margin-left: auto;
-      text-align: right;
+      background-color: #3a663a;
+      align-self: flex-end;
     }
     .chat-bubble.peer {
-      background-color: #444;
-      margin-right: auto;
-      text-align: left;
+      background-color: #2a4f6c;
+      align-self: flex-start;
     }
-    .chat-bubble.system {
-      background-color: #333;
-      margin: 5px auto;
-      text-align: center;
-      font-style: italic;
+    /* File link styling */
+    .file-link a {
+      text-decoration: none;
     }
-    #chatLog {
-      width: 100%;
-      max-width: 600px;
-      height: 300px;
-      overflow-y: auto;
-      border: 1px solid #555;
+    .file-link.me a { color: #8fbc8f; }
+    .file-link.peer a { color: #6495ed; }
+    /* QR Code container with white background and padding */
+    #qrCodeContainer {
+      margin-top: 10px;
+      padding: 20px;
+      background: #fff;
+      color: #121212;
+      display: inline-block;
       border-radius: 5px;
-      padding: 10px;
-      margin-bottom: 10px;
+    }
+    /* QR scanner container */
+    #qr-reader {
+      width: 300px;
+      margin-top: 10px;
+      display: none;
+    }
+    /* Call/Stream sub-tabs - centered and same size */
+    #callStreamTabs {
       display: flex;
-      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 10px;
+      justify-content: center;
     }
-    /* Video elements */
-    .remote-video {
-      width: 100%;
-      max-width: 500px;
-      height: auto;
-      background-color: #000;
+    #callStreamTabs button {
+      padding: 5px 10px;
+      cursor: pointer;
       border: 1px solid #555;
+      background: #333;
+      width: 100px;
     }
-    .local-video {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      width: 120px;
-      height: auto;
-      background-color: #000;
+    #callStreamTabs button.active {
+      background: #444;
+      font-weight: bold;
+    }
+    /* Containers for Call and Stream features */
+    #callContainer, #streamContainer {
       border: 1px solid #555;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #1e1e1e;
+      border-radius: 10px;
     }
+    /* Video Call container */
     #videoCallContainer {
       position: relative;
       width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
+      max-width: 640px;
+      margin: auto;
     }
-    /* Call animation */
-    .call-animation {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #2d5c88;
-      margin: 0 auto;
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(0.9); opacity: 0.7; }
-      50% { transform: scale(1.1); opacity: 1; }
-      100% { transform: scale(0.9); opacity: 0.7; }
-    }
-    /* Music icon animation */
-    .music-icon-animation {
-      font-size: 40px;
-      animation: bounce 1s infinite alternate;
-    }
-    @keyframes bounce {
-      from { transform: translateY(0px); }
-      to { transform: translateY(-10px); }
-    }
-    /* Tab styling */
-    #mainTabs {
-      margin-bottom: 20px;
-    }
-    #mainTabs button {
-      padding: 10px 15px;
-      cursor: pointer;
-    }
-    #mainTabs button.active {
-      background-color: #2d5c88;
-    }
-    .tab-content {
+    #videoCallContainer .remote-video {
       width: 100%;
-      max-width: 800px;
+      height: auto;
+      background: black;
     }
-    #joinStreamBtn {
-      display: none;
-      background-color: #2d5c88;
+    #videoCallContainer .local-video {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 30%;
+      border: 2px solid #444;
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
     }
-    /* File link styling */
-    .file-link {
-      color: #4fa3f0;
-      text-decoration: underline;
-      cursor: pointer;
+    /* Footer */
+    footer {
+      font-size: 10px;
+      margin-top: auto;
+      padding: 5px;
+      color: #888;
+    }
+    /* Status indicators */
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    .status-connected {
+      background-color: green;
+    }
+    .status-disconnected {
+      background-color: red;
+    }
+    .status-connecting {
+      background-color: orange;
+    }
+    /* Progress bar for file transfers */
+    .progress-container {
+      width: 100%;
+      background-color: #333;
+      border-radius: 5px;
+      margin: 5px 0;
+    }
+    .progress-bar {
+      height: 10px;
+      background-color: #4caf50;
+      border-radius: 5px;
+      width: 0%;
+      transition: width 0.3s;
     }
   </style>
   <!-- Required libraries -->
-  <script src="https://unpkg.com/peerjs@1.3.2/dist/peerjs.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.4/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
-  <button id="helpBtn">Help</button>
-  <div id="helpModal">
-    <h2>Help &amp; Instructions</h2>
-    <p>This page allows you to connect peer-to-peer for chatting, file sharing, video calling, voice calling, and streaming video or audio. You can either create a room or join an existing room using a Room ID.</p>
-    <p><strong>Connection:</strong> Use the Connection tab to create a room or join an existing room using a Room ID.</p>
-    <p><strong>Chat &amp; Share:</strong> In this tab, you can send text messages and files. Use the file input and the send file button to share files with your peer.</p>
-    <p><strong>Call/Stream:</strong> Here you can choose between Call and Stream sub-tabs. In the Call sub-tab, you can start a video call or a voice call. Accepting an incoming call automatically opens this tab. In the Stream sub-tab, you can stream video or audio. If your peer starts a stream while you are not on the Stream sub-tab, a glowing indicator and a blue Join Stream button will appear.</p>
-    <p>The page uses dark theme styling, and glowing effects are used to indicate activity on tabs when you are not currently viewing them. If the connection is disconnected, the Connection tab will glow red.</p>
-    <button id="closeHelpBtn">Close</button>
-  </div>
-
   <h1>GEMINI CHAT AND SHARE</h1>
   <!-- Connection status -->
-  <div id="connectionStatus">Disconnected</div>
+  <div id="connectionStatus"><span class="status-indicator status-disconnected"></span>Disconnected</div>
 
   <!-- Main Tabs -->
   <div id="mainTabs">
@@ -212,7 +234,7 @@
 
   <!-- Connection Tab Content -->
   <div id="tabContentConnection" class="tab-content">
-    <div id="automaticSignaling" class="inner-tab-content">
+    <div id="automaticSignaling">
       <h2>PeerJS Signaling</h2>
       <button id="createRoomBtn">Create Room</button>
       <button id="copyRoomIdBtn">Copy Room ID</button>
@@ -220,6 +242,10 @@
       <input type="text" id="roomIdInput" placeholder="Room ID">
       <button id="joinRoomBtn">Join Room</button>
       <div id="peerStatus"></div>
+      <div id="qrCodeContainer"></div>
+      <button id="scanQRCodeBtn">Scan QR Code</button>
+      <button id="closeScannerBtn" style="display:none;">Close Scanner</button>
+      <div id="qr-reader"></div>
     </div>
   </div>
 
@@ -231,10 +257,13 @@
       <div id="chatInputContainer">
         <input type="text" id="chatInput" placeholder="Type a message...">
         <button id="sendChatBtn">Send Chat</button>
-        <div style="display: flex; justify-content: center; align-items: center;">
+        <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
           <input type="file" id="fileInput">
           <button id="sendFileBtn">Send File</button>
-          <button id="endFileTransferBtn" style="display:none;">End Transfer</button>
+          <div id="fileProgressContainer" class="progress-container" style="display: none;">
+            <div id="fileProgressBar" class="progress-bar"></div>
+          </div>
+          <button id="cancelFileTransferBtn" style="display:none;">Cancel Transfer</button>
         </div>
       </div>
     </section>
@@ -253,20 +282,11 @@
         <div id="videoCallSection">
           <h2>Video Call</h2>
           <button id="startVideoCallBtn">Start Video Call</button>
-          <button id="endCallBtn">End Video Call</button>
-          <div id="videoCallContainer">
+          <button id="endCallBtn" style="display:none;">End Video Call</button>
+          <div id="videoCallContainer" style="display:none;">
             <video id="remoteVideo" class="remote-video" autoplay playsinline></video>
             <video id="localVideo" class="local-video" autoplay muted playsinline></video>
           </div>
-        </div>
-        <!-- Voice Call Section -->
-        <div id="voiceCallSection" style="margin-top:20px;">
-          <h2>Voice Call</h2>
-          <button id="startVoiceCallBtn">Start Voice Call</button>
-          <button id="endVoiceCallBtn">End Voice Call</button>
-          <br>
-          <div id="voiceCallAnimation" class="call-animation" style="display:none; margin: 10px auto;"></div>
-          <audio id="hiddenRemoteVoice" autoplay style="display:none;"></audio>
         </div>
       </div>
       <!-- Stream Features -->
@@ -277,31 +297,15 @@
           <p><strong>Select a video file to stream:</strong></p>
           <input type="file" id="videoFileInput" accept="video/*">
           <button id="startVideoStreamBtn">Start Video Stream</button>
-          <button id="endStreamBtn">End Video Stream</button>
+          <button id="endStreamBtn" style="display:none;">End Video Stream</button>
           <br>
           <p><strong>Local Stream (Sender's Playback):</strong></p>
-          <video id="localStreamedVideo" controls playsinline style="width:300px"></video>
+          <video id="localStreamedVideo" controls playsinline style="width:300px; display:none;"></video>
           <p><strong>Remote Stream (Receiver's Playback):</strong></p>
-          <video id="remoteStreamedVideo" autoplay playsinline style="width:300px"></video>
+          <video id="remoteStreamedVideo" autoplay playsinline style="width:300px; display:none;"></video>
           <br>
-          <button id="enterFullscreenBtn">Full Screen Mode</button>
+          <button id="enterFullscreenBtn" style="display:none;">Full Screen Mode</button>
           <button id="exitFullscreenBtn" style="display:none;">Exit Full Screen</button>
-        </div>
-        <!-- Audio Streaming Section -->
-        <div id="audioStreamSection" style="margin-top:20px;">
-          <h2>Audio Streaming</h2>
-          <p><strong>Select an audio file to stream:</strong></p>
-          <input type="file" id="audioFileInput" accept="audio/*">
-          <button id="startAudioStreamBtn">Start Audio Stream</button>
-          <button id="endAudioStreamBtn">End Audio Stream</button>
-          <br>
-          <p><strong>Local Stream (Sender's Playback):</strong></p>
-          <audio id="localStreamedAudio" controls playsinline style="width:300px"></audio>
-          <p><strong>Remote Stream (Receiver's Playback):</strong></p>
-          <div id="remoteAudioAnimation" class="music-icon-animation" style="display:none; margin: 10px auto;">
-            &#9835;
-          </div>
-          <audio id="hiddenRemoteAudioStream" autoplay style="display:none;"></audio>
         </div>
       </div>
     </div>
@@ -310,857 +314,1141 @@
   <footer>Developed by Jijo.</footer>
 
   <script>
-    /***** FAST, MODULAR SCRIPT (drop-in replacement) *****/
+    /***** Global Variables *****/
+    let currentMainTab = "connection";
+    let currentSubTab = "call";
+    let isOfferer = false;
+    let dataPeer = null; // For data channel (chat, file transfer, and signaling)
+    let mediaPeer = null; // Dedicated for media streaming and calls
+    let dataChannel = null;
+    let fileReceiver = null;
+    let fileSender = null;
+    let peer = null;
+    let signalingConn = null;
+    let isStreamSender = false;
+    let isInCall = false;
 
-/* =========================
-   0) CACHED DOM REFERENCES
-   ========================= */
-const el = {
-  // Global
-  connectionStatus: document.getElementById("connectionStatus"),
-  peerStatus: document.getElementById("peerStatus"),
-  mainTabConnection: document.getElementById("mainTabConnection"),
-  mainTabChat: document.getElementById("mainTabChat"),
-  mainTabCallStream: document.getElementById("mainTabCallStream"),
-  joinStreamBtn: document.getElementById("joinStreamBtn"),
+    let html5QrCodeScannerInstance = null;
 
-  // Tabs
-  tabContentConnection: document.getElementById("tabContentConnection"),
-  tabContentChat: document.getElementById("tabContentChat"),
-  tabContentCallStream: document.getElementById("tabContentCallStream"),
-  subTabCall: document.getElementById("subTabCall"),
-  subTabStream: document.getElementById("subTabStream"),
-  callContainer: document.getElementById("callContainer"),
-  streamContainer: document.getElementById("streamContainer"),
+    // ICE candidate buffers
+    const dataIceBuffer = [];
+    const mediaIceBuffer = [];
+    let dataRemoteDescriptionSet = false;
+    let mediaRemoteDescriptionSet = false;
 
-  // Connection
-  createRoomBtn: document.getElementById("createRoomBtn"),
-  copyRoomIdBtn: document.getElementById("copyRoomIdBtn"),
-  roomIdInput: document.getElementById("roomIdInput"),
-  joinRoomBtn: document.getElementById("joinRoomBtn"),
+    /***** ICE Servers Configuration *****/
+    const iceServers = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'stun:stun3.l.google.com:19302' },
+      { urls: 'stun:stun4.l.google.com:19302' }
+    ];
 
-  // Chat & File
-  chatLog: document.getElementById("chatLog"),
-  chatInput: document.getElementById("chatInput"),
-  sendChatBtn: document.getElementById("sendChatBtn"),
-  fileInput: document.getElementById("fileInput"),
-  sendFileBtn: document.getElementById("sendFileBtn"),
-  endFileTransferBtn: document.getElementById("endFileTransferBtn"),
-
-  // Video Call
-  startVideoCallBtn: document.getElementById("startVideoCallBtn"),
-  endCallBtn: document.getElementById("endCallBtn"),
-  remoteVideo: document.getElementById("remoteVideo"),
-  localVideo: document.getElementById("localVideo"),
-
-  // Voice Call
-  startVoiceCallBtn: document.getElementById("startVoiceCallBtn"),
-  endVoiceCallBtn: document.getElementById("endVoiceCallBtn"),
-  hiddenRemoteVoice: document.getElementById("hiddenRemoteVoice"),
-  voiceCallAnimation: document.getElementById("voiceCallAnimation"),
-
-  // Streaming (Video)
-  videoFileInput: document.getElementById("videoFileInput"),
-  startVideoStreamBtn: document.getElementById("startVideoStreamBtn"),
-  endStreamBtn: document.getElementById("endStreamBtn"),
-  localStreamedVideo: document.getElementById("localStreamedVideo"),
-  remoteStreamedVideo: document.getElementById("remoteStreamedVideo"),
-  enterFullscreenBtn: document.getElementById("enterFullscreenBtn"),
-  exitFullscreenBtn: document.getElementById("exitFullscreenBtn"),
-
-  // Streaming (Audio)
-  audioFileInput: document.getElementById("audioFileInput"),
-  startAudioStreamBtn: document.getElementById("startAudioStreamBtn"),
-  endAudioStreamBtn: document.getElementById("endAudioStreamBtn"),
-  localStreamedAudio: document.getElementById("localStreamedAudio"),
-  hiddenRemoteAudioStream: document.getElementById("hiddenRemoteAudioStream"),
-  remoteAudioAnimation: document.getElementById("remoteAudioAnimation"),
-};
-
-/* =========================
-   1) CONSTANTS & STATE
-   ========================= */
-const ICE_CONFIG = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun.cloudflare.com:3478" },
-    { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" },
-    { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" },
-    { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelayproject", credential: "openrelayproject" },
-  ],
-};
-
-const LOG_PREFIX = "[GEMINI]";
-const DC_CHUNK_SIZE = 64 * 1024;               // 64KB
-const DC_BUFFER_MAX = 1 * 1024 * 1024;         // 1MB max before backpressure wait
-const DC_BUFFER_LOW = 256 * 1024;              // 256KB low watermark for resume
-
-let currentMainTab = "connection";
-let currentSubTab = "call";
-
-let peer = null;            // PeerJS instance
-let signalingConn = null;   // PeerJS DataConnection used for signaling
-
-// Core DataChannel PeerConnection
-let dcPC = null;
-let dataChannel = null;
-let isOfferer = null;
-
-// Media PeerConnections
-let videoCallPC = null;
-let voiceCallPC = null;
-let videoStreamPC = null;
-let audioStreamPC = null;
-
-let fileReceiver = null;
-let currentSendProgressElem = null;
-let currentReceiveProgressElem = null;
-
-let isStreamSender = false;
-
-/* =========================
-   2) UTILITIES
-   ========================= */
-function log(...args) { console.log(LOG_PREFIX, ...args); }
-
-function setStatus(text, color) {
-  el.connectionStatus.innerText = text;
-  el.connectionStatus.style.fontWeight = "bold";
-  el.connectionStatus.style.color = color || "#e0e0e0";
-  if (text.toLowerCase().includes("connected")) {
-    el.mainTabConnection.classList.remove("glow-red");
-  } else if (text.toLowerCase().includes("disconnected") || text.toLowerCase().includes("failed")) {
-    el.mainTabConnection.classList.add("glow-red");
-  }
-}
-
-function switchMainTab(name) {
-  el.tabContentConnection.style.display = "none";
-  el.tabContentChat.style.display = "none";
-  el.tabContentCallStream.style.display = "none";
-  el.mainTabConnection.classList.remove("active", "glow-red", "glow-green");
-  el.mainTabChat.classList.remove("active", "glow-green");
-  el.mainTabCallStream.classList.remove("active", "glow-green");
-
-  if (name === "connection") {
-    el.tabContentConnection.style.display = "block";
-    el.mainTabConnection.classList.add("active");
-  } else if (name === "chat") {
-    el.tabContentChat.style.display = "block";
-    el.mainTabChat.classList.add("active");
-  } else if (name === "callstream") {
-    el.tabContentCallStream.style.display = "block";
-    el.mainTabCallStream.classList.add("active");
-    el.joinStreamBtn.style.display = "none";
-  }
-  currentMainTab = name;
-}
-
-function switchCallStreamSubTab(name) {
-  el.callContainer.style.display = "none";
-  el.streamContainer.style.display = "none";
-  el.subTabCall.classList.remove("active", "glow-green");
-  el.subTabStream.classList.remove("active", "glow-green");
-
-  if (name === "call") {
-    el.callContainer.style.display = "block";
-    el.subTabCall.classList.add("active");
-  } else {
-    el.streamContainer.style.display = "block";
-    el.subTabStream.classList.add("active");
-  }
-  currentSubTab = name;
-}
-
-function logChat(message, who = "system") {
-  const bubble = document.createElement("div");
-  bubble.classList.add("chat-bubble");
-  if (who === "me") bubble.classList.add("me");
-  else if (who === "peer") bubble.classList.add("peer");
-  else bubble.classList.add("system");
-  bubble.innerText = message;
-  el.chatLog.appendChild(bubble);
-  el.chatLog.scrollTop = el.chatLog.scrollHeight;
-}
-
-function logFileBubble(link, who = "peer") {
-  const bubble = document.createElement("div");
-  bubble.classList.add("chat-bubble");
-  bubble.classList.add(who === "me" ? "me" : "peer");
-  bubble.appendChild(link);
-  el.chatLog.appendChild(bubble);
-  el.chatLog.scrollTop = el.chatLog.scrollHeight;
-}
-
-function safeDestroyPeerJS() {
-  if (peer) {
-    try { peer.destroy(); } catch {}
-    peer = null;
-    if (el.peerStatus) el.peerStatus.innerText = "PeerJS connection closed.";
-  }
-}
-
-/* =========================
-   3) SIGNALING HELPERS
-   ========================= */
-function sendSignal(msg) {
-  if (signalingConn && signalingConn.open) {
-    signalingConn.send(JSON.stringify(msg));
-  }
-}
-
-function onSignalMessage(raw) {
-  let msg;
-  try { msg = JSON.parse(raw); } catch {
-    // If we can't parse, ignore (do not confuse with file data; file data comes via RTC DC not PeerJS)
-    return;
-  }
-  switch (msg.type) {
-    case "offer":
-      isOfferer = false;
-      ensureDataPC(false);
-      dcPC.setRemoteDescription(msg.sdp).then(async () => {
-        const answer = await dcPC.createAnswer();
-        await dcPC.setLocalDescription(answer);
-        sendSignal({ type: "answer", sdp: dcPC.localDescription });
-      });
-      break;
-    case "answer":
-      if (dcPC && dcPC.signalingState === "have-local-offer") {
-        dcPC.setRemoteDescription(msg.sdp);
+    /***** Tab Switching Functions *****/
+    function switchMainTab(tabName) {
+      document.getElementById("tabContentConnection").style.display = "none";
+      document.getElementById("tabContentChat").style.display = "none";
+      document.getElementById("tabContentCallStream").style.display = "none";
+      document.getElementById("mainTabConnection").classList.remove("active", "glow-red", "glow-green");
+      document.getElementById("mainTabChat").classList.remove("active", "glow-green");
+      document.getElementById("mainTabCallStream").classList.remove("active", "glow-green");
+      
+      if(tabName === "connection") {
+        document.getElementById("tabContentConnection").style.display = "block";
+        document.getElementById("mainTabConnection").classList.add("active");
+      } else if(tabName === "chat") {
+        document.getElementById("tabContentChat").style.display = "block";
+        document.getElementById("mainTabChat").classList.add("active");
+      } else if(tabName === "callstream") {
+        document.getElementById("tabContentCallStream").style.display = "block";
+        document.getElementById("mainTabCallStream").classList.add("active");
       }
-      break;
-    case "candidate":
-      if (dcPC && msg.candidate) {
-        dcPC.addIceCandidate(msg.candidate).catch(()=>{});
+      
+      currentMainTab = tabName;
+      if(tabName === "callstream") {
+        document.getElementById("joinStreamBtn").style.display = "none";
       }
-      break;
-
-    // Stream / Call relays via DataChannel in this build. Keep PeerJS clean & minimal.
-    default:
-      log("Unknown signaling msg", msg);
-  }
-}
-
-/* =========================
-   4) DATA CHANNEL PC + FLOW
-   ========================= */
-function ensureDataPC(makeOffer) {
-  if (dcPC) return;
-
-  dcPC = new RTCPeerConnection(ICE_CONFIG);
-  dcPC.onicecandidate = (e) => {
-    if (e.candidate) sendSignal({ type: "candidate", candidate: e.candidate });
-  };
-  dcPC.onconnectionstatechange = () => {
-    log("DC PC state:", dcPC.connectionState);
-    if (dcPC.connectionState === "connected") {
-      setStatus("Connected", "green");
-      switchMainTab("chat");
-      // Drop dependency on PeerJS as soon as we're connected
-      safeDestroyPeerJS();
-    } else if (dcPC.connectionState === "disconnected" || dcPC.connectionState === "failed") {
-      setStatus("Disconnected", "red");
-    } else if (dcPC.connectionState === "connecting") {
-      setStatus("Connecting", "blue");
     }
-  };
 
-  if (makeOffer) {
-    // Create DC early to start ICE gathering ASAP
-    dataChannel = dcPC.createDataChannel("chat");
-    setupDataChannel(dataChannel);
-    dcPC.createOffer().then(async (offer) => {
-      await dcPC.setLocalDescription(offer);
-      sendSignal({ type: "offer", sdp: dcPC.localDescription });
-    });
-  } else {
-    dcPC.ondatachannel = (evt) => {
-      dataChannel = evt.channel;
-      setupDataChannel(dataChannel);
-    };
-  }
-}
-
-function setupDataChannel(dc) {
-  // Flow control
-  dc.bufferedAmountLowThreshold = DC_BUFFER_LOW;
-
-  dc.onopen = () => {
-    logChat("Data channel open.", "system");
-    setStatus("Connected", "green");
-  };
-  dc.onclose = () => setStatus("Disconnected", "red");
-
-  dc.onmessage = (evt) => {
-    // Binary vs JSON messages
-    if (typeof evt.data === "string") {
-      try {
-        const msg = JSON.parse(evt.data);
-        handleDCMessage(msg);
-      } catch {
-        // Ignore stray strings
+    function switchCallStreamSubTab(tabName) {
+      document.getElementById("callContainer").style.display = "none";
+      document.getElementById("streamContainer").style.display = "none";
+      document.getElementById("subTabCall").classList.remove("active", "glow-green");
+      document.getElementById("subTabStream").classList.remove("active", "glow-green");
+      
+      if(tabName === "call") {
+        document.getElementById("callContainer").style.display = "block";
+        document.getElementById("subTabCall").classList.add("active");
+      } else if(tabName === "stream") {
+        document.getElementById("streamContainer").style.display = "block";
+        document.getElementById("subTabStream").classList.add("active");
       }
-    } else {
-      handleIncomingFileChunk(evt.data);
+      
+      currentSubTab = tabName;
     }
-  };
-}
 
-function dcSendJSON(obj) {
-  if (!dataChannel || dataChannel.readyState !== "open") return;
-  const s = JSON.stringify(obj);
-  dataChannel.send(s);
-}
-
-function dcSendBinary(buffer) {
-  if (!dataChannel || dataChannel.readyState !== "open") return Promise.resolve();
-  return new Promise((resolve) => {
-    const sendChunk = () => {
-      if (dataChannel.bufferedAmount > DC_BUFFER_MAX) {
-        const onLow = () => {
-          dataChannel.removeEventListener("bufferedamountlow", onLow);
-          resolve();
-        };
-        dataChannel.addEventListener("bufferedamountlow", onLow, { once: true });
+    /***** Utility Functions *****/
+    function updateConnectionStatus(status) {
+      const elem = document.getElementById("connectionStatus");
+      const indicator = elem.querySelector('.status-indicator');
+      elem.innerHTML = '';
+      
+      if (status.toLowerCase() === "connected") {
+        indicator.className = 'status-indicator status-connected';
+        elem.appendChild(indicator);
+        elem.appendChild(document.createTextNode("Connected"));
+        document.getElementById("mainTabConnection").classList.remove("glow-red");
+      } else if (status.toLowerCase() === "connecting") {
+        indicator.className = 'status-indicator status-connecting';
+        elem.appendChild(indicator);
+        elem.appendChild(document.createTextNode("Connecting"));
+      } else if (status.toLowerCase() === "disconnected") {
+        indicator.className = 'status-indicator status-disconnected';
+        elem.appendChild(indicator);
+        elem.appendChild(document.createTextNode("Disconnected"));
+        document.getElementById("mainTabConnection").classList.add("glow-red");
       } else {
-        dataChannel.send(buffer);
-        resolve();
+        indicator.className = 'status-indicator status-disconnected';
+        elem.appendChild(indicator);
+        elem.appendChild(document.createTextNode(status));
+      }
+      
+      elem.style.fontWeight = "bold";
+    }
+    
+    function logChat(message, sender) {
+      const chatLog = document.getElementById("chatLog");
+      const bubble = document.createElement("div");
+      bubble.classList.add("chat-bubble");
+      
+      if(sender === "me") {
+        bubble.classList.add("me");
+      } else if(sender === "peer") {
+        bubble.classList.add("peer");
+      } else {
+        bubble.style.backgroundColor = "#555";
+        bubble.style.alignSelf = "center";
+      }
+      
+      bubble.innerText = message;
+      chatLog.appendChild(bubble);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+    
+    function logFileBubble(linkElement, sender) {
+      const chatLog = document.getElementById("chatLog");
+      const bubble = document.createElement("div");
+      bubble.classList.add("chat-bubble");
+      
+      if(sender === "me") {
+        bubble.classList.add("me");
+      } else {
+        bubble.classList.add("peer");
+      }
+      
+      bubble.appendChild(linkElement);
+      chatLog.appendChild(bubble);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+    
+    function clearTabIndicators() {
+      document.getElementById("mainTabChat").classList.remove("glow-green");
+      document.getElementById("mainTabCallStream").classList.remove("glow-green");
+      document.getElementById("subTabStream").classList.remove("glow-green");
+    }
+
+    /***** Setup for Data Connection *****/
+    function setupDataConnection() {
+      dataPeer = new RTCPeerConnection({ iceServers });
+      
+      // Buffer ICE candidates until remote description is set
+      dataPeer.onicecandidate = event => {
+        if (event.candidate) {
+          if (signalingConn && signalingConn.open) {
+            signalingConn.send(JSON.stringify({ 
+              type: "data-candidate", 
+              candidate: event.candidate 
+            }));
+          }
+        }
+      };
+      
+      if (isOfferer) {
+        dataChannel = dataPeer.createDataChannel("chat");
+        setupDataChannel();
+      } else {
+        dataPeer.ondatachannel = event => {
+          dataChannel = event.channel;
+          setupDataChannel();
+        };
+      }
+    }
+    
+    function setupDataChannel() {
+      dataChannel.onopen = () => {
+        logChat("Data channel open.", "system");
+        updateConnectionStatus("Connected");
+        switchMainTab("chat");
+      };
+      
+      dataChannel.onclose = () => { 
+        updateConnectionStatus("Disconnected"); 
+        logChat("Data channel closed.", "system");
+      };
+      
+      dataChannel.onerror = (error) => {
+        console.error("Data channel error:", error);
+        logChat("Data channel error occurred.", "system");
+      };
+      
+      dataChannel.onmessage = event => {
+        try {
+          const msg = JSON.parse(event.data);
+          handleDataChannelMessage(msg);
+        } catch (e) {
+          handleFileChunk(event.data);
+        }
+      };
+    }
+
+    /***** Setup for Media Connection *****/
+    function setupMediaConnection() {
+      mediaPeer = new RTCPeerConnection({ iceServers });
+      
+      mediaPeer.onicecandidate = event => {
+        if (event.candidate && dataChannel && dataChannel.readyState === "open") {
+          dataChannel.send(JSON.stringify({ 
+            type: "media-candidate", 
+            candidate: event.candidate 
+          }));
+        }
+      };
+      
+      mediaPeer.ontrack = event => {
+        if (event.streams && event.streams[0]) {
+          if (event.track.kind === "video") {
+            document.getElementById("remoteVideo").srcObject = event.streams[0];
+            document.getElementById("remoteStreamedVideo").srcObject = event.streams[0];
+            document.getElementById("remoteStreamedVideo").style.display = "block";
+            document.getElementById("enterFullscreenBtn").style.display = "inline";
+          }
+        }
+      };
+      
+      mediaPeer.onconnectionstatechange = () => {
+        console.log("Media connection state:", mediaPeer.connectionState);
+        if (mediaPeer.connectionState === "disconnected" || 
+            mediaPeer.connectionState === "failed") {
+          if (isInCall) {
+            endVideoCall();
+          }
+          if (isStreamSender) {
+            endVideoStream();
+          }
+        }
+      };
+    }
+
+    /***** PeerJS Signaling *****/
+    function sendSignalingMessage(msg) {
+      if (signalingConn && signalingConn.open) {
+        signalingConn.send(JSON.stringify(msg));
+      }
+    }
+    
+    function handleSignalingMessage(msg) {
+      switch (msg.type) {
+        case "data-offer":
+          isOfferer = false;
+          setupDataConnection();
+          setupMediaConnection();
+          
+          dataPeer.setRemoteDescription(new RTCSessionDescription(msg.sdp))
+            .then(async () => {
+              dataRemoteDescriptionSet = true;
+              
+              // Process buffered ICE candidates
+              while (dataIceBuffer.length > 0) {
+                const candidate = dataIceBuffer.shift();
+                await dataPeer.addIceCandidate(new RTCIceCandidate(candidate));
+              }
+              
+              const answer = await dataPeer.createAnswer();
+              await dataPeer.setLocalDescription(answer);
+              sendSignalingMessage({ type: "data-answer", sdp: dataPeer.localDescription });
+            })
+            .catch(error => {
+              console.error("Error setting remote description:", error);
+            });
+          break;
+          
+        case "data-answer":
+          dataPeer.setRemoteDescription(new RTCSessionDescription(msg.sdp))
+            .then(() => {
+              dataRemoteDescriptionSet = true;
+              
+              // Process buffered ICE candidates
+              while (dataIceBuffer.length > 0) {
+                const candidate = dataIceBuffer.shift();
+                dataPeer.addIceCandidate(new RTCIceCandidate(candidate));
+              }
+            })
+            .catch(error => {
+              console.error("Error setting remote description:", error);
+            });
+          break;
+          
+        case "data-candidate":
+          const candidate = new RTCIceCandidate(msg.candidate);
+          if (dataRemoteDescriptionSet) {
+            dataPeer.addIceCandidate(candidate)
+              .catch(error => {
+                console.error("Error adding ICE candidate:", error);
+              });
+          } else {
+            dataIceBuffer.push(candidate);
+          }
+          break;
+          
+        default:
+          console.log("Unknown signaling message:", msg.type);
+      }
+    }
+
+    /***** Automatic Signaling (PeerJS) *****/
+    function initializePeerConnection() {
+      peer = new Peer({
+        debug: 3,
+        config: { iceServers }
+      });
+      
+      peer.on('open', id => {
+        document.getElementById("roomIdInput").value = id;
+        document.getElementById("peerStatus").innerText = "Room created with ID: " + id;
+        isOfferer = true;
+        
+        const qrContainer = document.getElementById("qrCodeContainer");
+        qrContainer.innerHTML = "";
+        new QRCode(qrContainer, {
+          text: id,
+          width: 128,
+          height: 128,
+          colorDark: "#121212",
+          colorLight: "#fff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      });
+      
+      peer.on('connection', conn => {
+        signalingConn = conn;
+        
+        signalingConn.on('data', data => { 
+          handleSignalingMessage(JSON.parse(data)); 
+        });
+        
+        signalingConn.on('open', () => {
+          document.getElementById("peerStatus").innerText += " – Signaling connection established.";
+          updateConnectionStatus("Connecting");
+          
+          setupDataConnection();
+          setupMediaConnection();
+          
+          dataPeer.createOffer()
+            .then(offer => dataPeer.setLocalDescription(offer))
+            .then(() => {
+              sendSignalingMessage({ type: "data-offer", sdp: dataPeer.localDescription });
+            })
+            .catch(error => {
+              console.error("Error creating data offer:", error);
+            });
+        });
+        
+        signalingConn.on('close', () => {
+          logChat("Signaling connection closed.", "system");
+          updateConnectionStatus("Disconnected");
+        });
+        
+        signalingConn.on('error', (error) => {
+          console.error("Signaling connection error:", error);
+          logChat("Signaling error occurred.", "system");
+        });
+      });
+      
+      peer.on('error', error => {
+        console.error('PeerJS error:', error);
+        updateConnectionStatus("Failed connecting");
+        logChat("Connection error: " + error.type, "system");
+      });
+      
+      peer.on('disconnected', () => {
+        logChat("Peer disconnected.", "system");
+        updateConnectionStatus("Disconnected");
+      });
+      
+      peer.on('close', () => {
+        logChat("Peer connection closed.", "system");
+        updateConnectionStatus("Disconnected");
+      });
+    }
+
+    document.getElementById("createRoomBtn").onclick = () => {
+      if (peer) {
+        peer.destroy();
+      }
+      initializePeerConnection();
+    };
+    
+    document.getElementById("copyRoomIdBtn").onclick = () => {
+      const roomId = document.getElementById("roomIdInput").value;
+      navigator.clipboard.writeText(roomId)
+        .then(() => {
+          logChat("Room ID copied to clipboard.", "system");
+        })
+        .catch(error => {
+          console.error("Failed to copy room ID:", error);
+        });
+    };
+    
+    document.getElementById("joinRoomBtn").onclick = () => {
+      const roomId = document.getElementById("roomIdInput").value;
+      if (!roomId) {
+        alert("Please enter a Room ID to join.");
+        return;
+      }
+      
+      if (peer) {
+        peer.destroy();
+      }
+      
+      peer = new Peer({
+        debug: 3,
+        config: { iceServers }
+      });
+      
+      peer.on('open', id => {
+        document.getElementById("peerStatus").innerText = "Your PeerJS ID: " + id;
+        signalingConn = peer.connect(roomId);
+        
+        signalingConn.on('open', () => {
+          document.getElementById("peerStatus").innerText += " – Connected to room " + roomId;
+          updateConnectionStatus("Connecting");
+        });
+        
+        signalingConn.on('data', data => { 
+          handleSignalingMessage(JSON.parse(data)); 
+        });
+        
+        signalingConn.on('close', () => {
+          logChat("Signaling connection closed.", "system");
+          updateConnectionStatus("Disconnected");
+        });
+        
+        signalingConn.on('error', (error) => {
+          console.error("Signaling connection error:", error);
+          logChat("Signaling error occurred.", "system");
+        });
+      });
+      
+      peer.on('error', error => {
+        console.error('PeerJS error:', error);
+        updateConnectionStatus("Failed connecting");
+        logChat("Connection error: " + error.type, "system");
+      });
+      
+      updateConnectionStatus("Connecting");
+    };
+
+    /***** QR Code Scanning using Html5Qrcode *****/
+    function startQrScanner() {
+      const qrReaderElem = document.getElementById("qr-reader");
+      qrReaderElem.style.display = "block";
+      
+      html5QrCodeScannerInstance = new Html5Qrcode("qr-reader");
+      const config = { fps: 10, qrbox: 250 };
+      
+      html5QrCodeScannerInstance.start(
+        { facingMode: "environment" },
+        config,
+        (decodedText, decodedResult) => {
+          console.log("QR Code detected: ", decodedText);
+          document.getElementById("roomIdInput").value = decodedText;
+          
+          html5QrCodeScannerInstance.stop().then(() => {
+            qrReaderElem.style.display = "none";
+            document.getElementById("closeScannerBtn").style.display = "none";
+            document.getElementById("scanQRCodeBtn").style.display = "inline";
+            document.getElementById("joinRoomBtn").click();
+          }).catch(err => {
+            console.error("Failed to stop scanner: ", err);
+          });
+        },
+        errorMessage => {
+          console.log("QR scan error: ", errorMessage);
+        }
+      ).catch(err => {
+        console.error("Unable to start scanning.", err);
+      });
+    }
+    
+    document.getElementById("scanQRCodeBtn").onclick = function() {
+      startQrScanner();
+      this.style.display = "none";
+      document.getElementById("closeScannerBtn").style.display = "inline";
+    };
+    
+    document.getElementById("closeScannerBtn").onclick = function() {
+      if (html5QrCodeScannerInstance) {
+        html5QrCodeScannerInstance.stop().then(() => {
+          document.getElementById("qr-reader").style.display = "none";
+          html5QrCodeScannerInstance = null;
+          this.style.display = "none";
+          document.getElementById("scanQRCodeBtn").style.display = "inline";
+        }).catch(err => {
+          console.error("Error stopping QR scanner: ", err);
+        });
       }
     };
-    sendChunk();
-  });
-}
 
-/* =========================
-   5) UI EVENTS – TABS
-   ========================= */
-document.getElementById("mainTabConnection").onclick = () => switchMainTab("connection");
-document.getElementById("mainTabChat").onclick = () => switchMainTab("chat");
-document.getElementById("mainTabCallStream").onclick = () => switchMainTab("callstream");
-document.getElementById("subTabCall").onclick = () => switchCallStreamSubTab("call");
-document.getElementById("subTabStream").onclick = () => switchCallStreamSubTab("stream");
-
-/* =========================
-   6) PEERJS – CREATE/JOIN
-   ========================= */
-el.createRoomBtn.onclick = () => {
-  if (peer) safeDestroyPeerJS();
-  peer = new Peer({ config: ICE_CONFIG });
-  peer.on("open", (id) => {
-    el.roomIdInput.value = id;
-    el.peerStatus.innerText = "Room created with ID: " + id;
-    isOfferer = true;
-  });
-  peer.on("connection", (conn) => {
-    signalingConn = conn;
-    signalingConn.on("data", onSignalMessage);
-    signalingConn.on("open", () => {
-      el.peerStatus.innerText += " – Signaling connection established.";
-      ensureDataPC(true);
-    });
-  });
-  peer.on("error", (err) => {
-    el.peerStatus.innerText = "Error: " + err;
-    setStatus("Failed Connecting", "orange");
-  });
-  setStatus("Connecting", "blue");
-};
-
-el.copyRoomIdBtn.onclick = () => {
-  const id = el.roomIdInput.value;
-  if (id) navigator.clipboard.writeText(id);
-};
-
-el.joinRoomBtn.onclick = () => {
-  const roomId = el.roomIdInput.value.trim();
-  if (!roomId) return alert("Please enter a Room ID to join.");
-
-  if (peer) safeDestroyPeerJS();
-  peer = new Peer({ config: ICE_CONFIG });
-  peer.on("open", (id) => {
-    el.peerStatus.innerText = "Your PeerJS ID: " + id;
-    signalingConn = peer.connect(roomId);
-    signalingConn.on("open", () => {
-      el.peerStatus.innerText += " – Connected to room " + roomId;
-      // callee path: wait for offer
-      ensureDataPC(false);
-    });
-    signalingConn.on("data", onSignalMessage);
-  });
-  peer.on("error", (err) => {
-    el.peerStatus.innerText = "Error: " + err;
-    setStatus("Failed Connecting", "orange");
-  });
-  setStatus("Connecting", "blue");
-};
-
-/* =========================
-   7) DATA CHANNEL – CHAT + FILE
-   ========================= */
-el.sendChatBtn.onclick = () => {
-  const text = el.chatInput.value.trim();
-  if (!text) return;
-  if (!dataChannel || dataChannel.readyState !== "open") return alert("Data channel is not open.");
-  dcSendJSON({ type: "chat", message: text });
-  logChat(text, "me");
-  el.chatInput.value = "";
-};
-
-el.sendFileBtn.onclick = async () => {
-  if (!dataChannel || dataChannel.readyState !== "open") return alert("Data channel is not open.");
-  const file = el.fileInput.files[0];
-  if (!file) return;
-
-  // Progress bubble
-  el.endFileTransferBtn.style.display = "inline";
-  currentSendProgressElem = document.createElement("div");
-  currentSendProgressElem.classList.add("chat-bubble", "me");
-  currentSendProgressElem.innerText = `Sending file: ${file.name} (0%)`;
-  el.chatLog.appendChild(currentSendProgressElem);
-
-  // Announce metadata
-  dcSendJSON({ type: "file-meta", name: file.name, size: file.size, fileType: file.type });
-
-  const reader = new FileReader();
-  let offset = 0;
-
-  const readSlice = (o) => {
-    const slice = file.slice(o, o + DC_CHUNK_SIZE);
-    reader.readAsArrayBuffer(slice);
-  };
-
-  reader.onload = async (e) => {
-    const buffer = e.target.result;
-    await dcSendBinary(buffer);
-    offset += buffer.byteLength;
-
-    const progress = Math.floor((offset / file.size) * 100);
-    if (currentSendProgressElem) currentSendProgressElem.innerText = `Sending file: ${file.name} (${progress}%)`;
-
-    if (offset < file.size) {
-      readSlice(offset);
-    } else {
-      if (currentSendProgressElem) {
-        currentSendProgressElem.innerText = file.name;
-        currentSendProgressElem = null;
+    /***** Data Channel Message Handling *****/
+    function handleDataChannelMessage(msg) {
+      switch (msg.type) {
+        case "chat":
+          logChat(msg.message, "peer");
+          if(currentMainTab !== "chat") {
+            document.getElementById("mainTabChat").classList.add("glow-green");
+          }
+          break;
+          
+        case "file-meta":
+          if (fileReceiver) {
+            logChat("Already receiving a file. Please wait.", "system");
+            return;
+          }
+          
+          fileReceiver = {
+            name: msg.name,
+            size: msg.size,
+            type: msg.fileType,
+            received: [],
+            receivedSize: 0
+          };
+          
+          const progressElem = document.createElement("div");
+          progressElem.innerHTML = `
+            <div>Receiving file: ${msg.name}</div>
+            <div class="progress-container">
+              <div class="progress-bar" style="width: 0%"></div>
+            </div>
+          `;
+          progressElem.classList.add("chat-bubble", "peer");
+          document.getElementById("chatLog").appendChild(progressElem);
+          
+          if(currentMainTab !== "chat") {
+            document.getElementById("mainTabChat").classList.add("glow-green");
+          }
+          break;
+          
+        case "file-cancel":
+          if (fileReceiver) {
+            logChat("File transfer canceled by sender.", "system");
+            fileReceiver = null;
+            
+            // Remove progress indicator
+            const chatLog = document.getElementById("chatLog");
+            const lastChild = chatLog.lastChild;
+            if (lastChild && lastChild.classList.contains("chat-bubble")) {
+              chatLog.removeChild(lastChild);
+            }
+          }
+          break;
+          
+        case "media-offer":
+          if (!mediaPeer) {
+            setupMediaConnection();
+          }
+          
+          mediaPeer.setRemoteDescription(new RTCSessionDescription(msg.sdp))
+            .then(async () => {
+              mediaRemoteDescriptionSet = true;
+              
+              // Process buffered ICE candidates
+              while (mediaIceBuffer.length > 0) {
+                const candidate = mediaIceBuffer.shift();
+                await mediaPeer.addIceCandidate(new RTCIceCandidate(candidate));
+              }
+              
+              const answer = await mediaPeer.createAnswer();
+              await mediaPeer.setLocalDescription(answer);
+              
+              if (dataChannel && dataChannel.readyState === "open") {
+                dataChannel.send(JSON.stringify({ 
+                  type: "media-answer", 
+                  sdp: mediaPeer.localDescription 
+                }));
+              }
+            })
+            .catch(error => {
+              console.error("Error setting remote media description:", error);
+            });
+          break;
+          
+        case "media-answer":
+          mediaPeer.setRemoteDescription(new RTCSessionDescription(msg.sdp))
+            .then(() => {
+              mediaRemoteDescriptionSet = true;
+              
+              // Process buffered ICE candidates
+              while (mediaIceBuffer.length > 0) {
+                const candidate = mediaIceBuffer.shift();
+                mediaPeer.addIceCandidate(new RTCIceCandidate(candidate));
+              }
+            })
+            .catch(error => {
+              console.error("Error setting remote media description:", error);
+            });
+          break;
+          
+        case "media-candidate":
+          const candidate = new RTCIceCandidate(msg.candidate);
+          if (mediaRemoteDescriptionSet) {
+            mediaPeer.addIceCandidate(candidate)
+              .catch(error => {
+                console.error("Error adding media ICE candidate:", error);
+              });
+          } else {
+            mediaIceBuffer.push(candidate);
+          }
+          break;
+          
+        case "call-request":
+          if (confirm("Incoming video call from peer. Accept call?")) {
+            dataChannel.send(JSON.stringify({ type: "call-response", accepted: true }));
+            switchMainTab("callstream");
+            switchCallStreamSubTab("call");
+            prepareVideoCall();
+          } else {
+            dataChannel.send(JSON.stringify({ type: "call-response", accepted: false }));
+          }
+          break;
+          
+        case "call-response":
+          if (msg.accepted) {
+            startVideoCall();
+          } else {
+            alert("Your video call request was rejected.");
+            document.getElementById("startVideoCallBtn").disabled = false;
+          }
+          break;
+          
+        case "stream-offer":
+          handleStreamOffer(msg.sdp);
+          if(currentMainTab !== "callstream" || currentSubTab !== "stream") {
+            document.getElementById("mainTabCallStream").classList.add("glow-green");
+            document.getElementById("subTabStream").classList.add("glow-green");
+            document.getElementById("joinStreamBtn").style.display = "inline";
+          }
+          break;
+          
+        case "end-stream":
+          document.getElementById("remoteStreamedVideo").srcObject = null;
+          document.getElementById("remoteStreamedVideo").style.display = "none";
+          document.getElementById("enterFullscreenBtn").style.display = "none";
+          logChat("Video stream ended by peer.", "peer");
+          break;
+          
+        case "end-call":
+          endVideoCall();
+          logChat("Video call ended by peer.", "peer");
+          break;
+          
+        default:
+          console.log("Unknown message type:", msg.type);
       }
-      el.endFileTransferBtn.style.display = "none";
     }
-  };
 
-  readSlice(0);
-};
-
-el.endFileTransferBtn.onclick = () => {
-  fileReceiver = null;
-  logChat("File transfer canceled.", "me");
-  el.endFileTransferBtn.style.display = "none";
-  if (currentSendProgressElem) { currentSendProgressElem.innerText = "File transfer canceled."; currentSendProgressElem = null; }
-  if (currentReceiveProgressElem) { currentReceiveProgressElem.innerText = "File transfer canceled."; currentReceiveProgressElem = null; }
-};
-
-function handleIncomingFileChunk(chunk) {
-  if (!fileReceiver) return;
-  fileReceiver.received.push(chunk);
-  fileReceiver.receivedSize += chunk.byteLength;
-
-  const progress = Math.floor((fileReceiver.receivedSize / fileReceiver.size) * 100);
-  if (currentReceiveProgressElem) {
-    currentReceiveProgressElem.innerText = `Receiving file: ${fileReceiver.name} (${progress}%)`;
-  }
-
-  if (fileReceiver.receivedSize >= fileReceiver.size) {
-    const blob = new Blob(fileReceiver.received, { type: fileReceiver.type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileReceiver.name;
-    a.innerText = fileReceiver.name;
-    a.classList.add("file-link", "peer");
-    logFileBubble(a, "peer");
-    if (currentReceiveProgressElem) currentReceiveProgressElem.remove();
-    fileReceiver = null;
-    currentReceiveProgressElem = null;
-    // Revoke later to allow download
-    setTimeout(() => URL.revokeObjectURL(url), 60_000);
-  }
-}
-
-function handleDCMessage(msg) {
-  switch (msg.type) {
-    case "chat":
-      logChat(msg.message, "peer");
-      if (currentMainTab !== "chat") el.mainTabChat.classList.add("glow-green");
-      break;
-
-    case "file-meta":
-      fileReceiver = {
-        name: msg.name,
-        size: msg.size,
-        type: msg.fileType,
-        received: [],
-        receivedSize: 0,
+    /***** Combined Chat & File Transfer *****/
+    document.getElementById("sendChatBtn").onclick = () => {
+      const input = document.getElementById("chatInput");
+      const text = input.value.trim();
+      
+      if (!text) return;
+      
+      if (dataChannel && dataChannel.readyState === "open") {
+        dataChannel.send(JSON.stringify({ type: "chat", message: text }));
+        logChat(text, "me");
+        input.value = "";
+      } else {
+        logChat("Data channel is not ready. Please check connection.", "system");
+      }
+    };
+    
+    document.getElementById("chatInput").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        document.getElementById("sendChatBtn").click();
+      }
+    });
+    
+    document.getElementById("sendFileBtn").onclick = () => {
+      const fileInput = document.getElementById("fileInput");
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        alert("Please select a file first.");
+        return;
+      }
+      
+      if (!dataChannel || dataChannel.readyState !== "open") {
+        alert("Data channel is not ready. Please check connection.");
+        return;
+      }
+      
+      if (fileSender) {
+        alert("A file transfer is already in progress.");
+        return;
+      }
+      
+      // Show progress UI
+      document.getElementById("fileProgressContainer").style.display = "block";
+      document.getElementById("fileProgressBar").style.width = "0%";
+      document.getElementById("cancelFileTransferBtn").style.display = "inline";
+      document.getElementById("sendFileBtn").disabled = true;
+      
+      // Send file metadata
+      dataChannel.send(JSON.stringify({ 
+        type: "file-meta", 
+        name: file.name, 
+        size: file.size, 
+        fileType: file.type 
+      }));
+      
+      let offset = 0;
+      const chunkSize = 16384; // 16KB chunks
+      const reader = new FileReader();
+      
+      fileSender = {
+        file: file,
+        offset: offset,
+        reader: reader,
+        cancelled: false
       };
-      currentReceiveProgressElem = document.createElement("div");
-      currentReceiveProgressElem.classList.add("chat-bubble", "peer");
-      currentReceiveProgressElem.innerText = `Receiving file: ${msg.name} (0%)`;
-      el.chatLog.appendChild(currentReceiveProgressElem);
-      if (currentMainTab !== "chat") el.mainTabChat.classList.add("glow-green");
-      break;
-
-    /* Call control */
-    case "call-request":
-      if (confirm("Incoming video call from peer. Accept call?")) {
-        dcSendJSON({ type: "call-response", accepted: true });
-        switchMainTab("callstream"); switchCallStreamSubTab("call");
-        prepareVideoCallForCallee();
-      } else dcSendJSON({ type: "call-response", accepted: false });
-      break;
-    case "call-response":
-      if (msg.accepted) startVideoCallCaller();
-      else alert("Your video call request was rejected.");
-      break;
-
-    /* Video call SDP/CAND */
-    case "video-offer": handleVideoOffer(msg.sdp); break;
-    case "video-answer": handleVideoAnswer(msg.sdp); break;
-    case "video-candidate": videoCallPC?.addIceCandidate(msg.candidate).catch(()=>{}); break;
-
-    /* Voice call */
-    case "voice-call-request":
-      if (confirm("Incoming voice call from peer. Accept call?")) {
-        dcSendJSON({ type: "voice-call-response", accepted: true });
-        switchMainTab("callstream"); switchCallStreamSubTab("call");
-        prepareVoiceCallForCallee();
-      } else dcSendJSON({ type: "voice-call-response", accepted: false });
-      break;
-    case "voice-call-response":
-      if (msg.accepted) startVoiceCallCaller();
-      else alert("Your voice call request was rejected.");
-      break;
-    case "voice-offer": handleVoiceOffer(msg.sdp); break;
-    case "voice-answer": handleVoiceAnswer(msg.sdp); break;
-    case "voice-candidate": voiceCallPC?.addIceCandidate(msg.candidate).catch(()=>{}); break;
-
-    /* Video stream */
-    case "stream-offer":
-      handleStreamOffer(msg.sdp);
-      if (currentMainTab !== "callstream" || currentSubTab !== "stream") {
-        el.mainTabCallStream.classList.add("glow-green");
-        el.subTabStream.classList.add("glow-green");
-        el.joinStreamBtn.style.display = "inline";
+      
+      reader.onload = e => {
+        if (fileSender.cancelled) {
+          return;
+        }
+        
+        try {
+          dataChannel.send(e.target.result);
+          offset += e.target.result.byteLength;
+          
+          // Update progress
+          const progress = Math.floor((offset / file.size) * 100);
+          document.getElementById("fileProgressBar").style.width = progress + "%";
+          
+          if (offset < file.size) {
+            readNextChunk();
+          } else {
+            // Transfer complete
+            document.getElementById("fileProgressContainer").style.display = "none";
+            document.getElementById("cancelFileTransferBtn").style.display = "none";
+            document.getElementById("sendFileBtn").disabled = false;
+            fileInput.value = "";
+            fileSender = null;
+            logChat(`File "${file.name}" sent successfully.`, "me");
+          }
+        } catch (error) {
+          console.error("Error sending file chunk:", error);
+          logChat("File transfer failed.", "system");
+          cancelFileTransfer();
+        }
+      };
+      
+      reader.onerror = () => {
+        console.error("File reading error");
+        logChat("File transfer failed.", "system");
+        cancelFileTransfer();
+      };
+      
+      const readNextChunk = () => {
+        if (fileSender.cancelled) {
+          return;
+        }
+        
+        const slice = file.slice(offset, offset + chunkSize);
+        reader.readAsArrayBuffer(slice);
+      };
+      
+      readNextChunk();
+    };
+    
+    document.getElementById("cancelFileTransferBtn").onclick = () => {
+      cancelFileTransfer();
+    };
+    
+    function cancelFileTransfer() {
+      if (fileSender) {
+        fileSender.cancelled = true;
+        
+        if (dataChannel && dataChannel.readyState === "open") {
+          dataChannel.send(JSON.stringify({ type: "file-cancel" }));
+        }
+        
+        document.getElementById("fileProgressContainer").style.display = "none";
+        document.getElementById("cancelFileTransferBtn").style.display = "none";
+        document.getElementById("sendFileBtn").disabled = false;
+        fileSender = null;
+        logChat("File transfer cancelled.", "system");
       }
-      break;
-    case "stream-answer": handleStreamAnswer(msg.sdp); break;
-    case "stream-candidate": videoStreamPC?.addIceCandidate(msg.candidate).catch(()=>{}); break;
-    case "end-stream":
-      el.remoteStreamedVideo.srcObject = null;
-      logChat("Video stream ended by peer.", "peer");
-      break;
-
-    /* Audio stream */
-    case "audio-stream-offer":
-      handleAudioStreamOffer(msg.sdp);
-      if (currentMainTab !== "callstream" || currentSubTab !== "stream") {
-        el.mainTabCallStream.classList.add("glow-green");
-        el.subTabStream.classList.add("glow-green");
-        el.joinStreamBtn.style.display = "inline";
-      }
-      break;
-    case "audio-stream-answer": handleAudioStreamAnswer(msg.sdp); break;
-    case "audio-stream-candidate": audioStreamPC?.addIceCandidate(msg.candidate).catch(()=>{}); break;
-    case "end-audio-stream":
-      el.hiddenRemoteAudioStream.srcObject = null;
-      el.remoteAudioAnimation.style.display = "none";
-      logChat("Audio stream ended by peer.", "peer");
-      break;
-
-    default:
-      log("Unknown DC message", msg);
-  }
-}
-
-/* =========================
-   8) VIDEO CALL
-   ========================= */
-el.startVideoCallBtn.onclick = () => {
-  if (!dataChannel || dataChannel.readyState !== "open") return alert("Data channel is not open.");
-  dcSendJSON({ type: "call-request" });
-};
-
-el.endCallBtn.onclick = () => {
-  if (videoCallPC) { try { videoCallPC.close(); } catch {} videoCallPC = null; }
-  if (el.localVideo.srcObject) {
-    el.localVideo.srcObject.getTracks().forEach(t => t.stop());
-    el.localVideo.srcObject = null;
-  }
-  el.remoteVideo.srcObject = null;
-  logChat("Video call ended.", "me");
-};
-
-async function startVideoCallCaller() {
-  if (videoCallPC) { try { videoCallPC.close(); } catch {} videoCallPC = null; }
-  const local = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-  el.localVideo.srcObject = local;
-
-  videoCallPC = new RTCPeerConnection(ICE_CONFIG);
-  local.getTracks().forEach(t => videoCallPC.addTrack(t, local));
-  videoCallPC.onicecandidate = (e) => { if (e.candidate) dcSendJSON({ type: "video-candidate", candidate: e.candidate }); };
-  videoCallPC.ontrack = (e) => { el.remoteVideo.srcObject = e.streams[0]; };
-
-  const offer = await videoCallPC.createOffer();
-  await videoCallPC.setLocalDescription(offer);
-  dcSendJSON({ type: "video-offer", sdp: videoCallPC.localDescription });
-}
-
-async function prepareVideoCallForCallee() {
-  if (videoCallPC) { try { videoCallPC.close(); } catch {} videoCallPC = null; }
-  const local = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-  el.localVideo.srcObject = local;
-
-  videoCallPC = new RTCPeerConnection(ICE_CONFIG);
-  local.getTracks().forEach(t => videoCallPC.addTrack(t, local));
-  videoCallPC.onicecandidate = (e) => { if (e.candidate) dcSendJSON({ type: "video-candidate", candidate: e.candidate }); };
-  videoCallPC.ontrack = (e) => { el.remoteVideo.srcObject = e.streams[0]; };
-}
-
-async function handleVideoOffer(sdp) {
-  if (!videoCallPC) await prepareVideoCallForCallee();
-  await videoCallPC.setRemoteDescription(sdp);
-  const answer = await videoCallPC.createAnswer();
-  await videoCallPC.setLocalDescription(answer);
-  dcSendJSON({ type: "video-answer", sdp: videoCallPC.localDescription });
-}
-
-async function handleVideoAnswer(sdp) {
-  if (videoCallPC) await videoCallPC.setRemoteDescription(sdp);
-}
-
-/* =========================
-   9) VOICE CALL
-   ========================= */
-el.startVoiceCallBtn.onclick = () => {
-  if (!dataChannel || dataChannel.readyState !== "open") return alert("Data channel is not open.");
-  dcSendJSON({ type: "voice-call-request" });
-};
-
-el.endVoiceCallBtn.onclick = () => {
-  if (voiceCallPC) { try { voiceCallPC.close(); } catch {} voiceCallPC = null; }
-  el.hiddenRemoteVoice.srcObject = null;
-  el.voiceCallAnimation.style.display = "none";
-  logChat("Voice call ended.", "me");
-};
-
-async function startVoiceCallCaller() {
-  if (voiceCallPC) { try { voiceCallPC.close(); } catch {} voiceCallPC = null; }
-  const local = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-  voiceCallPC = new RTCPeerConnection(ICE_CONFIG);
-  local.getTracks().forEach(t => voiceCallPC.addTrack(t, local));
-  voiceCallPC.onicecandidate = (e) => { if (e.candidate) dcSendJSON({ type: "voice-candidate", candidate: e.candidate }); };
-  voiceCallPC.ontrack = (e) => {
-    el.hiddenRemoteVoice.srcObject = e.streams[0];
-    el.voiceCallAnimation.style.display = "block";
-  };
-
-  const offer = await voiceCallPC.createOffer();
-  await voiceCallPC.setLocalDescription(offer);
-  dcSendJSON({ type: "voice-offer", sdp: voiceCallPC.localDescription });
-}
-
-async function prepareVoiceCallForCallee() {
-  if (voiceCallPC) { try { voiceCallPC.close(); } catch {} voiceCallPC = null; }
-  const local = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-  voiceCallPC = new RTCPeerConnection(ICE_CONFIG);
-  local.getTracks().forEach(t => voiceCallPC.addTrack(t, local));
-  voiceCallPC.onicecandidate = (e) => { if (e.candidate) dcSendJSON({ type: "voice-candidate", candidate: e.candidate }); };
-  voiceCallPC.ontrack = (e) => {
-    el.hiddenRemoteVoice.srcObject = e.streams[0];
-    el.voiceCallAnimation.style.display = "block";
-  };
-}
-
-async function handleVoiceOffer(sdp) {
-  await prepareVoiceCallForCallee();
-  await voiceCallPC.setRemoteDescription(sdp);
-  const answer = await voiceCallPC.createAnswer();
-  await voiceCallPC.setLocalDescription(answer);
-  dcSendJSON({ type: "voice-answer", sdp: voiceCallPC.localDescription });
-}
-
-async function handleVoiceAnswer(sdp) {
-  if (voiceCallPC) await voiceCallPC.setRemoteDescription(sdp);
-}
-
-/* =========================
-   10) VIDEO STREAMING
-   ========================= */
-el.startVideoStreamBtn.onclick = async () => {
-  if (!dataChannel || dataChannel.readyState !== "open") return alert("Data channel is not open.");
-  const file = el.videoFileInput.files[0];
-  if (!file) return;
-
-  isStreamSender = true;
-  if (videoStreamPC) { try { videoStreamPC.close(); } catch {} videoStreamPC = null; }
-
-  if (el.localStreamedVideo.srcObject) {
-    el.localStreamedVideo.srcObject.getTracks().forEach(t => t.stop());
-  }
-  const url = URL.createObjectURL(file);
-  el.localStreamedVideo.src = url;
-  el.localStreamedVideo.muted = false;
-  await new Promise(res => { el.localStreamedVideo.onloadedmetadata = res; });
-  await el.localStreamedVideo.play();
-
-  const stream = el.localStreamedVideo.captureStream();
-  videoStreamPC = new RTCPeerConnection(ICE_CONFIG);
-  stream.getTracks().forEach(t => videoStreamPC.addTrack(t, stream));
-  videoStreamPC.onicecandidate = (e) => { if (e.candidate) dcSendJSON({ type: "stream-candidate", candidate: e.candidate }); };
-
-  const offer = await videoStreamPC.createOffer();
-  await videoStreamPC.setLocalDescription(offer);
-  dcSendJSON({ type: "stream-offer", sdp: videoStreamPC.localDescription });
-};
-
-el.endStreamBtn.onclick = () => {
-  if (isStreamSender) {
-    if (videoStreamPC) { try { videoStreamPC.close(); } catch {} videoStreamPC = null; }
-    if (el.localStreamedVideo.srcObject) {
-      el.localStreamedVideo.srcObject.getTracks().forEach(t => t.stop());
-      el.localStreamedVideo.srcObject = null;
     }
-    dcSendJSON({ type: "end-stream" });
-    el.remoteStreamedVideo.srcObject = null;
-    logChat("Video stream ended.", "me");
-    isStreamSender = false;
-  } else {
-    el.remoteStreamedVideo.srcObject = null;
-    logChat("Remote video stream cleared.", "me");
-  }
-};
+    
+    function handleFileChunk(chunk) {
+      if (!fileReceiver) return;
+      
+      fileReceiver.received.push(chunk);
+      fileReceiver.receivedSize += chunk.byteLength;
+      
+      // Update progress UI
+      const progress = Math.floor((fileReceiver.receivedSize / fileReceiver.size) * 100);
+      const progressBars = document.querySelectorAll(".progress-bar");
+      if (progressBars.length > 0) {
+        progressBars[progressBars.length - 1].style.width = progress + "%";
+      }
+      
+      if (fileReceiver.receivedSize >= fileReceiver.size) {
+        // File transfer complete
+        const blob = new Blob(fileReceiver.received, { type: fileReceiver.type });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileReceiver.name;
+        link.innerText = fileReceiver.name;
+        link.classList.add("file-link", "peer");
+        
+        // Replace progress indicator with download link
+        const chatLog = document.getElementById("chatLog");
+        const lastChild = chatLog.lastChild;
+        if (lastChild && lastChild.classList.contains("chat-bubble")) {
+          chatLog.removeChild(lastChild);
+        }
+        
+        logFileBubble(link, "peer");
+        fileReceiver = null;
+      }
+    }
 
-async function handleStreamOffer(sdp) {
-  if (videoStreamPC) { try { videoStreamPC.close(); } catch {} videoStreamPC = null; }
-  videoStreamPC = new RTCPeerConnection(ICE_CONFIG);
-  videoStreamPC.onicecandidate = (e) => { if (e.candidate) dcSendJSON({ type: "stream-candidate", candidate: e.candidate }); };
-  videoStreamPC.ontrack = (e) => { el.remoteStreamedVideo.srcObject = e.streams[0]; };
-  await videoStreamPC.setRemoteDescription(sdp);
-  const answer = await videoStreamPC.createAnswer();
-  await videoStreamPC.setLocalDescription(answer);
-  dcSendJSON({ type: "stream-answer", sdp: videoStreamPC.localDescription });
-}
+    /***** Video Call Functions *****/
+    document.getElementById("startVideoCallBtn").onclick = () => {
+      if (!dataChannel || dataChannel.readyState !== "open") {
+        alert("Data channel is not open.");
+        return;
+      }
+      
+      document.getElementById("startVideoCallBtn").disabled = true;
+      dataChannel.send(JSON.stringify({ type: "call-request" }));
+      
+      // Timeout if no response
+      setTimeout(() => {
+        if (!isInCall) {
+          document.getElementById("startVideoCallBtn").disabled = false;
+          alert("No response from peer. Call timed out.");
+        }
+      }, 30000);
+    };
+    
+    async function prepareVideoCall() {
+      if (isInCall) return;
+      
+      try {
+        const localStream = await navigator.mediaDevices.getUserMedia({ 
+          video: true, 
+          audio: true 
+        });
+        
+        document.getElementById("localVideo").srcObject = localStream;
+        document.getElementById("videoCallContainer").style.display = "block";
+        document.getElementById("endCallBtn").style.display = "inline";
+        
+        // Add tracks to media connection
+        localStream.getTracks().forEach(track => {
+          mediaPeer.addTrack(track, localStream);
+        });
+        
+        // Create and send offer
+        const offer = await mediaPeer.createOffer();
+        await mediaPeer.setLocalDescription(offer);
+        
+        if (dataChannel && dataChannel.readyState === "open") {
+          dataChannel.send(JSON.stringify({ 
+            type: "media-offer", 
+            sdp: mediaPeer.localDescription 
+          }));
+        }
+        
+        isInCall = true;
+      } catch (error) {
+        console.error("Error starting video call:", error);
+        logChat("Failed to access camera/microphone.", "system");
+        document.getElementById("startVideoCallBtn").disabled = false;
+      }
+    }
+    
+    async function startVideoCall() {
+      if (isInCall) return;
+      
+      try {
+        const localStream = await navigator.mediaDevices.getUserMedia({ 
+          video: true, 
+          audio: true 
+        });
+        
+        document.getElementById("localVideo").srcObject = localStream;
+        document.getElementById("videoCallContainer").style.display = "block";
+        document.getElementById("endCallBtn").style.display = "inline";
+        document.getElementById("startVideoCallBtn").disabled = false;
+        
+        // Add tracks to media connection
+        localStream.getTracks().forEach(track => {
+          mediaPeer.addTrack(track, localStream);
+        });
+        
+        isInCall = true;
+      } catch (error) {
+        console.error("Error starting video call:", error);
+        logChat("Failed to access camera/microphone.", "system");
+        document.getElementById("startVideoCallBtn").disabled = false;
+      }
+    }
+    
+    document.getElementById("endCallBtn").onclick = () => {
+      endVideoCall();
+      
+      if (dataChannel && dataChannel.readyState === "open") {
+        dataChannel.send(JSON.stringify({ type: "end-call" }));
+      }
+    };
+    
+    function endVideoCall() {
+      if (!isInCall) return;
+      
+      // Stop all tracks
+      if (document.getElementById("localVideo").srcObject) {
+        document.getElementById("localVideo").srcObject.getTracks().forEach(track => track.stop());
+        document.getElementById("localVideo").srcObject = null;
+      }
+      
+      document.getElementById("remoteVideo").srcObject = null;
+      document.getElementById("videoCallContainer").style.display = "none";
+      document.getElementById("endCallBtn").style.display = "none";
+      
+      // Remove all tracks from media connection
+      if (mediaPeer) {
+        mediaPeer.getSenders().forEach(sender => {
+          if (sender.track) {
+            sender.track.stop();
+          }
+        });
+      }
+      
+      isInCall = false;
+      logChat("Video call ended.", "me");
+    }
 
-async function handleStreamAnswer(sdp) {
-  if (videoStreamPC) await videoStreamPC.setRemoteDescription(sdp);
-}
+    /***** Video Streaming Functions *****/
+    document.getElementById("startVideoStreamBtn").onclick = async () => {
+      if (!dataChannel || dataChannel.readyState !== "open") {
+        alert("Data channel is not open.");
+        return;
+      }
+      
+      const fileInput = document.getElementById("videoFileInput");
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        alert("Please select a video file first.");
+        return;
+      }
+      
+      isStreamSender = true;
+      document.getElementById("startVideoStreamBtn").disabled = true;
+      document.getElementById("endStreamBtn").style.display = "inline";
+      
+      const localStreamedVideo = document.getElementById("localStreamedVideo");
+      localStreamedVideo.style.display = "block";
+      
+      if (localStreamedVideo.srcObject) {
+        localStreamedVideo.srcObject.getTracks().forEach(track => track.stop());
+      }
+      
+      const fileURL = URL.createObjectURL(file);
+      localStreamedVideo.src = fileURL;
+      localStreamedVideo.muted = true;
+      localStreamedVideo.load();
+      
+      localStreamedVideo.onloadedmetadata = async () => {
+        try {
+          await localStreamedVideo.play();
+          const stream = localStreamedVideo.captureStream();
+          
+          // Add tracks to media connection
+          stream.getTracks().forEach(track => {
+            mediaPeer.addTrack(track, stream);
+          });
+          
+          // Create and send offer
+          const offer = await mediaPeer.createOffer();
+          await mediaPeer.setLocalDescription(offer);
+          
+          if (dataChannel && dataChannel.readyState === "open") {
+            dataChannel.send(JSON.stringify({ 
+              type: "stream-offer", 
+              sdp: mediaPeer.localDescription 
+            }));
+          }
+        } catch (error) {
+          console.error("Error starting video stream:", error);
+          logChat("Failed to start video stream.", "system");
+          endVideoStream();
+        }
+      };
+      
+      localStreamedVideo.onerror = () => {
+        console.error("Error loading video");
+        logChat("Failed to load video file.", "system");
+        endVideoStream();
+      };
+    };
+    
+    async function handleStreamOffer(sdp) {
+      if (!mediaPeer) {
+        setupMediaConnection();
+      }
+      
+      try {
+        await mediaPeer.setRemoteDescription(new RTCSessionDescription(sdp));
+        mediaRemoteDescriptionSet = true;
+        
+        // Process buffered ICE candidates
+        while (mediaIceBuffer.length > 0) {
+          const candidate = mediaIceBuffer.shift();
+          await mediaPeer.addIceCandidate(new RTCIceCandidate(candidate));
+        }
+        
+        const answer = await mediaPeer.createAnswer();
+        await mediaPeer.setLocalDescription(answer);
+        
+        if (dataChannel && dataChannel.readyState === "open") {
+          dataChannel.send(JSON.stringify({ 
+            type: "media-answer", 
+            sdp: mediaPeer.localDescription 
+          }));
+        }
+      } catch (error) {
+        console.error("Error handling stream offer:", error);
+      }
+    }
+    
+    document.getElementById("endStreamBtn").onclick = () => {
+      endVideoStream();
+      
+      if (dataChannel && dataChannel.readyState === "open") {
+        dataChannel.send(JSON.stringify({ type: "end-stream" }));
+      }
+    };
+    
+    function endVideoStream() {
+      const localStreamedVideo = document.getElementById("localStreamedVideo");
+      if (localStreamedVideo.srcObject) {
+        localStreamedVideo.srcObject.getTracks().forEach(track => track.stop());
+        localStreamedVideo.srcObject = null;
+      }
+      
+      localStreamedVideo.style.display = "none";
+      document.getElementById("remoteStreamedVideo").srcObject = null;
+      document.getElementById("remoteStreamedVideo").style.display = "none";
+      document.getElementById("endStreamBtn").style.display = "none";
+      document.getElementById("startVideoStreamBtn").disabled = false;
+      document.getElementById("enterFullscreenBtn").style.display = "none";
+      
+      // Remove all tracks from media connection
+      if (mediaPeer) {
+        mediaPeer.getSenders().forEach(sender => {
+          if (sender.track) {
+            sender.track.stop();
+          }
+        });
+      }
+      
+      isStreamSender = false;
+      logChat("Video stream ended.", "me");
+    }
 
-/* =========================
-   11) AUDIO STREAMING
-   ========================= */
-el.startAudioStreamBtn.onclick = async () => {
-  if (!dataChannel || dataChannel.readyState !== "open") return alert("Data channel is not open.");
-  const file = el.audioFileInput.files[0];
-  if (!file) return;
+    /***** Full Screen Controls *****/
+    document.getElementById("enterFullscreenBtn").onclick = async () => {
+      const remoteStreamedVideo = document.getElementById("remoteStreamedVideo");
+      
+      if (remoteStreamedVideo.requestFullscreen) {
+        await remoteStreamedVideo.requestFullscreen();
+        document.getElementById("enterFullscreenBtn").style.display = "none";
+        document.getElementById("exitFullscreenBtn").style.display = "inline";
+      }
+    };
+    
+    document.getElementById("exitFullscreenBtn").onclick = async () => {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+        document.getElementById("enterFullscreenBtn").style.display = "inline";
+        document.getElementById("exitFullscreenBtn").style.display = "none";
+      }
+    };
+    
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) {
+        document.getElementById("enterFullscreenBtn").style.display = "inline";
+        document.getElementById("exitFullscreenBtn").style.display = "none";
+      }
+    });
 
-  if (audioStreamPC) { try { audioStreamPC.close(); } catch {} audioStreamPC = null; }
-  if (el.localStreamedAudio.srcObject) {
-    el.localStreamedAudio.srcObject.getTracks().forEach(t => t.stop());
-  }
+    /***** Join Stream Button Functionality *****/
+    document.getElementById("joinStreamBtn").onclick = () => {
+      document.getElementById("joinStreamBtn").style.display = "none";
+      switchMainTab("callstream");
+      switchCallStreamSubTab("stream");
+      clearTabIndicators();
+    };
 
-  const url = URL.createObjectURL(file);
-  el.localStreamedAudio.src = url;
-  await new Promise(res => { el.localStreamedAudio.onloadedmetadata = res; });
-  await el.localStreamedAudio.play();
-
-  const stream = el.localStreamedAudio.captureStream();
-  audioStreamPC = new RTCPeerConnection(ICE_CONFIG);
-  stream.getTracks().forEach(t => audioStreamPC.addTrack(t, stream));
-  audioStreamPC.onicecandidate = (e) => { if (e.candidate) dcSendJSON({ type: "audio-stream-candidate", candidate: e.candidate }); };
-
-  const offer = await audioStreamPC.createOffer();
-  await audioStreamPC.setLocalDescription(offer);
-  dcSendJSON({ type: "audio-stream-offer", sdp: audioStreamPC.localDescription });
-};
-
-el.endAudioStreamBtn.onclick = () => {
-  if (audioStreamPC) { try { audioStreamPC.close(); } catch {} audioStreamPC = null; }
-  if (el.localStreamedAudio.srcObject) {
-    el.localStreamedAudio.srcObject.getTracks().forEach(t => t.stop());
-    el.localStreamedAudio.srcObject = null;
-  }
-  dcSendJSON({ type: "end-audio-stream" });
-  el.remoteAudioAnimation.style.display = "none";
-  logChat("Audio stream ended.", "me");
-};
-
-async function handleAudioStreamOffer(sdp) {
-  if (audioStreamPC) { try { audioStreamPC.close(); } catch {} audioStreamPC = null; }
-  audioStreamPC = new RTCPeerConnection(ICE_CONFIG);
-  audioStreamPC.onicecandidate = (e) => { if (e.candidate) dcSendJSON({ type: "audio-stream-candidate", candidate: e.candidate }); };
-  audioStreamPC.ontrack = (e) => {
-    el.hiddenRemoteAudioStream.srcObject = e.streams[0];
-    el.remoteAudioAnimation.style.display = "block";
-  };
-  await audioStreamPC.setRemoteDescription(sdp);
-  const answer = await audioStreamPC.createAnswer();
-  await audioStreamPC.setLocalDescription(answer);
-  dcSendJSON({ type: "audio-stream-answer", sdp: audioStreamPC.localDescription });
-}
-
-async function handleAudioStreamAnswer(sdp) {
-  if (audioStreamPC) await audioStreamPC.setRemoteDescription(sdp);
-}
-
-/* =========================
-   12) FULLSCREEN + JOIN STREAM
-   ========================= */
-el.enterFullscreenBtn.innerText = "Full Screen Mode";
-el.enterFullscreenBtn.onclick = async () => {
-  if (el.remoteStreamedVideo.requestFullscreen) {
-    await el.remoteStreamedVideo.requestFullscreen();
-    el.enterFullscreenBtn.style.display = "none";
-    el.exitFullscreenBtn.style.display = "inline";
-  }
-};
-el.exitFullscreenBtn.onclick = async () => {
-  if (document.exitFullscreen) {
-    await document.exitFullscreen();
-    el.enterFullscreenBtn.style.display = "inline";
-    el.exitFullscreenBtn.style.display = "none";
-  }
-};
-document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement) {
-    el.enterFullscreenBtn.style.display = "inline";
-    el.exitFullscreenBtn.style.display = "none";
-  }
-});
-
-el.joinStreamBtn.onclick = () => {
-  el.joinStreamBtn.style.display = "none";
-  switchMainTab("callstream");
-  switchCallStreamSubTab("stream");
-  el.mainTabCallStream.classList.remove("glow-green");
-  el.subTabStream.classList.remove("glow-green");
-};
-
-/* =========================
-   13) HELP MODAL (unchanged)
-   ========================= */
-const helpBtn = document.getElementById("helpBtn");
-const helpModal = document.getElementById("helpModal");
-const closeHelpBtn = document.getElementById("closeHelpBtn");
-helpBtn.onclick = () => { helpModal.style.display = "block"; };
-closeHelpBtn.onclick = () => { helpModal.style.display = "none"; };
-
-/* =========================
-   14) INIT DEFAULT VIEW
-   ========================= */
-switchMainTab("connection");
-switchCallStreamSubTab("call");
-setStatus("Disconnected", "red");
+    /***** Initialize Event Listeners *****/
+    function initializeEventListeners() {
+      // Main tab switching
+      document.getElementById("mainTabConnection").addEventListener("click", () => { 
+        switchMainTab("connection"); 
+        clearTabIndicators();
+      });
+      document.getElementById("mainTabChat").addEventListener("click", () => { 
+        switchMainTab("chat"); 
+        clearTabIndicators();
+      });
+      document.getElementById("mainTabCallStream").addEventListener("click", () => { 
+        switchMainTab("callstream"); 
+        clearTabIndicators();
+      });
+      
+      // Sub tab switching
+      document.getElementById("subTabCall").addEventListener("click", () => { 
+        switchCallStreamSubTab("call"); 
+        clearTabIndicators();
+      });
+      document.getElementById("subTabStream").addEventListener("click", () => { 
+        switchCallStreamSubTab("stream"); 
+        clearTabIndicators();
+      });
+      
+      // Initialize app
+      updateConnectionStatus("Disconnected");
+    }
+    
+    // Initialize when page loads
+    window.addEventListener('load', initializeEventListeners);
   </script>
 </body>
 </html>
