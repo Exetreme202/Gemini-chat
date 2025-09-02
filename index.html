@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -63,15 +62,14 @@
     .player-controls{display:flex;align-items:center;gap:10px;margin-top:10px}
     .player-controls button{background:#4CAF50}
     .player-controls input[type="range"]{flex:1}
+    .inline-back{background:#e0e0e0;color:#111;border:none;border-radius:6px;padding:6px 8px;cursor:pointer}
     @media (max-width:560px){
       #localVideo{width:45%;max-width:50vw}
     }
   </style>
 </head>
 <body>
-<h1>Simple WebRTC Chat</h1>
-
-<div class="container">
+<h1>Simple WebRTC Chat</h1><div class="container">
   <div class="connection-panel">
     <h2>Connection</h2>
     <div class="id-section">
@@ -86,9 +84,7 @@
       <span class="connection-status status-disconnected" id="statusDot"></span>
       Status: <span id="connectionStatus">Disconnected</span>
     </div>
-  </div>
-
-  <div class="chat-panel">
+  </div>  <div class="chat-panel">
     <h2>Chat</h2>
     <div id="chatMessages"></div>
     <div id="typingIndicator" class="typing-indicator"></div>
@@ -96,9 +92,7 @@
       <input type="text" id="messageInput" placeholder="Type your message" disabled/>
       <button id="sendMessageButton" disabled>Send</button>
     </div>
-  </div>
-
-  <div class="media-panel">
+  </div>  <div class="media-panel">
     <h2>Video & Voice Call</h2>
     <div class="video-container">
       <video id="remoteVideo" autoplay playsinline></video>
@@ -109,9 +103,7 @@
       <button id="startVoiceButton" class="secondary">Voice Call</button>
       <button id="endCallButton" class="warn" disabled>End Call</button>
     </div>
-  </div>
-
-  <div class="stream-panel">
+  </div>  <div class="stream-panel">
     <h2>Video Streaming</h2>
     <div class="stream-video-container">
       <div class="stream-video">
@@ -126,9 +118,7 @@
       <button id="startStreamButton" disabled>Start Stream</button>
       <button id="stopStreamButton" class="warn" disabled>Stop Stream</button>
     </div>
-  </div>
-
-  <div class="file-panel">
+  </div>  <div class="file-panel">
     <h2>File Sharing</h2>
     <div class="input-group">
       <button id="btnShareDownloadable" class="secondary">Share downloadable files</button>
@@ -139,28 +129,24 @@
         <strong>Transfers & Received Files</strong>
       </div>
       <div id="transferList" class="transfer-list"></div>
-    </div>
+    </div><!-- Hidden pickers -->
+<input type="file" id="pickDownloadable" multiple style="display:none"/>
+<input type="file" id="pickNonDownloadable" multiple accept="image/*,video/*" style="display:none"/>
 
-    <!-- Hidden pickers -->
-    <input type="file" id="pickDownloadable" multiple style="display:none"/>
-    <input type="file" id="pickNonDownloadable" multiple accept="image/*,video/*" style="display:none"/>
   </div>
-</div>
-
-<!-- Modal -->
-<div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+</div><!-- Modal --><div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
   <div class="modal">
     <div class="modal-header">
       <div id="modalTitle">Preview</div>
-      <button id="modalBackBtn">Back</button>
+      <div>
+        <button id="modalBackBtn">Back</button>
+      </div>
     </div>
     <div class="modal-body" id="modalBody">
       <!-- dynamic -->
     </div>
   </div>
-</div>
-
-<script>
+</div><script>
 /* =======================
    Config & Globals
 ======================= */
@@ -175,11 +161,13 @@ const config = {
 };
 
 let peer, connection, dataChannel;
-let localStream, remoteStream, isCaller = false, connectedPeerId = null, typingTimer = null;
-let streamCall = null;
+let localStream = null, remoteStream = null;
+let mediaCall = null, streamCall = null;
+let isCaller = false, connectedPeerId = null, typingTimer = null;
+let capturedMediaStream = null; // captureStream from video file (to stop tracks when stopping stream)
 
-/* File transfer (128KB chunks) */
-const CHUNK_SIZE = 128 * 1024;
+/* File transfer (256KB chunks - optimized) */
+const CHUNK_SIZE = 256 * 1024;
 const sendingTransfers = new Map();   // id -> {file, offset, total, name, size, mime, category, ui}
 const receivingTransfers = new Map(); // id -> {chunks:[], received, total, meta, ui}
 
@@ -238,32 +226,41 @@ function initializePeer() {
     connectButton.disabled = true;
   });
 
+  // Incoming calls: use metadata to decide whether it's a media call (camera/mic) or a stream call (file stream).
   peer.on('call', call => {
-    // Answer with our current localStream (video/voice) if present, else undefined
-    call.answer(localStream || undefined);
+    const callType = call.metadata && call.metadata.type ? call.metadata.type : 'media';
 
-    trackRTCPeerConnection(call.peerConnection, 'Media');
-
-    call.on('stream', stream => {
-      // If our main remoteVideo is empty, treat as call; else treat as remote stream
-      if (!remoteVideo.srcObject) {
-        remoteStream = stream;
-        remoteVideo.srcObject = stream;
-        endCallButton.disabled = false;
+    // For 'media' calls (video/voice), answer with local camera/mic (if available). For 'stream' calls (file streaming),
+    // answer without sending our camera/mic to avoid mixing streams and calls.
+    try {
+      if (callType === 'media') {
+        // If we already have an active streamCall (streaming), close it to prioritize call media (prevent mixing).
+        if (streamCall) {
+          try { streamCall.close(); } catch(e) {}
+          streamCall = null;
+          stopCapturedMediaStream();
+        }
+        call.answer(localStream || undefined); // will send our local camera/mic if present
+        mediaCall = call;
+        trackRTCPeerConnection(call.peerConnection, 'Media');
+        setupMediaCallHandlers(call, 'media');
+      } else if (callType === 'stream') {
+        // For streams, answer without local media. We'll show incoming stream in remoteStreamVideo.
+        // If we have an active media call, we keep it— but prefer not to send our camera as response to stream calls.
+        call.answer(undefined);
+        streamCall = call;
+        trackRTCPeerConnection(call.peerConnection, 'Stream');
+        setupMediaCallHandlers(call, 'stream');
       } else {
-        remoteStreamVideo.srcObject = stream;
+        // fallback - treat as media
+        call.answer(localStream || undefined);
+        mediaCall = call;
+        setupMediaCallHandlers(call, 'media');
       }
-    });
-
-    call.on('close', () => {
-      endCall();
-      stopStreaming();
-    });
-
-    call.on('error', err => {
-      console.error('Call error:', err);
-      updateConnectionStatus('error', 'Media error');
-    });
+    } catch (err) {
+      console.error('Error answering call:', err);
+      updateConnectionStatus('error', 'Call answer failed');
+    }
   });
 
   peer.on('disconnected', () => {
@@ -273,7 +270,7 @@ function initializePeer() {
 
   peer.on('error', err => {
     console.error('PeerJS error:', err);
-    updateConnectionStatus('error', 'Error: ' + err.type);
+    updateConnectionStatus('error', 'Error: ' + (err && err.type ? err.type : err));
   });
 }
 
@@ -318,8 +315,9 @@ function setupDataConnection(conn){
     startStreamButton.disabled = false;
     connectedPeerId = connection.peer;
 
-    // Real-time connection monitoring
-    trackRTCPeerConnection(connection.peerConnection, 'Data');
+    // Real-time connection monitoring - PeerJS exposes underlying peerConnection on the call objects, but for data
+    // we attempt to use connection.peerConnection if available.
+    if (connection.peerConnection) trackRTCPeerConnection(connection.peerConnection, 'Data');
 
     setupDataChannel();
   });
@@ -334,7 +332,12 @@ function setupDataConnection(conn){
 }
 
 function setupDataChannel(){
+  if (!dataChannel) return;
   dataChannel.on('data', handleDataMessage);
+  // attempt to set binaryType if available (PeerJS uses underlying DC)
+  try {
+    if (dataChannel._dc) dataChannel._dc.binaryType = 'arraybuffer';
+  } catch(e){}
 }
 
 /* =======================
@@ -342,33 +345,37 @@ function setupDataChannel(){
 ======================= */
 function handleDataMessage(data){
   if (!data) return;
-  switch(data.type){
-    case 'chat':
-      addMessage(data.message, 'remote');
-      break;
-    case 'typing-start':
-      typingIndicator.textContent = 'Peer is typing...';
-      typingIndicator.style.visibility = 'visible';
-      break;
-    case 'typing-stop':
-      typingIndicator.style.visibility = 'hidden';
-      break;
-    /* File transfer protocol */
-    case 'file-meta':
-      startReceivingFile(data.meta);
-      break;
-    case 'file-chunk':
-      receiveFileChunk(data.id, data.seq, data.total, data.chunk);
-      break;
-    case 'file-complete':
-      finalizeReceivedFile(data.id);
-      break;
-    case 'file-progress':
-      updateSendProgressUI(data.id, data.percent);
-      break;
-    default:
-      // ignore
-      break;
+  try {
+    switch(data.type){
+      case 'chat':
+        addMessage(data.message, 'remote');
+        break;
+      case 'typing-start':
+        typingIndicator.textContent = 'Peer is typing...';
+        typingIndicator.style.visibility = 'visible';
+        break;
+      case 'typing-stop':
+        typingIndicator.style.visibility = 'hidden';
+        break;
+      /* File transfer protocol */
+      case 'file-meta':
+        startReceivingFile(data.meta);
+        break;
+      case 'file-chunk':
+        receiveFileChunk(data.id, data.seq, data.total, data.chunk);
+        break;
+      case 'file-complete':
+        finalizeReceivedFile(data.id);
+        break;
+      case 'file-progress':
+        updateSendProgressUI(data.id, data.percent);
+        break;
+      default:
+        // ignore
+        break;
+    }
+  } catch (err) {
+    console.error('Error handling data message', err);
   }
 }
 
@@ -383,109 +390,270 @@ function addMessage(message, type){
 function sendMessage(){
   const message = messageInput.value.trim();
   if (message && dataChannel){
-    dataChannel.send({type:'chat', message});
-    addMessage(message, 'local');
-    messageInput.value = '';
+    try {
+      dataChannel.send({type:'chat', message});
+      addMessage(message, 'local');
+      messageInput.value = '';
+    } catch (err) {
+      console.error('Send message failed', err);
+    }
   }
 }
 
 function handleTyping(){
   if (!dataChannel) return;
-  dataChannel.send({type:'typing-start'});
-  if (typingTimer) clearTimeout(typingTimer);
-  typingTimer = setTimeout(() => dataChannel?.send({type:'typing-stop'}), 1000);
+  try {
+    dataChannel.send({type:'typing-start'});
+    if (typingTimer) clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => dataChannel?.send({type:'typing-stop'}), 1000);
+  } catch(e){}
 }
 
 /* =======================
    Calls (Video / Voice)
+   - maintain separate mediaCall and streamCall
+   - use call.metadata to distinguish
+   - bandwidth prioritization applied after call establishment
 ======================= */
+
 async function startVideoCall(){
   try{
+    // Ensure streaming is stopped before initiating a direct media call to avoid mixing.
+    if (streamCall) {
+      try { streamCall.close(); } catch(e){}
+      streamCall = null;
+      stopCapturedMediaStream();
+    }
+
     localStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
     localVideo.srcObject = localStream;
-    startCall();
-  }catch(e){ alert('Could not access camera/mic'); }
+    startCall('media');
+  }catch(e){ alert('Could not access camera/mic'); console.error(e); }
 }
 
 async function startVoiceCall(){
   try{
+    if (streamCall) {
+      try { streamCall.close(); } catch(e){}
+      streamCall = null;
+      stopCapturedMediaStream();
+    }
+
     localStream = await navigator.mediaDevices.getUserMedia({video:false, audio:true});
-    startCall();
-  }catch(e){ alert('Could not access microphone'); }
+    // localVideo remains empty for voice-only, but keep localStream assigned
+    startCall('media');
+  }catch(e){ alert('Could not access microphone'); console.error(e); }
 }
 
-function startCall(){
+function startCall(type='media'){
   if (!connection) return alert('Connect to a peer first');
   isCaller = true;
   endCallButton.disabled = false;
-  const call = peer.call(connection.peer, localStream);
+
+  // Close existing mediaCall if any to avoid duplicates
+  if (mediaCall) {
+    try { mediaCall.close(); } catch(e){}
+    mediaCall = null;
+  }
+
+  // call.metadata used to let remote side know the type
+  const call = peer.call(connection.peer, localStream, { metadata: { type: type === 'stream' ? 'stream' : 'media' } });
+  mediaCall = call;
   trackRTCPeerConnection(call.peerConnection, 'Media');
-  call.on('stream', stream => {
-    remoteStream = stream;
-    remoteVideo.srcObject = stream;
+  setupMediaCallHandlers(call, 'media');
+
+  // attempt to set higher bitrate / prioritize after small delay
+  call.on('stream', () => {
+    prioritizeBandwidth(call.peerConnection, 'video');
+    prioritizeBandwidth(call.peerConnection, 'audio');
   });
-  call.on('close', endCall);
+
   call.on('error', err => {
-    console.error(err);
+    console.error('Call error:', err);
     updateConnectionStatus('error', 'Media error');
   });
 }
 
 function endCall(){
+  // End only mediaCall (video/voice)
+  if (mediaCall){
+    try{ mediaCall.close(); }catch(e){}
+    mediaCall = null;
+  }
   if (localStream){
     localStream.getTracks().forEach(t => t.stop());
     localStream = null;
     localVideo.srcObject = null;
   }
   if (remoteStream){
-    remoteStream.getTracks().forEach(t => t.stop());
+    try{ remoteStream.getTracks().forEach(t=>t.stop()); }catch(e){}
     remoteStream = null;
     remoteVideo.srcObject = null;
   }
   endCallButton.disabled = true;
+  // After ending, allow streaming again
+  startStreamButton.disabled = !(connection && streamFileInput.files[0]);
+}
+
+/* common handler for both media and stream calls */
+function setupMediaCallHandlers(call, kind = 'media'){
+  call.on('stream', stream => {
+    if (kind === 'media') {
+      // Show on main remoteVideo
+      remoteStream = stream;
+      remoteVideo.srcObject = stream;
+      endCallButton.disabled = false;
+    } else if (kind === 'stream') {
+      // Show in remoteStreamVideo
+      remoteStreamVideo.srcObject = stream;
+    }
+    // After receiving remote stream, attempt to prioritize inbound bandwidth (best-effort)
+    try { prioritizeBandwidth(call.peerConnection, 'video'); } catch(e){}
+  });
+
+  call.on('close', () => {
+    if (kind === 'media') {
+      endCall();
+    } else if (kind === 'stream') {
+      stopStreaming();
+    }
+  });
+
+  call.on('error', err => {
+    console.error(kind + ' call error:', err);
+    updateConnectionStatus('error', `${kind} media error`);
+    if (kind === 'media') endCall();
+    else stopStreaming();
+  });
+}
+
+/* =======================
+   Bandwidth Prioritization
+   - Best-effort: set encoder params on RTCRtpSender if supported
+======================= */
+function prioritizeBandwidth(pc, kind = 'video'){
+  if (!pc) return;
+  try {
+    const senders = pc.getSenders ? pc.getSenders() : [];
+    senders.forEach(sender => {
+      if (!sender || !sender.track) return;
+      const trackKind = sender.track.kind;
+      if ((kind === 'video' && trackKind === 'video') || (kind === 'audio' && trackKind === 'audio')) {
+        const params = sender.getParameters ? sender.getParameters() : null;
+        if (params && params.encodings && params.encodings.length) {
+          // set higher maxBitrate for video, moderate for audio
+          params.encodings.forEach(enc => {
+            if (trackKind === 'video') {
+              // prefer high bitrate but keep within reasonable limits to avoid congestion
+              enc.maxBitrate = enc.maxBitrate || 2_000_000; // ~2 Mbps
+              enc.priority = 'high';
+          } else if (trackKind === 'audio') {
+              enc.maxBitrate = enc.maxBitrate || 128_000; // 128 kbps
+              enc.priority = 'high';
+            }
+          });
+          try {
+            sender.setParameters(params).catch(()=>{/* ignore */});
+          } catch(e){}
+        }
+      }
+    });
+  } catch (e) {
+    // Not all browsers or senders support setParameters - fail silently
+    console.warn('Bandwidth prioritization not fully supported by browser', e);
+  }
 }
 
 /* =======================
    Synchronized Streaming
+   - Use metadata type 'stream' to avoid being answered with local camera/mic
+   - Capture stream from the video element and call with it
+   - Ensure we stop captured tracks and close streamCall when stopping
 ======================= */
 async function startStreaming(){
   if (!connection) return alert('Please connect first');
   const file = streamFileInput.files[0];
   if (!file) return alert('Select a video file first');
+
+  // If a media call (camera/mic) is active, close it to reduce mixing and free bandwidth
+  if (mediaCall) {
+    try { mediaCall.close(); } catch(e){}
+    mediaCall = null;
+    if (localStream) {
+      localStream.getTracks().forEach(t=>t.stop());
+      localStream = null;
+      localVideo.srcObject = null;
+    }
+  }
+
   const fileURL = URL.createObjectURL(file);
   localStreamVideo.src = fileURL;
   localStreamVideo.onloadedmetadata = async () => {
-    await localStreamVideo.play();
+    try {
+      await localStreamVideo.play();
+    } catch(e){/* auto-play restrictions - ignore */ }
+
     if (!localStreamVideo.captureStream){
       alert("Your browser doesn't support captureStream");
       return;
     }
-    const mediaStream = localStreamVideo.captureStream();
-    streamCall = peer.call(connection.peer, mediaStream);
-    trackRTCPeerConnection(streamCall.peerConnection, 'Stream');
-    streamCall.on('stream', rStream => {
-      remoteStreamVideo.srcObject = rStream;
-    });
-    streamCall.on('close', stopStreaming);
-    startStreamButton.disabled = true;
-    stopStreamButton.disabled = false;
+
+    // captureStream returns a MediaStream of the playback; we'll call with that
+    try {
+      stopCapturedMediaStream();
+      capturedMediaStream = localStreamVideo.captureStream();
+      // send with metadata telling callee it's a stream so they don't answer with their local camera
+      const call = peer.call(connection.peer, capturedMediaStream, { metadata: { type: 'stream' } });
+      streamCall = call;
+      trackRTCPeerConnection(call.peerConnection, 'Stream');
+      setupMediaCallHandlers(call, 'stream');
+
+      call.on('stream', rStream => {
+        // remote might send their playback stream back (if they also stream)
+        remoteStreamVideo.srcObject = rStream;
+      });
+
+      call.on('close', stopStreaming);
+      startStreamButton.disabled = true;
+      stopStreamButton.disabled = false;
+
+      // Attempt to prioritize video bandwidth on the call
+      setTimeout(()=> {
+        try { prioritizeBandwidth(call.peerConnection, 'video'); } catch(e){}
+      }, 800);
+    } catch (err) {
+      console.error('Start stream error', err);
+      alert('Failed to start stream');
+      stopCapturedMediaStream();
+    }
   };
+}
+
+function stopCapturedMediaStream(){
+  if (capturedMediaStream){
+    try { capturedMediaStream.getTracks().forEach(t=>t.stop()); } catch(e){}
+    capturedMediaStream = null;
+  }
 }
 
 function stopStreaming(){
   if (streamCall){
-    try{ streamCall.close(); }catch{}
+    try{ streamCall.close(); }catch(e){}
     streamCall = null;
   }
-  localStreamVideo.pause();
+  stopCapturedMediaStream();
+  try { localStreamVideo.pause(); } catch(e){}
   localStreamVideo.src = '';
   remoteStreamVideo.srcObject = null;
-  startStreamButton.disabled = false;
+  startStreamButton.disabled = !(connection && streamFileInput.files[0]);
   stopStreamButton.disabled = true;
 }
 
 /* =======================
-   File Transfer (Chunked, 128KB)
+   File Transfer (Chunked, optimized)
+   - Uses CHUNK_SIZE 256KB
+   - Implements simple pacing (throttling) to avoid overwhelming DataChannel
+   - Sends meta, then chunks (ArrayBuffer), then complete
 ======================= */
 function uuid(){
   return 'f-' + Math.random().toString(36).slice(2) + '-' + Date.now().toString(36);
@@ -538,9 +706,13 @@ function updateProgressUI(id, percent){
   if (prog) prog.style.width = `${percent}%`;
 }
 
-/* Sender: iterate chunks and send */
+/* Throttle wait - simple promise-based wait */
+function wait(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+/* Sender: iterate chunks and send with pacing */
 async function sendFileAsChunks(file, category){
-  if (!dataChannel) return;
+  if (!dataChannel || !connection || !connection.open) return alert('Connect first');
+
   const id = uuid();
   const meta = { id, name: file.name, size: file.size, mime: file.type || 'application/octet-stream', category };
   const ui = createTransferUI(id, file.name, file.size, 'send');
@@ -548,39 +720,60 @@ async function sendFileAsChunks(file, category){
   sendingTransfers.set(id, { file, offset: 0, total: file.size, name:file.name, size:file.size, mime:meta.mime, category, ui });
 
   // Send meta
-  dataChannel.send({ type: 'file-meta', meta });
+  try { dataChannel.send({ type: 'file-meta', meta }); } catch(e){ console.error('send meta failed', e); }
 
   const reader = new FileReader();
-
   let offset = 0;
   let seq = 0;
   const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
-  function readSlice(o){
-    const slice = file.slice(o, o + CHUNK_SIZE);
-    reader.readAsArrayBuffer(slice);
-  }
+  function readSlice(o){ const slice = file.slice(o, o + CHUNK_SIZE); reader.readAsArrayBuffer(slice); }
 
-  reader.onload = () => {
+  reader.onload = async () => {
     const chunk = reader.result; // ArrayBuffer
-    dataChannel.send({ type:'file-chunk', id, seq, total: totalChunks, chunk });
+    try {
+      // send chunk as plain ArrayBuffer in an object to maintain protocol
+      dataChannel.send({ type:'file-chunk', id, seq, total: totalChunks, chunk });
+    } catch (err) {
+      // if structured clone fails or channel overloaded, try sending as base64 fallback
+      try {
+        const blob = new Blob([chunk]);
+        const text = await blobToBase64(blob);
+        dataChannel.send({ type:'file-chunk', id, seq, total: totalChunks, chunkB64: text });
+      } catch(e){
+        console.error('Failed to send chunk', e);
+      }
+    }
 
     offset += chunk.byteLength;
     seq += 1;
 
-    // Update local (sender) progress; use receiver echo for synchronized updates too
+    // Update local (sender) progress; receiver echoes progress back for sync
     const percent = Math.min(100, Math.floor((offset / file.size) * 100));
     updateProgressUI(id, percent);
 
+    // Throttle: small pause to avoid hogging channel; adaptive delay
+    // Smaller files can send faster; large files get small pauses.
     if (offset < file.size){
+      // Micro-throttle based on chunk size and file size
+      const adaptiveDelay = Math.min(40, Math.max(8, Math.floor((CHUNK_SIZE / 1024) / 6))); // 8-40ms
+      await wait(adaptiveDelay);
       readSlice(offset);
-    }else{
-      dataChannel.send({ type:'file-complete', id });
+    } else {
+      try { dataChannel.send({ type:'file-complete', id }); } catch(e){ console.error('send complete err', e); }
     }
   };
 
   readSlice(0);
 }
+
+/* utility: blob to base64 (fallback) */
+function blobToBase64(blob){ return new Promise((res, rej) => {
+  const r = new FileReader();
+  r.onload = ()=> res(r.result.split(',')[1]);
+  r.onerror = rej;
+  r.readAsDataURL(blob);
+}); }
 
 /* Receiver: initialize structure on meta */
 function startReceivingFile(meta){
@@ -589,24 +782,58 @@ function startReceivingFile(meta){
   receivingTransfers.set(id, { chunks: [], received: 0, total: size, meta, ui });
 }
 
-/* Receiver: collect chunks */
-function receiveFileChunk(id, seq, total, chunk){
+/* Receiver: collect chunks (handle ArrayBuffer or base64) */
+async function receiveFileChunk(id, seq, total, chunk){
   const rcv = receivingTransfers.get(id);
   if (!rcv) return;
-  // Ensure array size
-  if (!rcv.chunks[seq]) rcv.chunks[seq] = new Uint8Array(chunk);
-  rcv.received += (chunk.byteLength || chunk.size || 0);
+
+  if (chunk) {
+    // If chunk is ArrayBuffer-like, convert to Uint8Array
+    try {
+      const arr = new Uint8Array(chunk);
+      rcv.chunks[seq] = arr;
+      rcv.received += arr.byteLength;
+    } catch (e) {
+      // if chunk isn't ArrayBuffer, ignore
+    }
+  } else {
+    // fallback: maybe chunkB64 was sent
+    // PeerJS structured clone may have sent chunkB64 as property
+    // If we receive object with chunkB64 in data, handle at top-level handler (not here)
+  }
 
   const pct = Math.min(100, Math.floor((rcv.received / rcv.total) * 100));
   updateProgressUI(id, pct);
 
-  // echo progress back to sender for synchronized progress
-  dataChannel?.send({ type: 'file-progress', id, percent: pct });
+  // echo progress back to sender for synchronized updates
+  try { dataChannel?.send({ type: 'file-progress', id, percent: pct }); } catch(e){}
 
-  // if all chunks received? (simple check)
-  if (rcv.chunks.filter(Boolean).length === total){
+  // if all chunks received?
+  // check number of non-empty entries
+  const have = rcv.chunks.filter(Boolean).length;
+  if (have === total){
     finalizeReceivedFile(id);
   }
+}
+
+/* handle fallback chunkB64 when received */
+function handleFallbackChunkB64(obj){
+  // obj: {type:'file-chunk', id, seq, total, chunkB64}
+  const { id, seq, total, chunkB64 } = obj;
+  if (!chunkB64) return;
+  const rcv = receivingTransfers.get(id);
+  if (!rcv) return;
+  // convert base64 to Uint8Array
+  const byteString = atob(chunkB64);
+  const arr = new Uint8Array(byteString.length);
+  for (let i=0;i<byteString.length;i++) arr[i] = byteString.charCodeAt(i);
+  rcv.chunks[seq] = arr;
+  rcv.received += arr.byteLength;
+  const pct = Math.min(100, Math.floor((rcv.received / rcv.total) * 100));
+  updateProgressUI(id, pct);
+  try { dataChannel?.send({ type: 'file-progress', id, percent: pct }); } catch(e){}
+  const have = rcv.chunks.filter(Boolean).length;
+  if (have === total) finalizeReceivedFile(id);
 }
 
 /* Sender receives echoed progress */
@@ -619,8 +846,13 @@ function finalizeReceivedFile(id){
   const rcv = receivingTransfers.get(id);
   if (!rcv) return;
 
-  // Build Blob
-  const blob = new Blob(rcv.chunks, { type: rcv.meta.mime });
+  // Build Blob - ensure ordered by seq
+  const ordered = [];
+  for (let i=0;i<rcv.chunks.length;i++){
+    if (rcv.chunks[i]) ordered.push(rcv.chunks[i]);
+  }
+
+  const blob = new Blob(ordered, { type: rcv.meta.mime });
   const url = URL.createObjectURL(blob);
 
   const parent = document.getElementById(`xfer-${id}`);
@@ -649,18 +881,27 @@ function finalizeReceivedFile(id){
 /* =======================
    Modal Preview (non-downloadable)
    - images or videos
-   - video: custom play/pause + external seeker
+   - video: custom play/pause + external seeker + inline back button
 ======================= */
 function openPreviewModal(name, url, mime){
   modalTitle.textContent = name || 'Preview';
   modalBody.innerHTML = '';
 
-  if (mime.startsWith('image/')){
+  if (mime && mime.startsWith('image/')) {
     const img = document.createElement('img');
     img.src = url;
     img.alt = name || 'image';
     modalBody.appendChild(img);
-  } else if (mime.startsWith('video/')){
+
+    // add an inline back button for convenience on mobile/video flows
+    const backBtn = document.createElement('button');
+    backBtn.className = 'inline-back';
+    backBtn.textContent = 'Back';
+    backBtn.style.marginTop = '8px';
+    backBtn.addEventListener('click', closePreviewModal);
+    modalBody.appendChild(backBtn);
+
+  } else if (mime && mime.startsWith('video/')) {
     const vid = document.createElement('video');
     vid.src = url;
     vid.playsInline = true;
@@ -694,22 +935,50 @@ function openPreviewModal(name, url, mime){
 
     controls.appendChild(btn);
     controls.appendChild(seek);
+
+    // Add a Back button inside controls for easy exit (especially mobile)
+    const backInside = document.createElement('button');
+    backInside.className = 'inline-back';
+    backInside.textContent = 'Back';
+    backInside.addEventListener('click', () => {
+      vid.pause();
+      closePreviewModal();
+    });
+    controls.appendChild(backInside);
+
     modalBody.appendChild(controls);
   } else {
     const p = document.createElement('p');
     p.textContent = 'This preview only supports images and videos.';
     modalBody.appendChild(p);
+
+    const backBtn = document.createElement('button');
+    backBtn.className = 'inline-back';
+    backBtn.textContent = 'Back';
+    backBtn.style.marginTop = '8px';
+    backBtn.addEventListener('click', closePreviewModal);
+    modalBody.appendChild(backBtn);
   }
 
   modalBackdrop.style.display = 'flex';
   modalBackdrop.setAttribute('aria-hidden', 'false');
 }
 
-modalBackBtn.addEventListener('click', () => {
+function closePreviewModal(){
+  // Stop any playing video inside modal to free resources
+  try {
+    const vid = document.getElementById('customVideo');
+    if (vid) {
+      vid.pause();
+      vid.src = '';
+    }
+  } catch(e){}
   modalBackdrop.style.display = 'none';
   modalBackdrop.setAttribute('aria-hidden', 'true');
   modalBody.innerHTML = '';
-});
+}
+
+modalBackBtn.addEventListener('click', closePreviewModal);
 
 /* =======================
    Connection Actions
@@ -742,6 +1011,13 @@ function resetConnectionState(){
   typingIndicator.style.visibility = 'hidden';
   endCall();
   stopStreaming();
+  // cleanup data connection
+  try {
+    if (connection && connection.close) connection.close();
+  } catch(e){}
+  connection = null;
+  dataChannel = null;
+  connectedPeerId = null;
 }
 
 /* =======================
@@ -783,10 +1059,29 @@ pickNonDownloadable.addEventListener('change', () => {
   pickNonDownloadable.value = '';
 });
 
+/* Also handle fallback-case where chunks may be received as objects with chunkB64
+   Because our main on('data') handler receives everything, we must detect chunkB64 there.
+   We'll wrap original handler with extra check to detect fallback shaped messages.
+*/
+const originalHandleDataMessage = handleDataMessage;
+function enhancedHandleDataMessage(obj){
+  // Detect fallback chunkB64 message shape
+  if (obj && obj.type === 'file-chunk' && obj.chunkB64) {
+    handleFallbackChunkB64(obj);
+    return;
+  }
+  originalHandleDataMessage(obj);
+}
+// Replace data handler setter dynamically if connection already exists:
+function setupDataChannel(){
+  if (!dataChannel) return;
+  dataChannel.on('data', enhancedHandleDataMessage);
+  try { if (dataChannel._dc) dataChannel._dc.binaryType = 'arraybuffer'; } catch(e){}
+}
+
 /* =======================
    Initialize
 ======================= */
 initializePeer();
-</script>
-</body>
+</script></body>
 </html>
