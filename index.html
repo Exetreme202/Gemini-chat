@@ -1,1087 +1,1181 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simple WebRTC Chat (Upgraded)</title>
-  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
-    body{max-width:1100px;margin:0 auto;padding:20px;background:#f5f5f5}
-    h1{text-align:center;margin-bottom:20px;color:#333}
-    .container{display:flex;flex-direction:column;gap:20px}
-    .connection-panel,.chat-panel,.media-panel,.file-panel,.stream-panel{
-      background:#fff;padding:15px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.08)
-    }
-    .input-group{display:flex;gap:10px;margin-bottom:10px}
-    input,button{padding:10px 12px;border:1px solid #ddd;border-radius:6px}
-    input{flex:1}
-    button{background:#4CAF50;color:#fff;border:none;cursor:pointer;transition:background .2s}
-    button:hover{background:#45a049}
-    button.secondary{background:#2196F3}
-    button.secondary:hover{background:#0b7dda}
-    button.warn{background:#9C27B0}
-    button.warn:hover{background:#7b1fa2}
-    button:disabled{background:#ccc;cursor:not-allowed}
-    #chatMessages{height:200px;overflow-y:auto;border:1px solid #ddd;padding:10px;margin-bottom:10px;border-radius:6px}
-    .message{margin-bottom:8px;padding:6px 8px;border-radius:6px;line-height:1.35}
-    .local{background:#e6f7ff;text-align:right}
-    .remote{background:#f0f0f0}
-    .video-container{position:relative;width:100%;max-width:820px;margin:0 auto;background:#000;border-radius:12px;overflow:hidden}
-    #remoteVideo{width:100%;height:auto;display:block}
-    #localVideo{
-      position:absolute;bottom:20px;right:20px;width:40%;max-width:320px;height:auto;border:2px solid #fff;border-radius:8px;z-index:10
-    }
-    .stream-video-container{display:flex;flex-direction:column;gap:16px;margin-bottom:10px;align-items:center}
-    .stream-video{width:100%;max-width:900px;background:#000;border-radius:12px;overflow:hidden}
-    .stream-video video{width:100%;height:auto;display:block}
-    .file-info{margin-top:10px;padding:10px;background:#f9f9f9;border-radius:6px;display:block}
-    .status{margin-top:10px;font-style:italic;color:#666}
-    .typing-indicator{height:20px;color:#666;font-style:italic;margin-bottom:5px;visibility:hidden}
-    .id-section{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-    .connection-status{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;border:1px solid #ddd}
-    .status-connected{background:#4CAF50}
-    .status-connecting{background:#FFC107}
-    .status-disconnected{background:#F44336}
-    .status-error{background:#F44336}
-    .transfer-list{display:flex;flex-direction:column;gap:8px}
-    .transfer-item{padding:8px;border:1px solid #eee;border-radius:8px;background:#fff}
-    .transfer-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
-    .transfer-name{font-weight:bold;word-break:break-all}
-    .progress-bar{width:100%;height:8px;background:#eee;border-radius:999px;overflow:hidden}
-    .progress{height:100%;width:0%}
-    .progress[data-type="send"]{background:#4CAF50}
-    .progress[data-type="recv"]{background:#2196F3}
-    .file-link{display:inline-block;margin-top:6px;text-decoration:underline;color:#2196F3;cursor:pointer}
-    /* Modal */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:9999}
-    .modal{background:#111;color:#fff;width:min(92vw,900px);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.3);overflow:hidden}
-    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#1c1c1c}
-    .modal-header button{background:#e0e0e0;color:#111;border:none;border-radius:6px;padding:8px 10px}
-    .modal-body{padding:12px}
-    .modal-body img,.modal-body video{width:100%;height:auto;display:block;border-radius:8px;background:#000}
-    .player-controls{display:flex;align-items:center;gap:10px;margin-top:10px}
-    .player-controls button{background:#4CAF50}
-    .player-controls input[type="range"]{flex:1}
-    .inline-back{background:#e0e0e0;color:#111;border:none;border-radius:6px;padding:6px 8px;cursor:pointer}
-    @media (max-width:560px){
-      #localVideo{width:45%;max-width:50vw}
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple WebRTC Chat (Upgraded)</title>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif} 
+        body{max-width:1100px;margin:0 auto;padding:20px;background:#f5f5f5} 
+        h1{text-align:center;margin-bottom:20px;color:#333} 
+        .container{display:flex;flex-direction:column;gap:20px} 
+        .connection-panel,.chat-panel,.media-panel,.file-panel,.stream-panel{ 
+            background:#fff;padding:15px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.08) 
+        } 
+        .input-group{display:flex;gap:10px;margin-bottom:10px} 
+        input,button{padding:10px 12px;border:1px solid #ddd;border-radius:6px} 
+        input{flex:1} 
+        button{background:#4CAF50;color:#fff;border:none;cursor:pointer;transition:background .2s} 
+        button:hover{background:#45a049} 
+        button.secondary{background:#2196F3} 
+        button.secondary:hover{background:#0b7dda} 
+        button.warn{background:#9C27B0} 
+        button.warn:hover{background:#7b1fa2} 
+        button:disabled{background:#ccc;cursor:not-allowed} 
+        #chatMessages{height:200px;overflow-y:auto;border:1px solid #ddd;padding:10px;margin-bottom:10px;border-radius:6px;display:flex;flex-direction:column;gap:8px} 
+        .message{max-width:70%;padding:8px 12px;border-radius:18px;line-height:1.4;word-wrap:break-word;position:relative} 
+        .local{align-self:flex-end;background:#dcf8c6;margin-left:30%} 
+        .remote{align-self:flex-start;background:#f0f0f0;margin-right:30%} 
+        .video-container{position:relative;width:100%;max-width:820px;margin:0 auto;background:#000;border-radius:12px;overflow:hidden} 
+        #remoteVideo{width:100%;height:auto;display:block} 
+        #localVideo{ 
+            position:absolute;bottom:20px;right:20px;width:40%;max-width:320px;height:auto;border:2px solid #fff;border-radius:8px;z-index:10 
+        } 
+        .stream-video-container{display:flex;flex-direction:column;gap:16px;margin-bottom:10px;align-items:center} 
+        .stream-video{width:100%;max-width:900px;background:#000;border-radius:12px;overflow:hidden} 
+        .stream-video video{width:100%;height:auto;display:block} 
+        .file-info{margin-top:10px;padding:10px;background:#f9f9f9;border-radius:6px;display:block} 
+        .status{margin-top:10px;font-style:italic;color:#666} 
+        .typing-indicator{height:20px;color:#666;font-style:italic;margin-bottom:5px;visibility:hidden} 
+        .id-section{display:flex;align-items:center;gap:10px;margin-bottom:10px} 
+        .connection-status{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;border:1px solid #ddd} 
+        .status-connected{background:#4CAF50} 
+        .status-connecting{background:#FFC107} 
+        .status-disconnected{background:#F44336} 
+        .status-error{background:#F44336} 
+        .transfer-list{display:flex;flex-direction:column;gap:8px} 
+        .transfer-item{padding:8px;border:1px solid #eee;border-radius:8px;background:#fff} 
+        .transfer-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px} 
+        .transfer-name{font-weight:bold;word-break:break-all} 
+        .progress-bar{width:100%;height:8px;background:#eee;border-radius:999px;overflow:hidden} 
+        .progress{height:100%;width:0%} 
+        .progress[data-type="send"]{background:#4CAF50} 
+        .progress[data-type="recv"]{background:#2196F3} 
+        .file-link{display:inline-block;margin-top:6px;text-decoration:underline;color:#2196F3;cursor:pointer} 
+        /* Modal */ 
+        .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:9999} 
+        .modal{background:#111;color:#fff;width:min(92vw,900px);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.3);overflow:hidden} 
+        .modal-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#1c1c1c} 
+        .modal-header button{background:#e0e0e0;color:#111;border:none;border-radius:6px;padding:8px 10px} 
+        .modal-body{padding:12px} 
+        .modal-body img,.modal-body video{width:100%;height:auto;display:block;border-radius:8px;background:#000} 
+        .player-controls{display:flex;align-items:center;gap:10px;margin-top:10px} 
+        .player-controls button{background:#4CAF50} 
+        .player-controls input[type="range"]{flex:1} 
+        .inline-back{background:#e0e0e0;color:#111;border:none;border-radius:6px;padding:6px 8px;cursor:pointer} 
+        @media (max-width:560px){ 
+            #localVideo{width:45%;max-width:50vw} 
+            .message{max-width:85%} 
+        }
+    </style>
 </head>
 <body>
-<h1>Simple WebRTC Chat</h1><div class="container">
-  <div class="connection-panel">
-    <h2>Connection</h2>
-    <div class="id-section">
-      <span>Your ID: <strong id="myId">Generating...</strong></span>
-      <button id="copyIdButton" class="secondary" disabled>Copy ID</button>
+    <h1>Simple WebRTC Chat</h1>
+    
+    <div class="container">
+        <div class="connection-panel">
+            <h2>Connection</h2>
+            <div class="id-section">
+                <span>Your ID: <span id="myId">Generating...</span></span>
+                <button id="copyIdButton" disabled>Copy ID</button>
+            </div>
+            <div class="input-group">
+                <input type="text" id="peerIdInput" placeholder="Peer ID to connect">
+                <button id="connectButton">Connect</button>
+            </div>
+            <div class="status">
+                <span class="connection-status" id="statusDot"></span>
+                <span id="connectionStatus">Status: Disconnected</span>
+            </div>
+        </div>
+        
+        <div class="chat-panel">
+            <h2>Chat</h2>
+            <div id="chatMessages"></div>
+            <div id="typingIndicator" class="typing-indicator">Peer is typing...</div>
+            <div class="input-group">
+                <input type="text" id="messageInput" placeholder="Type a message" disabled>
+                <button id="sendMessageButton" disabled>Send</button>
+            </div>
+        </div>
+        
+        <div class="media-panel">
+            <h2>Video & Voice Call</h2>
+            <div class="input-group">
+                <button id="startVideoButton">Start Video Call</button>
+                <button id="startVoiceButton">Start Voice Call</button>
+                <button id="endCallButton" disabled>End Call</button>
+            </div>
+            <div class="video-container">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <video id="localVideo" autoplay playsinline muted></video>
+            </div>
+        </div>
+        
+        <div class="stream-panel">
+            <h2>Video Streaming</h2>
+            <div class="input-group">
+                <input type="file" id="streamFileInput" accept="video/*" style="display:none">
+                <button onclick="document.getElementById('streamFileInput').click()">Select Video</button>
+                <button id="startStreamButton" disabled>Start Stream</button>
+                <button id="stopStreamButton" disabled>Stop Stream</button>
+            </div>
+            <div class="stream-video-container">
+                <div class="stream-video">
+                    <video id="localStreamVideo" controls></video>
+                </div>
+                <div class="stream-video">
+                    <video id="remoteStreamVideo" controls autoplay></video>
+                </div>
+            </div>
+        </div>
+        
+        <div class="file-panel">
+            <h2>File Sharing</h2>
+            <div class="input-group">
+                <button id="btnShareDownloadable" class="secondary">Share downloadable files</button>
+                <button id="btnShareNonDownloadable" class="secondary">Share non downloadable files</button>
+                <input type="file" id="pickDownloadable" multiple style="display:none">
+                <input type="file" id="pickNonDownloadable" accept="image/*,video/*" multiple style="display:none">
+            </div>
+            <h3>Transfers & Received Files</h3>
+            <div id="transferList" class="transfer-list"></div>
+        </div>
     </div>
-    <div class="input-group">
-      <input type="text" id="peerIdInput" placeholder="Enter peer ID to connect"/>
-      <button id="connectButton">Connect</button>
+    
+    <!-- Modal -->
+    <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Preview</h3>
+                <!-- Removed the top back button as requested -->
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be inserted here -->
+            </div>
+        </div>
     </div>
-    <div class="status">
-      <span class="connection-status status-disconnected" id="statusDot"></span>
-      Status: <span id="connectionStatus">Disconnected</span>
-    </div>
-  </div>  <div class="chat-panel">
-    <h2>Chat</h2>
-    <div id="chatMessages"></div>
-    <div id="typingIndicator" class="typing-indicator"></div>
-    <div class="input-group">
-      <input type="text" id="messageInput" placeholder="Type your message" disabled/>
-      <button id="sendMessageButton" disabled>Send</button>
-    </div>
-  </div>  <div class="media-panel">
-    <h2>Video & Voice Call</h2>
-    <div class="video-container">
-      <video id="remoteVideo" autoplay playsinline></video>
-      <video id="localVideo" autoplay playsinline muted></video>
-    </div>
-    <div class="input-group">
-      <button id="startVideoButton">Start Video</button>
-      <button id="startVoiceButton" class="secondary">Voice Call</button>
-      <button id="endCallButton" class="warn" disabled>End Call</button>
-    </div>
-  </div>  <div class="stream-panel">
-    <h2>Video Streaming</h2>
-    <div class="stream-video-container">
-      <div class="stream-video">
-        <video id="localStreamVideo" controls></video>
-      </div>
-      <div class="stream-video">
-        <video id="remoteStreamVideo" controls></video>
-      </div>
-    </div>
-    <div class="input-group">
-      <input type="file" id="streamFileInput" accept="video/*"/>
-      <button id="startStreamButton" disabled>Start Stream</button>
-      <button id="stopStreamButton" class="warn" disabled>Stop Stream</button>
-    </div>
-  </div>  <div class="file-panel">
-    <h2>File Sharing</h2>
-    <div class="input-group">
-      <button id="btnShareDownloadable" class="secondary">Share downloadable files</button>
-      <button id="btnShareNonDownloadable" class="warn">Share non downloadable files</button>
-    </div>
-    <div id="fileInfo" class="file-info">
-      <div style="margin-bottom:6px;color:#555;">
-        <strong>Transfers & Received Files</strong>
-      </div>
-      <div id="transferList" class="transfer-list"></div>
-    </div><!-- Hidden pickers -->
-<input type="file" id="pickDownloadable" multiple style="display:none"/>
-<input type="file" id="pickNonDownloadable" multiple accept="image/*,video/*" style="display:none"/>
 
-  </div>
-</div><!-- Modal --><div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
-  <div class="modal">
-    <div class="modal-header">
-      <div id="modalTitle">Preview</div>
-      <div>
-        <button id="modalBackBtn">Back</button>
-      </div>
-    </div>
-    <div class="modal-body" id="modalBody">
-      <!-- dynamic -->
-    </div>
-  </div>
-</div><script>
-/* =======================
-   Config & Globals
-======================= */
-const config = {
-  iceServers: [
-    { urls:'stun:stun.l.google.com:19302'},
-    { urls:'stun:stun1.l.google.com:19302'},
-    { urls:'stun:stun2.l.google.com:19302'},
-    { urls:'stun:stun3.l.google.com:19302'},
-    { urls:'stun:stun4.l.google.com:19302'}
-  ]
-};
+    <script>
+        /* ======================= Config & Globals ======================= */
+        const config = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun3.l.google.com:19302' },
+                { urls: 'stun:stun4.l.google.com:19302' }
+            ]
+        };
 
-let peer, connection, dataChannel;
-let localStream = null, remoteStream = null;
-let mediaCall = null, streamCall = null;
-let isCaller = false, connectedPeerId = null, typingTimer = null;
-let capturedMediaStream = null; // captureStream from video file (to stop tracks when stopping stream)
+        let peer, connection, dataChannel;
+        let localStream = null, remoteStream = null;
+        let mediaCall = null, streamCall = null;
+        let isCaller = false, connectedPeerId = null, typingTimer = null;
+        let capturedMediaStream = null;
 
-/* File transfer (256KB chunks - optimized) */
-const CHUNK_SIZE = 256 * 1024;
-const sendingTransfers = new Map();   // id -> {file, offset, total, name, size, mime, category, ui}
-const receivingTransfers = new Map(); // id -> {chunks:[], received, total, meta, ui}
+        /* File transfer (256KB chunks - optimized) */
+        const CHUNK_SIZE = 256 * 1024;
+        const sendingTransfers = new Map();
+        const receivingTransfers = new Map();
 
-/* =======================
-   DOM
-======================= */
-const myIdElement = document.getElementById('myId');
-const connectionStatusElement = document.getElementById('connectionStatus');
-const statusDot = document.getElementById('statusDot');
-const copyIdButton = document.getElementById('copyIdButton');
-const peerIdInput = document.getElementById('peerIdInput');
-const connectButton = document.getElementById('connectButton');
-const messageInput = document.getElementById('messageInput');
-const sendMessageButton = document.getElementById('sendMessageButton');
-const chatMessages = document.getElementById('chatMessages');
-const typingIndicator = document.getElementById('typingIndicator');
-const startVideoButton = document.getElementById('startVideoButton');
-const startVoiceButton = document.getElementById('startVoiceButton');
-const endCallButton = document.getElementById('endCallButton');
-const localVideo = document.getElementById('localVideo');
-const remoteVideo = document.getElementById('remoteVideo');
-const streamFileInput = document.getElementById('streamFileInput');
-const startStreamButton = document.getElementById('startStreamButton');
-const stopStreamButton = document.getElementById('stopStreamButton');
-const localStreamVideo = document.getElementById('localStreamVideo');
-const remoteStreamVideo = document.getElementById('remoteStreamVideo');
-const btnShareDownloadable = document.getElementById('btnShareDownloadable');
-const btnShareNonDownloadable = document.getElementById('btnShareNonDownloadable');
-const pickDownloadable = document.getElementById('pickDownloadable');
-const pickNonDownloadable = document.getElementById('pickNonDownloadable');
-const transferList = document.getElementById('transferList');
+        /* IndexedDB for file storage */
+        let db = null;
+        const DB_NAME = 'WebRTCFilesDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'files';
 
-/* Modal */
-const modalBackdrop = document.getElementById('modalBackdrop');
-const modalBackBtn = document.getElementById('modalBackBtn');
-const modalBody = document.getElementById('modalBody');
-const modalTitle = document.getElementById('modalTitle');
-
-/* =======================
-   PeerJS Init
-======================= */
-function initializePeer() {
-  peer = new Peer({ config, debug: 2 });
-
-  peer.on('open', id => {
-    myIdElement.textContent = id;
-    updateConnectionStatus('disconnected', 'Ready to connect');
-    copyIdButton.disabled = false;
-  });
-
-  peer.on('connection', conn => {
-    if (connection && connection.open) { conn.close(); return; }
-    connectedPeerId = conn.peer;
-    setupDataConnection(conn);
-    peerIdInput.value = conn.peer;
-    connectButton.disabled = true;
-  });
-
-  // Incoming calls: use metadata to decide whether it's a media call (camera/mic) or a stream call (file stream).
-  peer.on('call', call => {
-    const callType = call.metadata && call.metadata.type ? call.metadata.type : 'media';
-
-    // For 'media' calls (video/voice), answer with local camera/mic (if available). For 'stream' calls (file streaming),
-    // answer without sending our camera/mic to avoid mixing streams and calls.
-    try {
-      if (callType === 'media') {
-        // If we already have an active streamCall (streaming), close it to prioritize call media (prevent mixing).
-        if (streamCall) {
-          try { streamCall.close(); } catch(e) {}
-          streamCall = null;
-          stopCapturedMediaStream();
+        /* Initialize IndexedDB */
+        function initIndexedDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    if (!database.objectStoreNames.contains(STORE_NAME)) {
+                        database.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                };
+            });
         }
-        call.answer(localStream || undefined); // will send our local camera/mic if present
-        mediaCall = call;
-        trackRTCPeerConnection(call.peerConnection, 'Media');
-        setupMediaCallHandlers(call, 'media');
-      } else if (callType === 'stream') {
-        // For streams, answer without local media. We'll show incoming stream in remoteStreamVideo.
-        // If we have an active media call, we keep it— but prefer not to send our camera as response to stream calls.
-        call.answer(undefined);
-        streamCall = call;
-        trackRTCPeerConnection(call.peerConnection, 'Stream');
-        setupMediaCallHandlers(call, 'stream');
-      } else {
-        // fallback - treat as media
-        call.answer(localStream || undefined);
-        mediaCall = call;
-        setupMediaCallHandlers(call, 'media');
-      }
-    } catch (err) {
-      console.error('Error answering call:', err);
-      updateConnectionStatus('error', 'Call answer failed');
-    }
-  });
 
-  peer.on('disconnected', () => {
-    updateConnectionStatus('disconnected', 'Peer disconnected');
-    resetConnectionState();
-  });
+        /* Store file in IndexedDB */
+        function storeFileInDB(id, blob, metadata) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject(new Error('Database not initialized'));
+                    return;
+                }
+                
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                
+                const fileData = {
+                    id: id,
+                    blob: blob,
+                    metadata: metadata,
+                    timestamp: Date.now()
+                };
+                
+                const request = store.add(fileData);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve();
+            });
+        }
 
-  peer.on('error', err => {
-    console.error('PeerJS error:', err);
-    updateConnectionStatus('error', 'Error: ' + (err && err.type ? err.type : err));
-  });
-}
+        /* Get file from IndexedDB */
+        function getFileFromDB(id) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject(new Error('Database not initialized'));
+                    return;
+                }
+                
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.get(id);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    if (request.result) {
+                        resolve(request.result);
+                    } else {
+                        reject(new Error('File not found'));
+                    }
+                };
+            });
+        }
 
-/* =======================
-   UI: Connection Status
-======================= */
-function updateConnectionStatus(state, message){
-  connectionStatusElement.textContent = message;
-  statusDot.className = 'connection-status';
-  if (state === 'connected') statusDot.classList.add('status-connected');
-  else if (state === 'connecting') statusDot.classList.add('status-connecting');
-  else if (state === 'error') statusDot.classList.add('status-error');
-  else statusDot.classList.add('status-disconnected');
-}
+        /* Delete file from IndexedDB */
+        function deleteFileFromDB(id) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject(new Error('Database not initialized'));
+                    return;
+                }
+                
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.delete(id);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve();
+            });
+        }
 
-/* Monitor real-time state from RTCPeerConnection for both data & media */
-function trackRTCPeerConnection(pc, label='Data'){
-  if (!pc) return;
-  const handler = () => {
-    const s = pc.connectionState || pc.iceConnectionState;
-    if (s === 'connected') updateConnectionStatus('connected', `${label} connected`);
-    else if (s === 'connecting' || s === 'checking') updateConnectionStatus('connecting', `${label} connecting...`);
-    else if (s === 'disconnected') updateConnectionStatus('disconnected', `${label} disconnected`);
-    else if (s === 'failed') updateConnectionStatus('error', `${label} failed`);
-    else if (s === 'closed') updateConnectionStatus('disconnected', `${label} closed`);
-  };
-  pc.onconnectionstatechange = handler;
-  pc.oniceconnectionstatechange = handler;
-  handler();
-}
+        /* Clean up old files from IndexedDB (older than 1 day) */
+        function cleanupOldFiles() {
+            if (!db) return;
+            
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.openCursor();
+            const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
+            
+            request.onsuccess = function(event) {
+                const cursor = event.target.result;
+                if (cursor) {
+                    if (cursor.value.timestamp < oneDayAgo) {
+                        cursor.delete();
+                    }
+                    cursor.continue();
+                }
+            };
+        }
 
-/* =======================
-   Data Connection Setup
-======================= */
-function setupDataConnection(conn){
-  connection = conn;
-  connection.on('open', () => {
-    dataChannel = connection;
-    updateConnectionStatus('connected', 'Connected to ' + connection.peer);
-    messageInput.disabled = false;
-    sendMessageButton.disabled = false;
-    startStreamButton.disabled = false;
-    connectedPeerId = connection.peer;
+        /* =======================
+        DOM
+        ======================= */
+        const myIdElement = document.getElementById('myId');
+        const connectionStatusElement = document.getElementById('connectionStatus');
+        const statusDot = document.getElementById('statusDot');
+        const copyIdButton = document.getElementById('copyIdButton');
+        const peerIdInput = document.getElementById('peerIdInput');
+        const connectButton = document.getElementById('connectButton');
+        const messageInput = document.getElementById('messageInput');
+        const sendMessageButton = document.getElementById('sendMessageButton');
+        const chatMessages = document.getElementById('chatMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const startVideoButton = document.getElementById('startVideoButton');
+        const startVoiceButton = document.getElementById('startVoiceButton');
+        const endCallButton = document.getElementById('endCallButton');
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const streamFileInput = document.getElementById('streamFileInput');
+        const startStreamButton = document.getElementById('startStreamButton');
+        const stopStreamButton = document.getElementById('stopStreamButton');
+        const localStreamVideo = document.getElementById('localStreamVideo');
+        const remoteStreamVideo = document.getElementById('remoteStreamVideo');
+        const btnShareDownloadable = document.getElementById('btnShareDownloadable');
+        const btnShareNonDownloadable = document.getElementById('btnShareNonDownloadable');
+        const pickDownloadable = document.getElementById('pickDownloadable');
+        const pickNonDownloadable = document.getElementById('pickNonDownloadable');
+        const transferList = document.getElementById('transferList');
 
-    // Real-time connection monitoring - PeerJS exposes underlying peerConnection on the call objects, but for data
-    // we attempt to use connection.peerConnection if available.
-    if (connection.peerConnection) trackRTCPeerConnection(connection.peerConnection, 'Data');
+        /* Modal */
+        const modalBackdrop = document.getElementById('modalBackdrop');
+        const modalBody = document.getElementById('modalBody');
+        const modalTitle = document.getElementById('modalTitle');
 
-    setupDataChannel();
-  });
-  connection.on('close', () => {
-    updateConnectionStatus('disconnected', 'Connection closed');
-    resetConnectionState();
-  });
-  connection.on('error', err => {
-    console.error('Connection error:', err);
-    updateConnectionStatus('error', 'Connection error');
-  });
-}
+        /* =======================
+        PeerJS Init
+        ======================= */
+        function initializePeer() {
+            peer = new Peer({ config, debug: 2 });
 
-function setupDataChannel(){
-  if (!dataChannel) return;
-  dataChannel.on('data', handleDataMessage);
-  // attempt to set binaryType if available (PeerJS uses underlying DC)
-  try {
-    if (dataChannel._dc) dataChannel._dc.binaryType = 'arraybuffer';
-  } catch(e){}
-}
+            peer.on('open', id => {
+                myIdElement.textContent = id;
+                updateConnectionStatus('disconnected', 'Ready to connect');
+                copyIdButton.disabled = false;
+            });
 
-/* =======================
-   Chat
-======================= */
-function handleDataMessage(data){
-  if (!data) return;
-  try {
-    switch(data.type){
-      case 'chat':
-        addMessage(data.message, 'remote');
-        break;
-      case 'typing-start':
-        typingIndicator.textContent = 'Peer is typing...';
-        typingIndicator.style.visibility = 'visible';
-        break;
-      case 'typing-stop':
-        typingIndicator.style.visibility = 'hidden';
-        break;
-      /* File transfer protocol */
-      case 'file-meta':
-        startReceivingFile(data.meta);
-        break;
-      case 'file-chunk':
-        receiveFileChunk(data.id, data.seq, data.total, data.chunk);
-        break;
-      case 'file-complete':
-        finalizeReceivedFile(data.id);
-        break;
-      case 'file-progress':
-        updateSendProgressUI(data.id, data.percent);
-        break;
-      default:
-        // ignore
-        break;
-    }
-  } catch (err) {
-    console.error('Error handling data message', err);
-  }
-}
+            peer.on('connection', conn => {
+                if (connection && connection.open) { conn.close(); return; }
+                connectedPeerId = conn.peer;
+                setupDataConnection(conn);
+                peerIdInput.value = conn.peer;
+                connectButton.disabled = true;
+            });
 
-function addMessage(message, type){
-  const el = document.createElement('div');
-  el.classList.add('message', type);
-  el.textContent = message;
-  chatMessages.appendChild(el);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+            // Incoming calls
+            peer.on('call', call => {
+                const callType = call.metadata && call.metadata.type ? call.metadata.type : 'media';
 
-function sendMessage(){
-  const message = messageInput.value.trim();
-  if (message && dataChannel){
-    try {
-      dataChannel.send({type:'chat', message});
-      addMessage(message, 'local');
-      messageInput.value = '';
-    } catch (err) {
-      console.error('Send message failed', err);
-    }
-  }
-}
+                try {
+                    if (callType === 'media') {
+                        if (streamCall) {
+                            try { streamCall.close(); } catch(e) {}
+                            streamCall = null;
+                            stopCapturedMediaStream();
+                        }
+                        call.answer(localStream || undefined);
+                        mediaCall = call;
+                        trackRTCPeerConnection(call.peerConnection, 'Media');
+                        setupMediaCallHandlers(call, 'media');
+                    } else if (callType === 'stream') {
+                        call.answer(undefined);
+                        streamCall = call;
+                        trackRTCPeerConnection(call.peerConnection, 'Stream');
+                        setupMediaCallHandlers(call, 'stream');
+                    } else {
+                        call.answer(localStream || undefined);
+                        mediaCall = call;
+                        setupMediaCallHandlers(call, 'media');
+                    }
+                } catch (err) {
+                    console.error('Error answering call:', err);
+                    updateConnectionStatus('error', 'Call answer failed');
+                }
+            });
 
-function handleTyping(){
-  if (!dataChannel) return;
-  try {
-    dataChannel.send({type:'typing-start'});
-    if (typingTimer) clearTimeout(typingTimer);
-    typingTimer = setTimeout(() => dataChannel?.send({type:'typing-stop'}), 1000);
-  } catch(e){}
-}
+            peer.on('disconnected', () => {
+                updateConnectionStatus('disconnected', 'Peer disconnected');
+                resetConnectionState();
+            });
 
-/* =======================
-   Calls (Video / Voice)
-   - maintain separate mediaCall and streamCall
-   - use call.metadata to distinguish
-   - bandwidth prioritization applied after call establishment
-======================= */
+            peer.on('error', err => {
+                console.error('PeerJS error:', err);
+                updateConnectionStatus('error', 'Error: ' + (err && err.type ? err.type : err));
+            });
+        }
 
-async function startVideoCall(){
-  try{
-    // Ensure streaming is stopped before initiating a direct media call to avoid mixing.
-    if (streamCall) {
-      try { streamCall.close(); } catch(e){}
-      streamCall = null;
-      stopCapturedMediaStream();
-    }
-
-    localStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
-    localVideo.srcObject = localStream;
-    startCall('media');
-  }catch(e){ alert('Could not access camera/mic'); console.error(e); }
-}
-
-async function startVoiceCall(){
-  try{
-    if (streamCall) {
-      try { streamCall.close(); } catch(e){}
-      streamCall = null;
-      stopCapturedMediaStream();
-    }
-
-    localStream = await navigator.mediaDevices.getUserMedia({video:false, audio:true});
-    // localVideo remains empty for voice-only, but keep localStream assigned
-    startCall('media');
-  }catch(e){ alert('Could not access microphone'); console.error(e); }
-}
-
-function startCall(type='media'){
-  if (!connection) return alert('Connect to a peer first');
-  isCaller = true;
-  endCallButton.disabled = false;
-
-  // Close existing mediaCall if any to avoid duplicates
-  if (mediaCall) {
-    try { mediaCall.close(); } catch(e){}
-    mediaCall = null;
-  }
-
-  // call.metadata used to let remote side know the type
-  const call = peer.call(connection.peer, localStream, { metadata: { type: type === 'stream' ? 'stream' : 'media' } });
-  mediaCall = call;
-  trackRTCPeerConnection(call.peerConnection, 'Media');
-  setupMediaCallHandlers(call, 'media');
-
-  // attempt to set higher bitrate / prioritize after small delay
-  call.on('stream', () => {
-    prioritizeBandwidth(call.peerConnection, 'video');
-    prioritizeBandwidth(call.peerConnection, 'audio');
-  });
-
-  call.on('error', err => {
-    console.error('Call error:', err);
-    updateConnectionStatus('error', 'Media error');
-  });
-}
-
-function endCall(){
-  // End only mediaCall (video/voice)
-  if (mediaCall){
-    try{ mediaCall.close(); }catch(e){}
-    mediaCall = null;
-  }
-  if (localStream){
-    localStream.getTracks().forEach(t => t.stop());
-    localStream = null;
-    localVideo.srcObject = null;
-  }
-  if (remoteStream){
-    try{ remoteStream.getTracks().forEach(t=>t.stop()); }catch(e){}
-    remoteStream = null;
-    remoteVideo.srcObject = null;
-  }
-  endCallButton.disabled = true;
-  // After ending, allow streaming again
-  startStreamButton.disabled = !(connection && streamFileInput.files[0]);
-}
-
-/* common handler for both media and stream calls */
-function setupMediaCallHandlers(call, kind = 'media'){
-  call.on('stream', stream => {
-    if (kind === 'media') {
-      // Show on main remoteVideo
-      remoteStream = stream;
-      remoteVideo.srcObject = stream;
-      endCallButton.disabled = false;
-    } else if (kind === 'stream') {
-      // Show in remoteStreamVideo
-      remoteStreamVideo.srcObject = stream;
-    }
-    // After receiving remote stream, attempt to prioritize inbound bandwidth (best-effort)
-    try { prioritizeBandwidth(call.peerConnection, 'video'); } catch(e){}
-  });
-
-  call.on('close', () => {
-    if (kind === 'media') {
-      endCall();
-    } else if (kind === 'stream') {
-      stopStreaming();
-    }
-  });
-
-  call.on('error', err => {
-    console.error(kind + ' call error:', err);
-    updateConnectionStatus('error', `${kind} media error`);
-    if (kind === 'media') endCall();
-    else stopStreaming();
-  });
-}
-
-/* =======================
-   Bandwidth Prioritization
-   - Best-effort: set encoder params on RTCRtpSender if supported
-======================= */
-function prioritizeBandwidth(pc, kind = 'video'){
-  if (!pc) return;
-  try {
-    const senders = pc.getSenders ? pc.getSenders() : [];
-    senders.forEach(sender => {
-      if (!sender || !sender.track) return;
-      const trackKind = sender.track.kind;
-      if ((kind === 'video' && trackKind === 'video') || (kind === 'audio' && trackKind === 'audio')) {
-        const params = sender.getParameters ? sender.getParameters() : null;
-        if (params && params.encodings && params.encodings.length) {
-          // set higher maxBitrate for video, moderate for audio
-          params.encodings.forEach(enc => {
-            if (trackKind === 'video') {
-              // prefer high bitrate but keep within reasonable limits to avoid congestion
-              enc.maxBitrate = enc.maxBitrate || 2_000_000; // ~2 Mbps
-              enc.priority = 'high';
-          } else if (trackKind === 'audio') {
-              enc.maxBitrate = enc.maxBitrate || 128_000; // 128 kbps
-              enc.priority = 'high';
+        /* =======================
+        UI: Connection Status
+        ======================= */
+        function updateConnectionStatus(state, message){
+            const allowedStates = ['connected', 'disconnected', 'connecting', 'error'];
+            if (!allowedStates.includes(state)) {
+                state = 'disconnected';
+                message = 'Disconnected';
             }
-          });
-          try {
-            sender.setParameters(params).catch(()=>{/* ignore */});
-          } catch(e){}
+            
+            connectionStatusElement.textContent = message;
+            statusDot.className = 'connection-status';
+            if (state === 'connected') statusDot.classList.add('status-connected');
+            else if (state === 'connecting') statusDot.classList.add('status-connecting');
+            else if (state === 'error') statusDot.classList.add('status-error');
+            else statusDot.classList.add('status-disconnected');
         }
-      }
-    });
-  } catch (e) {
-    // Not all browsers or senders support setParameters - fail silently
-    console.warn('Bandwidth prioritization not fully supported by browser', e);
-  }
-}
-
-/* =======================
-   Synchronized Streaming
-   - Use metadata type 'stream' to avoid being answered with local camera/mic
-   - Capture stream from the video element and call with it
-   - Ensure we stop captured tracks and close streamCall when stopping
-======================= */
-async function startStreaming(){
-  if (!connection) return alert('Please connect first');
-  const file = streamFileInput.files[0];
-  if (!file) return alert('Select a video file first');
-
-  // If a media call (camera/mic) is active, close it to reduce mixing and free bandwidth
-  if (mediaCall) {
-    try { mediaCall.close(); } catch(e){}
-    mediaCall = null;
-    if (localStream) {
-      localStream.getTracks().forEach(t=>t.stop());
-      localStream = null;
-      localVideo.srcObject = null;
-    }
-  }
-
-  const fileURL = URL.createObjectURL(file);
-  localStreamVideo.src = fileURL;
-  localStreamVideo.onloadedmetadata = async () => {
-    try {
-      await localStreamVideo.play();
-    } catch(e){/* auto-play restrictions - ignore */ }
-
-    if (!localStreamVideo.captureStream){
-      alert("Your browser doesn't support captureStream");
-      return;
-    }
-
-    // captureStream returns a MediaStream of the playback; we'll call with that
-    try {
-      stopCapturedMediaStream();
-      capturedMediaStream = localStreamVideo.captureStream();
-      // send with metadata telling callee it's a stream so they don't answer with their local camera
-      const call = peer.call(connection.peer, capturedMediaStream, { metadata: { type: 'stream' } });
-      streamCall = call;
-      trackRTCPeerConnection(call.peerConnection, 'Stream');
-      setupMediaCallHandlers(call, 'stream');
-
-      call.on('stream', rStream => {
-        // remote might send their playback stream back (if they also stream)
-        remoteStreamVideo.srcObject = rStream;
-      });
-
-      call.on('close', stopStreaming);
-      startStreamButton.disabled = true;
-      stopStreamButton.disabled = false;
-
-      // Attempt to prioritize video bandwidth on the call
-      setTimeout(()=> {
-        try { prioritizeBandwidth(call.peerConnection, 'video'); } catch(e){}
-      }, 800);
-    } catch (err) {
-      console.error('Start stream error', err);
-      alert('Failed to start stream');
-      stopCapturedMediaStream();
-    }
-  };
-}
-
-function stopCapturedMediaStream(){
-  if (capturedMediaStream){
-    try { capturedMediaStream.getTracks().forEach(t=>t.stop()); } catch(e){}
-    capturedMediaStream = null;
-  }
-}
-
-function stopStreaming(){
-  if (streamCall){
-    try{ streamCall.close(); }catch(e){}
-    streamCall = null;
-  }
-  stopCapturedMediaStream();
-  try { localStreamVideo.pause(); } catch(e){}
-  localStreamVideo.src = '';
-  remoteStreamVideo.srcObject = null;
-  startStreamButton.disabled = !(connection && streamFileInput.files[0]);
-  stopStreamButton.disabled = true;
-}
-
-/* =======================
-   File Transfer (Chunked, optimized)
-   - Uses CHUNK_SIZE 256KB
-   - Implements simple pacing (throttling) to avoid overwhelming DataChannel
-   - Sends meta, then chunks (ArrayBuffer), then complete
-======================= */
-function uuid(){
-  return 'f-' + Math.random().toString(36).slice(2) + '-' + Date.now().toString(36);
-}
-
-function humanSize(bytes){
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
-  return (bytes/1048576).toFixed(1) + ' MB';
-}
-
-/* UI helpers for transfers */
-function createTransferUI(id, name, size, type){
-  const wrap = document.createElement('div');
-  wrap.className = 'transfer-item';
-  wrap.id = `xfer-${id}`;
-
-  const top = document.createElement('div');
-  top.className = 'transfer-top';
-
-  const nameEl = document.createElement('div');
-  nameEl.className = 'transfer-name';
-  nameEl.textContent = `${name} (${humanSize(size)})`;
-  top.appendChild(nameEl);
-
-  const pctEl = document.createElement('div');
-  pctEl.id = `pct-${id}`;
-  pctEl.textContent = '0%';
-  top.appendChild(pctEl);
-
-  const bar = document.createElement('div');
-  bar.className = 'progress-bar';
-  const prog = document.createElement('div');
-  prog.className = 'progress';
-  prog.dataset.type = type; // 'send' or 'recv'
-  prog.style.width = '0%';
-  bar.appendChild(prog);
-
-  wrap.appendChild(top);
-  wrap.appendChild(bar);
-
-  transferList.appendChild(wrap);
-  return {wrap, pctEl, prog};
-}
-
-function updateProgressUI(id, percent){
-  const pctEl = document.getElementById(`pct-${id}`);
-  const prog = document.querySelector(`#xfer-${id} .progress`);
-  if (pctEl) pctEl.textContent = `${percent}%`;
-  if (prog) prog.style.width = `${percent}%`;
-}
-
-/* Throttle wait - simple promise-based wait */
-function wait(ms){ return new Promise(r=>setTimeout(r, ms)); }
-
-/* Sender: iterate chunks and send with pacing */
-async function sendFileAsChunks(file, category){
-  if (!dataChannel || !connection || !connection.open) return alert('Connect first');
-
-  const id = uuid();
-  const meta = { id, name: file.name, size: file.size, mime: file.type || 'application/octet-stream', category };
-  const ui = createTransferUI(id, file.name, file.size, 'send');
-
-  sendingTransfers.set(id, { file, offset: 0, total: file.size, name:file.name, size:file.size, mime:meta.mime, category, ui });
-
-  // Send meta
-  try { dataChannel.send({ type: 'file-meta', meta }); } catch(e){ console.error('send meta failed', e); }
-
-  const reader = new FileReader();
-  let offset = 0;
-  let seq = 0;
-  const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-
-  function readSlice(o){ const slice = file.slice(o, o + CHUNK_SIZE); reader.readAsArrayBuffer(slice); }
-
-  reader.onload = async () => {
-    const chunk = reader.result; // ArrayBuffer
-    try {
-      // send chunk as plain ArrayBuffer in an object to maintain protocol
-      dataChannel.send({ type:'file-chunk', id, seq, total: totalChunks, chunk });
-    } catch (err) {
-      // if structured clone fails or channel overloaded, try sending as base64 fallback
-      try {
-        const blob = new Blob([chunk]);
-        const text = await blobToBase64(blob);
-        dataChannel.send({ type:'file-chunk', id, seq, total: totalChunks, chunkB64: text });
-      } catch(e){
-        console.error('Failed to send chunk', e);
-      }
-    }
-
-    offset += chunk.byteLength;
-    seq += 1;
-
-    // Update local (sender) progress; receiver echoes progress back for sync
-    const percent = Math.min(100, Math.floor((offset / file.size) * 100));
-    updateProgressUI(id, percent);
-
-    // Throttle: small pause to avoid hogging channel; adaptive delay
-    // Smaller files can send faster; large files get small pauses.
-    if (offset < file.size){
-      // Micro-throttle based on chunk size and file size
-      const adaptiveDelay = Math.min(40, Math.max(8, Math.floor((CHUNK_SIZE / 1024) / 6))); // 8-40ms
-      await wait(adaptiveDelay);
-      readSlice(offset);
-    } else {
-      try { dataChannel.send({ type:'file-complete', id }); } catch(e){ console.error('send complete err', e); }
-    }
-  };
-
-  readSlice(0);
-}
-
-/* utility: blob to base64 (fallback) */
-function blobToBase64(blob){ return new Promise((res, rej) => {
-  const r = new FileReader();
-  r.onload = ()=> res(r.result.split(',')[1]);
-  r.onerror = rej;
-  r.readAsDataURL(blob);
-}); }
-
-/* Receiver: initialize structure on meta */
-function startReceivingFile(meta){
-  const { id, name, size, category } = meta;
-  const ui = createTransferUI(id, name, size, 'recv');
-  receivingTransfers.set(id, { chunks: [], received: 0, total: size, meta, ui });
-}
-
-/* Receiver: collect chunks (handle ArrayBuffer or base64) */
-async function receiveFileChunk(id, seq, total, chunk){
-  const rcv = receivingTransfers.get(id);
-  if (!rcv) return;
-
-  if (chunk) {
-    // If chunk is ArrayBuffer-like, convert to Uint8Array
-    try {
-      const arr = new Uint8Array(chunk);
-      rcv.chunks[seq] = arr;
-      rcv.received += arr.byteLength;
-    } catch (e) {
-      // if chunk isn't ArrayBuffer, ignore
-    }
-  } else {
-    // fallback: maybe chunkB64 was sent
-    // PeerJS structured clone may have sent chunkB64 as property
-    // If we receive object with chunkB64 in data, handle at top-level handler (not here)
-  }
-
-  const pct = Math.min(100, Math.floor((rcv.received / rcv.total) * 100));
-  updateProgressUI(id, pct);
-
-  // echo progress back to sender for synchronized updates
-  try { dataChannel?.send({ type: 'file-progress', id, percent: pct }); } catch(e){}
-
-  // if all chunks received?
-  // check number of non-empty entries
-  const have = rcv.chunks.filter(Boolean).length;
-  if (have === total){
-    finalizeReceivedFile(id);
-  }
-}
-
-/* handle fallback chunkB64 when received */
-function handleFallbackChunkB64(obj){
-  // obj: {type:'file-chunk', id, seq, total, chunkB64}
-  const { id, seq, total, chunkB64 } = obj;
-  if (!chunkB64) return;
-  const rcv = receivingTransfers.get(id);
-  if (!rcv) return;
-  // convert base64 to Uint8Array
-  const byteString = atob(chunkB64);
-  const arr = new Uint8Array(byteString.length);
-  for (let i=0;i<byteString.length;i++) arr[i] = byteString.charCodeAt(i);
-  rcv.chunks[seq] = arr;
-  rcv.received += arr.byteLength;
-  const pct = Math.min(100, Math.floor((rcv.received / rcv.total) * 100));
-  updateProgressUI(id, pct);
-  try { dataChannel?.send({ type: 'file-progress', id, percent: pct }); } catch(e){}
-  const have = rcv.chunks.filter(Boolean).length;
-  if (have === total) finalizeReceivedFile(id);
-}
-
-/* Sender receives echoed progress */
-function updateSendProgressUI(id, percent){
-  updateProgressUI(id, Math.max(0, Math.min(100, Math.floor(percent))));
-}
-
-/* Receiver: finalize and render link or modal opener */
-function finalizeReceivedFile(id){
-  const rcv = receivingTransfers.get(id);
-  if (!rcv) return;
-
-  // Build Blob - ensure ordered by seq
-  const ordered = [];
-  for (let i=0;i<rcv.chunks.length;i++){
-    if (rcv.chunks[i]) ordered.push(rcv.chunks[i]);
-  }
-
-  const blob = new Blob(ordered, { type: rcv.meta.mime });
-  const url = URL.createObjectURL(blob);
-
-  const parent = document.getElementById(`xfer-${id}`);
-  if (!parent) return;
-
-  const line = document.createElement('div');
-  line.style.marginTop = '6px';
-
-  const link = document.createElement('a');
-  link.className = 'file-link';
-  link.textContent = rcv.meta.category === 'downloadable' ? 'Download file' : 'Open preview';
-  link.href = rcv.meta.category === 'downloadable' ? url : 'javascript:void(0)';
-  if (rcv.meta.category === 'downloadable'){
-    link.download = rcv.meta.name || 'file';
-  }else{
-    link.addEventListener('click', () => openPreviewModal(rcv.meta.name, url, rcv.meta.mime));
-  }
-
-  line.appendChild(link);
-  parent.appendChild(line);
-
-  updateProgressUI(id, 100);
-  receivingTransfers.delete(id);
-}
-
-/* =======================
-   Modal Preview (non-downloadable)
-   - images or videos
-   - video: custom play/pause + external seeker + inline back button
-======================= */
-function openPreviewModal(name, url, mime){
-  modalTitle.textContent = name || 'Preview';
-  modalBody.innerHTML = '';
-
-  if (mime && mime.startsWith('image/')) {
-    const img = document.createElement('img');
-    img.src = url;
-    img.alt = name || 'image';
-    modalBody.appendChild(img);
-
-    // add an inline back button for convenience on mobile/video flows
-    const backBtn = document.createElement('button');
-    backBtn.className = 'inline-back';
-    backBtn.textContent = 'Back';
-    backBtn.style.marginTop = '8px';
-    backBtn.addEventListener('click', closePreviewModal);
-    modalBody.appendChild(backBtn);
-
-  } else if (mime && mime.startsWith('video/')) {
-    const vid = document.createElement('video');
-    vid.src = url;
-    vid.playsInline = true;
-    vid.controls = false; // custom only
-    vid.id = 'customVideo';
-    modalBody.appendChild(vid);
-
-    const controls = document.createElement('div');
-    controls.className = 'player-controls';
-
-    const btn = document.createElement('button');
-    btn.textContent = 'Play';
-    btn.addEventListener('click', () => {
-      if (vid.paused){ vid.play(); btn.textContent = 'Pause'; }
-      else { vid.pause(); btn.textContent = 'Play'; }
-    });
-
-    const seek = document.createElement('input');
-    seek.type = 'range';
-    seek.min = 0; seek.max = 1000; seek.value = 0;
-    seek.addEventListener('input', () => {
-      if (vid.duration && isFinite(vid.duration)){
-        vid.currentTime = (seek.value/1000) * vid.duration;
-      }
-    });
-    vid.addEventListener('timeupdate', () => {
-      if (vid.duration && isFinite(vid.duration)){
-        seek.value = Math.floor((vid.currentTime / vid.duration) * 1000);
-      }
-    });
-
-    controls.appendChild(btn);
-    controls.appendChild(seek);
-
-    // Add a Back button inside controls for easy exit (especially mobile)
-    const backInside = document.createElement('button');
-    backInside.className = 'inline-back';
-    backInside.textContent = 'Back';
-    backInside.addEventListener('click', () => {
-      vid.pause();
-      closePreviewModal();
-    });
-    controls.appendChild(backInside);
-
-    modalBody.appendChild(controls);
-  } else {
-    const p = document.createElement('p');
-    p.textContent = 'This preview only supports images and videos.';
-    modalBody.appendChild(p);
-
-    const backBtn = document.createElement('button');
-    backBtn.className = 'inline-back';
-    backBtn.textContent = 'Back';
-    backBtn.style.marginTop = '8px';
-    backBtn.addEventListener('click', closePreviewModal);
-    modalBody.appendChild(backBtn);
-  }
-
-  modalBackdrop.style.display = 'flex';
-  modalBackdrop.setAttribute('aria-hidden', 'false');
-}
-
-function closePreviewModal(){
-  // Stop any playing video inside modal to free resources
-  try {
-    const vid = document.getElementById('customVideo');
-    if (vid) {
-      vid.pause();
-      vid.src = '';
-    }
-  } catch(e){}
-  modalBackdrop.style.display = 'none';
-  modalBackdrop.setAttribute('aria-hidden', 'true');
-  modalBody.innerHTML = '';
-}
-
-modalBackBtn.addEventListener('click', closePreviewModal);
-
-/* =======================
-   Connection Actions
-======================= */
-function connectToPeer(){
-  const peerId = peerIdInput.value.trim();
-  if (!peerId) return;
-  updateConnectionStatus('connecting', 'Connecting to ' + peerId);
-  connectedPeerId = peerId;
-  const conn = peer.connect(peerId, { reliable: true });
-  setupDataConnection(conn);
-  connectButton.disabled = true;
-}
-
-function copyIdToClipboard(){
-  const id = myIdElement.textContent;
-  navigator.clipboard.writeText(id).then(() => {
-    const original = copyIdButton.textContent;
-    copyIdButton.textContent = 'Copied!';
-    setTimeout(() => copyIdButton.textContent = original, 1500);
-  });
-}
-
-function resetConnectionState(){
-  messageInput.disabled = true;
-  sendMessageButton.disabled = true;
-  startStreamButton.disabled = true;
-  stopStreamButton.disabled = true;
-  connectButton.disabled = false;
-  typingIndicator.style.visibility = 'hidden';
-  endCall();
-  stopStreaming();
-  // cleanup data connection
-  try {
-    if (connection && connection.close) connection.close();
-  } catch(e){}
-  connection = null;
-  dataChannel = null;
-  connectedPeerId = null;
-}
-
-/* =======================
-   Event Listeners
-======================= */
-connectButton.addEventListener('click', connectToPeer);
-copyIdButton.addEventListener('click', copyIdToClipboard);
-sendMessageButton.addEventListener('click', sendMessage);
-messageInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
-messageInput.addEventListener('input', handleTyping);
-startVideoButton.addEventListener('click', startVideoCall);
-startVoiceButton.addEventListener('click', startVoiceCall);
-endCallButton.addEventListener('click', endCall);
-startStreamButton.addEventListener('click', startStreaming);
-stopStreamButton.addEventListener('click', stopStreaming);
-streamFileInput.addEventListener('change', () => { startStreamButton.disabled = !streamFileInput.files[0]; });
-
-/* File sharing buttons */
-btnShareDownloadable.addEventListener('click', () => {
-  pickDownloadable.click();
-});
-btnShareNonDownloadable.addEventListener('click', () => {
-  alert('Non downloadable accepts only images and videos. They will open in a preview modal.');
-  pickNonDownloadable.click();
-});
-
-/* Handle chosen files */
-pickDownloadable.addEventListener('change', () => {
-  if (!dataChannel) return alert('Connect first');
-  const files = Array.from(pickDownloadable.files || []);
-  files.forEach(f => sendFileAsChunks(f, 'downloadable'));
-  // reset input so the same file can be re-chosen later
-  pickDownloadable.value = '';
-});
-pickNonDownloadable.addEventListener('change', () => {
-  if (!dataChannel) return alert('Connect first');
-  const files = Array.from(pickNonDownloadable.files || []);
-  files.forEach(f => sendFileAsChunks(f, 'non-downloadable'));
-  pickNonDownloadable.value = '';
-});
-
-/* Also handle fallback-case where chunks may be received as objects with chunkB64
-   Because our main on('data') handler receives everything, we must detect chunkB64 there.
-   We'll wrap original handler with extra check to detect fallback shaped messages.
-*/
-const originalHandleDataMessage = handleDataMessage;
-function enhancedHandleDataMessage(obj){
-  // Detect fallback chunkB64 message shape
-  if (obj && obj.type === 'file-chunk' && obj.chunkB64) {
-    handleFallbackChunkB64(obj);
-    return;
-  }
-  originalHandleDataMessage(obj);
-}
-// Replace data handler setter dynamically if connection already exists:
-function setupDataChannel(){
-  if (!dataChannel) return;
-  dataChannel.on('data', enhancedHandleDataMessage);
-  try { if (dataChannel._dc) dataChannel._dc.binaryType = 'arraybuffer'; } catch(e){}
-}
-
-/* =======================
-   Initialize
-======================= */
-initializePeer();
-</script></body>
+
+        function trackRTCPeerConnection(pc, label='Data'){
+            if (!pc) return;
+            const handler = () => {
+                const s = pc.connectionState || pc.iceConnectionState;
+                if (s === 'connected') updateConnectionStatus('connected', `${label} connected`);
+                else if (s === 'connecting' || s === 'checking') updateConnectionStatus('connecting', `${label} connecting...`);
+                else if (s === 'disconnected' || s === 'closed') updateConnectionStatus('disconnected', `${label} disconnected`);
+                else if (s === 'failed') updateConnectionStatus('error', `${label} failed`);
+                else updateConnectionStatus('disconnected', `${label} disconnected`);
+            };
+            pc.onconnectionstatechange = handler;
+            pc.oniceconnectionstatechange = handler;
+            handler();
+        }
+
+        /* =======================
+        Data Connection Setup
+        ======================= */
+        function setupDataConnection(conn){
+            connection = conn;
+            connection.on('open', () => {
+                dataChannel = connection;
+                updateConnectionStatus('connected', 'Connected to ' + connection.peer);
+                messageInput.disabled = false;
+                sendMessageButton.disabled = false;
+                startStreamButton.disabled = false;
+                connectedPeerId = connection.peer;
+
+                if (connection.peerConnection) trackRTCPeerConnection(connection.peerConnection, 'Data');
+                setupDataChannel();
+            });
+            connection.on('close', () => {
+                updateConnectionStatus('disconnected', 'Connection closed');
+                resetConnectionState();
+            });
+            connection.on('error', err => {
+                console.error('Connection error:', err);
+                updateConnectionStatus('error', 'Connection error');
+            });
+        }
+
+        function setupDataChannel(){
+            if (!dataChannel) return;
+            dataChannel.on('data', handleDataMessage);
+            try {
+                if (dataChannel._dc) dataChannel._dc.binaryType = 'arraybuffer';
+            } catch(e){}
+        }
+
+        /* =======================
+        Chat
+        ======================= */
+        function handleDataMessage(data){
+            if (!data) return;
+            try {
+                switch(data.type){
+                    case 'chat':
+                        addMessage(data.message, 'remote');
+                        break;
+                    case 'typing-start':
+                        typingIndicator.textContent = 'Peer is typing...';
+                        typingIndicator.style.visibility = 'visible';
+                        break;
+                    case 'typing-stop':
+                        typingIndicator.style.visibility = 'hidden';
+                        break;
+                    /* File transfer protocol */
+                    case 'file-meta':
+                        startReceivingFile(data.meta);
+                        break;
+                    case 'file-chunk':
+                        receiveFileChunk(data.id, data.seq, data.total, data.chunk);
+                        break;
+                    case 'file-complete':
+                        finalizeReceivedFile(data.id);
+                        break;
+                    case 'file-progress':
+                        updateSendProgressUI(data.id, data.percent);
+                        break;
+                    default:
+                        // ignore
+                        break;
+                }
+            } catch (err) {
+                console.error('Error handling data message', err);
+            }
+        }
+
+        function addMessage(message, type){
+            const el = document.createElement('div');
+            el.classList.add('message', type);
+            el.textContent = message;
+            chatMessages.appendChild(el);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage(){
+            const message = messageInput.value.trim();
+            if (message && dataChannel){
+                try {
+                    dataChannel.send({type:'chat', message});
+                    addMessage(message, 'local');
+                    messageInput.value = '';
+                } catch (err) {
+                    console.error('Send message failed', err);
+                }
+            }
+        }
+
+        function handleTyping(){
+            if (!dataChannel) return;
+            try {
+                dataChannel.send({type:'typing-start'});
+                if (typingTimer) clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => dataChannel?.send({type:'typing-stop'}), 1000);
+            } catch(e){}
+        }
+
+        /* =======================
+        Calls (Video / Voice)
+        ======================= */
+        async function startVideoCall(){
+            try{
+                if (streamCall) {
+                    try { streamCall.close(); } catch(e){}
+                    streamCall = null;
+                    stopCapturedMediaStream();
+                }
+
+                localStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+                localVideo.srcObject = localStream;
+                startCall('media');
+            }catch(e){ alert('Could not access camera/mic'); console.error(e); }
+        }
+
+        async function startVoiceCall(){
+            try{
+                if (streamCall) {
+                    try { streamCall.close(); } catch(e){}
+                    streamCall = null;
+                    stopCapturedMediaStream();
+                }
+
+                localStream = await navigator.mediaDevices.getUserMedia({video:false, audio:true});
+                startCall('media');
+            }catch(e){ alert('Could not access microphone'); console.error(e); }
+        }
+
+        function startCall(type='media'){
+            if (!connection) return alert('Connect to a peer first');
+            isCaller = true;
+            endCallButton.disabled = false;
+
+            if (mediaCall) {
+                try { mediaCall.close(); } catch(e){}
+                mediaCall = null;
+            }
+
+            const call = peer.call(connection.peer, localStream, { metadata: { type: type === 'stream' ? 'stream' : 'media' } });
+            mediaCall = call;
+            trackRTCPeerConnection(call.peerConnection, 'Media');
+            setupMediaCallHandlers(call, 'media');
+
+            call.on('stream', () => {
+                prioritizeBandwidth(call.peerConnection, 'video');
+                prioritizeBandwidth(call.peerConnection, 'audio');
+            });
+
+            call.on('error', err => {
+                console.error('Call error:', err);
+                updateConnectionStatus('error', 'Media error');
+            });
+        }
+
+        function endCall(){
+            if (mediaCall){
+                try{ mediaCall.close(); }catch(e){}
+                mediaCall = null;
+            }
+            if (localStream){
+                localStream.getTracks().forEach(t => t.stop());
+                localStream = null;
+                localVideo.srcObject = null;
+            }
+            if (remoteStream){
+                try{ remoteStream.getTracks().forEach(t=>t.stop()); }catch(e){}
+                remoteStream = null;
+                remoteVideo.srcObject = null;
+            }
+            endCallButton.disabled = true;
+            startStreamButton.disabled = !(connection && streamFileInput.files[0]);
+        }
+
+        function setupMediaCallHandlers(call, kind = 'media'){
+            call.on('stream', stream => {
+                if (kind === 'media') {
+                    remoteStream = stream;
+                    remoteVideo.srcObject = stream;
+                    endCallButton.disabled = false;
+                } else if (kind === 'stream') {
+                    remoteStreamVideo.srcObject = stream;
+                }
+                try { prioritizeBandwidth(call.peerConnection, 'video'); } catch(e){}
+            });
+
+            call.on('close', () => {
+                if (kind === 'media') {
+                    endCall();
+                } else if (kind === 'stream') {
+                    stopStreaming();
+                }
+            });
+
+            call.on('error', err => {
+                console.error(kind + ' call error:', err);
+                updateConnectionStatus('error', `${kind} media error`);
+                if (kind === 'media') endCall();
+                else stopStreaming();
+            });
+        }
+
+        function prioritizeBandwidth(pc, kind = 'video'){
+            if (!pc) return;
+            try {
+                const senders = pc.getSenders ? pc.getSenders() : [];
+                senders.forEach(sender => {
+                    if (!sender || !sender.track) return;
+                    const trackKind = sender.track.kind;
+                    if ((kind === 'video' && trackKind === 'video') || (kind === 'audio' && trackKind === 'audio')) {
+                        const params = sender.getParameters ? sender.getParameters() : null;
+                        if (params && params.encodings && params.encodings.length) {
+                            params.encodings.forEach(enc => {
+                                if (trackKind === 'video') {
+                                    enc.maxBitrate = 5_000_000; // Reduced from 10,000,000 to 5,000,000
+                                    enc.priority = 'high';
+                                } else if (trackKind === 'audio') {
+                                    enc.maxBitrate = enc.maxBitrate || 128_000;
+                                    enc.priority = 'high';
+                                }
+                            });
+                            try {
+                                sender.setParameters(params).catch(()=>{});
+                            } catch(e){}
+                        }
+                    }
+                });
+            } catch (e) {
+                console.warn('Bandwidth prioritization not fully supported by browser', e);
+            }
+        }
+
+        /* =======================
+        Synchronized Streaming
+        ======================= */
+        async function startStreaming(){
+            if (!connection) return alert('Please connect first');
+            const file = streamFileInput.files[0];
+            if (!file) return alert('Select a video file first');
+
+            if (mediaCall) {
+                try { mediaCall.close(); } catch(e){}
+                mediaCall = null;
+                if (localStream) {
+                    localStream.getTracks().forEach(t=>t.stop());
+                    localStream = null;
+                    localVideo.srcObject = null;
+                }
+            }
+
+            const fileURL = URL.createObjectURL(file);
+            localStreamVideo.src = fileURL;
+            localStreamVideo.onloadedmetadata = async () => {
+                try {
+                    await localStreamVideo.play();
+                } catch(e){}
+
+                if (!localStreamVideo.captureStream){ alert("Your browser doesn't support captureStream"); return; }
+                
+                try {
+                    stopCapturedMediaStream();
+                    capturedMediaStream = localStreamVideo.captureStream();
+                    
+                    const call = peer.call(connection.peer, capturedMediaStream, { metadata: { type: 'stream' } });
+                    streamCall = call;
+                    trackRTCPeerConnection(call.peerConnection, 'Stream');
+                    setupMediaCallHandlers(call, 'stream');
+                    
+                    call.on('stream', rStream => {
+                        remoteStreamVideo.srcObject = rStream;
+                    });
+                    
+                    call.on('close', stopStreaming);
+                    
+                    startStreamButton.disabled = true;
+                    stopStreamButton.disabled = false;
+                    
+                    setTimeout(()=> {
+                        try { prioritizeBandwidth(call.peerConnection, 'video'); } catch(e){}
+                    }, 800);
+                } catch (err) {
+                    console.error('Start stream error', err);
+                    alert('Failed to start stream');
+                    stopCapturedMediaStream();
+                }
+            };
+        }
+
+        function stopCapturedMediaStream(){
+            if (capturedMediaStream){
+                try { capturedMediaStream.getTracks().forEach(t=>t.stop()); } catch(e){}
+                capturedMediaStream = null;
+            }
+        }
+
+        function stopStreaming(){
+            if (streamCall){
+                try{ streamCall.close(); }catch(e){}
+                streamCall = null;
+            }
+            stopCapturedMediaStream();
+            try { localStreamVideo.pause(); } catch(e){}
+            localStreamVideo.src = '';
+            remoteStreamVideo.srcObject = null;
+            startStreamButton.disabled = !(connection && streamFileInput.files[0]);
+            stopStreamButton.disabled = true;
+        }
+
+        /* =======================
+        File Transfer (Chunked, optimized)
+        ======================= */
+        function uuid(){
+            return 'f-' + Math.random().toString(36).slice(2) + '-' + Date.now().toString(36);
+        }
+
+        function humanSize(bytes){
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+            return (bytes/1048576).toFixed(1) + ' MB';
+        }
+
+        function createTransferUI(id, name, size, type){
+            const wrap = document.createElement('div');
+            wrap.className = 'transfer-item';
+            wrap.id = `xfer-${id}`;
+
+            const top = document.createElement('div');
+            top.className = 'transfer-top';
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'transfer-name';
+            nameEl.textContent = `${name} (${humanSize(size)})`;
+            top.appendChild(nameEl);
+
+            const pctEl = document.createElement('div');
+            pctEl.id = `pct-${id}`;
+            pctEl.textContent = '0%';
+            top.appendChild(pctEl);
+
+            const bar = document.createElement('div');
+            bar.className = 'progress-bar';
+            const prog = document.createElement('div');
+            prog.className = 'progress';
+            prog.dataset.type = type;
+            prog.style.width = '0%';
+            bar.appendChild(prog);
+
+            wrap.appendChild(top);
+            wrap.appendChild(bar);
+
+            transferList.appendChild(wrap);
+            return {wrap, pctEl, prog};
+        }
+
+        function updateProgressUI(id, percent){
+            const pctEl = document.getElementById(`pct-${id}`);
+            const prog = document.querySelector(`#xfer-${id} .progress`);
+            if (pctEl) pctEl.textContent = `${percent}%`;
+            if (prog) prog.style.width = `${percent}%`;
+        }
+
+        function wait(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+        async function sendFileAsChunks(file, category){
+            if (!dataChannel || !connection || !connection.open) return alert('Connect first');
+
+            const id = uuid();
+            const meta = { id, name: file.name, size: file.size, mime: file.type || 'application/octet-stream', category };
+            const ui = createTransferUI(id, file.name, file.size, 'send');
+
+            sendingTransfers.set(id, { file, offset: 0, total: file.size, name:file.name, size:file.size, mime:meta.mime, category, ui });
+
+            try { dataChannel.send({ type: 'file-meta', meta }); } catch(e){ console.error('send meta failed', e); }
+
+            const reader = new FileReader();
+            let offset = 0;
+            let seq = 0;
+            const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+            function readSlice(o){ 
+                const slice = file.slice(o, Math.min(o + CHUNK_SIZE, file.size)); 
+                reader.readAsArrayBuffer(slice); 
+            }
+
+            reader.onload = async () => {
+                const chunk = reader.result;
+                try {
+                    dataChannel.send({ type:'file-chunk', id, seq, total: totalChunks, chunk });
+                } catch (err) {
+                    try {
+                        const blob = new Blob([chunk]);
+                        const text = await blobToBase64(blob);
+                        dataChannel.send({ type:'file-chunk', id, seq, total: totalChunks, chunkB64: text });
+                    } catch(e){
+                        console.error('Failed to send chunk', e);
+                    }
+                }
+
+                offset += chunk.byteLength;
+                seq += 1;
+                
+                const percent = Math.min(100, Math.floor((offset / file.size) * 100));
+                updateProgressUI(id, percent);
+                
+                if (offset < file.size){
+                    const adaptiveDelay = Math.min(40, Math.max(8, Math.floor((CHUNK_SIZE / 1024) / 6)));
+                    await wait(adaptiveDelay);
+                    readSlice(offset);
+                } else {
+                    try { 
+                        dataChannel.send({ type:'file-complete', id }); 
+                        console.log('File transfer complete:', id);
+                    } catch(e){ 
+                        console.error('send complete err', e); 
+                    }
+                }
+            };
+
+            readSlice(0);
+        }
+
+        function blobToBase64(blob){ return new Promise((res, rej) => {
+            const r = new FileReader();
+            r.onload = ()=> res(r.result.split(',')[1]);
+            r.onerror = rej;
+            r.readAsDataURL(blob);
+        }); }
+
+        function startReceivingFile(meta){
+            const { id, name, size, category } = meta;
+            const ui = createTransferUI(id, name, size, 'recv');
+            receivingTransfers.set(id, { chunks: [], received: 0, total: size, totalChunks: Math.ceil(size / CHUNK_SIZE), meta, ui });
+        }
+
+        async function receiveFileChunk(id, seq, total, chunk){
+            const rcv = receivingTransfers.get(id);
+            if (!rcv) return;
+
+            if (chunk) {
+                try {
+                    const arr = new Uint8Array(chunk);
+                    rcv.chunks[seq] = arr;
+                    rcv.received += arr.byteLength;
+                } catch (e) {}
+            }
+
+            const pct = Math.min(100, Math.floor((rcv.received / rcv.total) * 100));
+            updateProgressUI(id, pct);
+
+            try { dataChannel?.send({ type: 'file-progress', id, percent: pct }); } catch(e){}
+
+            // Check if we've received all chunks
+            const receivedChunks = rcv.chunks.filter(chunk => chunk !== undefined).length;
+            if (receivedChunks === rcv.totalChunks || rcv.received >= rcv.total){
+                finalizeReceivedFile(id);
+            }
+        }
+
+        function handleFallbackChunkB64(obj){
+            const { id, seq, total, chunkB64 } = obj;
+            if (!chunkB64) return;
+            const rcv = receivingTransfers.get(id);
+            if (!rcv) return;
+            const byteString = atob(chunkB64);
+            const arr = new Uint8Array(byteString.length);
+            for (let i=0;i<byteString.length;i++) arr[i] = byteString.charCodeAt(i);
+            rcv.chunks[seq] = arr;
+            rcv.received += arr.byteLength;
+            const pct = Math.min(100, Math.floor((rcv.received / rcv.total) * 100));
+            updateProgressUI(id, pct);
+            try { dataChannel?.send({ type: 'file-progress', id, percent: pct }); } catch(e){}
+            
+            // Check if we've received all chunks
+            const receivedChunks = rcv.chunks.filter(chunk => chunk !== undefined).length;
+            if (receivedChunks === rcv.totalChunks || rcv.received >= rcv.total){
+                finalizeReceivedFile(id);
+            }
+        }
+
+        function updateSendProgressUI(id, percent){
+            updateProgressUI(id, Math.max(0, Math.min(100, Math.floor(percent))));
+        }
+
+        async function finalizeReceivedFile(id){
+            const rcv = receivingTransfers.get(id);
+            if (!rcv) return;
+
+            // Verify we have all chunks
+            const ordered = [];
+            for (let i=0; i < rcv.totalChunks; i++){
+                if (rcv.chunks[i]) {
+                    ordered.push(rcv.chunks[i]);
+                } else {
+                    console.error('Missing chunk:', i, 'for file:', id);
+                    return; // Don't finalize if chunks are missing
+                }
+            }
+
+            // Check if we have the correct amount of data
+            if (rcv.received !== rcv.total) {
+                console.error('File size mismatch for:', id, 'Received:', rcv.received, 'Expected:', rcv.total);
+                return;
+            }
+
+            const blob = new Blob(ordered, { type: rcv.meta.mime });
+            
+            // Store in IndexedDB for non-downloadable files
+            if (rcv.meta.category === 'non-downloadable') {
+                try {
+                    await storeFileInDB(id, blob, rcv.meta);
+                } catch (err) {
+                    console.error('Failed to store file in IndexedDB:', err);
+                    return;
+                }
+            }
+
+            const parent = document.getElementById(`xfer-${id}`);
+            if (!parent) return;
+
+            const line = document.createElement('div');
+            line.style.marginTop = '6px';
+
+            const link = document.createElement('a');
+            link.className = 'file-link';
+            
+            if (rcv.meta.category === 'downloadable') {
+                const url = URL.createObjectURL(blob);
+                link.textContent = 'Download file';
+                link.href = url;
+                link.download = rcv.meta.name || 'file';
+            } else {
+                link.textContent = 'Open preview';
+                link.href = 'javascript:void(0)';
+                link.addEventListener('click', () => openPreviewModal(rcv.meta.name, id, rcv.meta.mime));
+            }
+
+            line.appendChild(link);
+            parent.appendChild(line);
+
+            updateProgressUI(id, 100);
+            receivingTransfers.delete(id);
+            console.log('File received completely:', id);
+        }
+
+        /* =======================
+        Modal Preview (non-downloadable)
+        ======================= */
+        async function openPreviewModal(name, fileId, mime){
+            modalTitle.textContent = name || 'Preview';
+            modalBody.innerHTML = '';
+
+            try {
+                const fileData = await getFileFromDB(fileId);
+                const blob = fileData.blob;
+                const url = URL.createObjectURL(blob);
+
+                if (mime && mime.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.alt = name || 'image';
+                    modalBody.appendChild(img);
+
+                    const backBtn = document.createElement('button');
+                    backBtn.className = 'inline-back';
+                    backBtn.textContent = 'Back';
+                    backBtn.style.marginTop = '8px';
+                    backBtn.addEventListener('click', closePreviewModal);
+                    modalBody.appendChild(backBtn);
+                } else if (mime && mime.startsWith('video/')) {
+                    const vid = document.createElement('video');
+                    vid.src = url;
+                    vid.playsInline = true;
+                    vid.controls = false;
+                    vid.id = 'customVideo';
+                    modalBody.appendChild(vid);
+
+                    const controls = document.createElement('div');
+                    controls.className = 'player-controls';
+                    const btn = document.createElement('button');
+                    btn.textContent = 'Play';
+                    btn.addEventListener('click', () => {
+                        if (vid.paused){
+                            vid.play();
+                            btn.textContent = 'Pause';
+                        } else {
+                            vid.pause();
+                            btn.textContent = 'Play';
+                        }
+                    });
+                    const seek = document.createElement('input');
+                    seek.type = 'range';
+                    seek.min = 0;
+                    seek.max = 1000;
+                    seek.value = 0;
+                    seek.addEventListener('input', () => {
+                        if (vid.duration && isFinite(vid.duration)){
+                            vid.currentTime = (seek.value/1000) * vid.duration;
+                        }
+                    });
+                    vid.addEventListener('timeupdate', () => {
+                        if (vid.duration && isFinite(vid.duration)){
+                            seek.value = Math.floor((vid.currentTime / vid.duration) * 1000);
+                        }
+                    });
+                    controls.appendChild(btn);
+                    controls.appendChild(seek);
+                    
+                    const backInside = document.createElement('button');
+                    backInside.className = 'inline-back';
+                    backInside.textContent = 'Back';
+                    backInside.addEventListener('click', closePreviewModal);
+                    controls.appendChild(backInside);
+                    
+                    modalBody.appendChild(controls);
+                } else {
+                    const p = document.createElement('p');
+                    p.textContent = 'This preview only supports images and videos.';
+                    modalBody.appendChild(p);
+
+                    const backBtn = document.createElement('button');
+                    backBtn.className = 'inline-back';
+                    backBtn.textContent = 'Back';
+                    backBtn.style.marginTop = '8px';
+                    backBtn.addEventListener('click', closePreviewModal);
+                    modalBody.appendChild(backBtn);
+                }
+
+                modalBackdrop.style.display = 'flex';
+                modalBackdrop.setAttribute('aria-hidden', 'false');
+            } catch (err) {
+                console.error('Error opening preview:', err);
+                alert('Failed to open file. It may have been deleted.');
+            }
+        }
+
+        function closePreviewModal(){
+            try {
+                const vid = document.getElementById('customVideo');
+                if (vid) {
+                    vid.pause();
+                    vid.src = '';
+                }
+            } catch(e){}
+            modalBackdrop.style.display = 'none';
+            modalBackdrop.setAttribute('aria-hidden', 'true');
+            modalBody.innerHTML = '';
+        }
+
+        /* =======================
+        Connection Actions
+        ======================= */
+        function connectToPeer(){
+            const peerId = peerIdInput.value.trim();
+            if (!peerId) return;
+            updateConnectionStatus('connecting', 'Connecting to ' + peerId);
+            connectedPeerId = peerId;
+            const conn = peer.connect(peerId, { reliable: true });
+            setupDataConnection(conn);
+            connectButton.disabled = true;
+        }
+
+        function copyIdToClipboard(){
+            const id = myIdElement.textContent;
+            navigator.clipboard.writeText(id).then(() => {
+                const original = copyIdButton.textContent;
+                copyIdButton.textContent = 'Copied!';
+                setTimeout(() => copyIdButton.textContent = original, 1500);
+            });
+        }
+
+        function resetConnectionState(){
+            messageInput.disabled = true;
+            sendMessageButton.disabled = true;
+            startStreamButton.disabled = true;
+            stopStreamButton.disabled = true;
+            connectButton.disabled = false;
+            typingIndicator.style.visibility = 'hidden';
+            endCall();
+            stopStreaming();
+            try {
+                if (connection && connection.close) connection.close();
+            } catch(e){}
+            connection = null;
+            dataChannel = null;
+            connectedPeerId = null;
+        }
+
+        /* =======================
+        Event Listeners
+        ======================= */
+        connectButton.addEventListener('click', connectToPeer);
+        copyIdButton.addEventListener('click', copyIdToClipboard);
+        sendMessageButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+        messageInput.addEventListener('input', handleTyping);
+        startVideoButton.addEventListener('click', startVideoCall);
+        startVoiceButton.addEventListener('click', startVoiceCall);
+        endCallButton.addEventListener('click', endCall);
+        startStreamButton.addEventListener('click', startStreaming);
+        stopStreamButton.addEventListener('click', stopStreaming);
+        streamFileInput.addEventListener('change', () => { startStreamButton.disabled = !streamFileInput.files[0]; });
+
+        btnShareDownloadable.addEventListener('click', () => {
+            pickDownloadable.click();
+        });
+        btnShareNonDownloadable.addEventListener('click', () => {
+            alert('Non downloadable accepts only images and videos. They will open in a preview modal.');
+            pickNonDownloadable.click();
+        });
+
+        pickDownloadable.addEventListener('change', () => {
+            if (!dataChannel) return alert('Connect first');
+            const files = Array.from(pickDownloadable.files || []);
+            files.forEach(f => sendFileAsChunks(f, 'downloadable'));
+            pickDownloadable.value = '';
+        });
+        pickNonDownloadable.addEventListener('change', () => {
+            if (!dataChannel) return alert('Connect first');
+            const files = Array.from(pickNonDownloadable.files || []);
+            files.forEach(f => sendFileAsChunks(f, 'non-downloadable'));
+            pickNonDownloadable.value = '';
+        });
+
+        const originalHandleDataMessage = handleDataMessage;
+        function enhancedHandleDataMessage(obj){
+            if (obj && obj.type === 'file-chunk' && obj.chunkB64) {
+                handleFallbackChunkB64(obj);
+                return;
+            }
+            originalHandleDataMessage(obj);
+        }
+        
+        function setupDataChannel(){
+            if (!dataChannel) return;
+            dataChannel.on('data', enhancedHandleDataMessage);
+            try { if (dataChannel._dc) dataChannel._dc.binaryType = 'arraybuffer'; } catch(e){}
+        }
+
+        /* =======================
+        Initialize
+        ======================= */
+        async function initializeApp() {
+            try {
+                await initIndexedDB();
+                cleanupOldFiles();
+                initializePeer();
+            } catch (err) {
+                console.error('Failed to initialize app:', err);
+            }
+        }
+
+        initializeApp();
+    </script>
+</body>
 </html>
