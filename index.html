@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple WebRTC Chat (Upgraded)</title>
+    <title>GEMINI CHAT</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif} 
@@ -67,10 +67,11 @@
             .message{max-width:85%} 
         }
         .username-section {margin-bottom: 10px;}
+        .app-title {color: #4285f4; font-size: 2.5rem; margin-bottom: 10px;}
     </style>
 </head>
 <body>
-    <h1>Simple WebRTC Chat</h1>
+    <h1 class="app-title">GEMINI CHAT</h1>
     
     <div class="container">
         <div class="connection-panel">
@@ -224,6 +225,20 @@
         const modalBackdrop = document.getElementById('modalBackdrop');
         const modalBody = document.getElementById('modalBody');
         const modalTitle = document.getElementById('modalTitle');
+
+        /* =======================
+        Initialize Username from localStorage
+        ======================= */
+        function initializeUsername() {
+            const savedUsername = localStorage.getItem('geminiChatUsername');
+            if (savedUsername) {
+                myUsername = savedUsername;
+                usernameInput.value = myUsername;
+                usernameStatus.textContent = `Username: ${myUsername}`;
+                usernameInput.disabled = true;
+                saveUsernameButton.disabled = true;
+            }
+        }
 
         /* =======================
         PeerJS Init
@@ -1004,6 +1019,8 @@
             const username = usernameInput.value.trim();
             if (username) {
                 myUsername = username;
+                // Save to localStorage
+                localStorage.setItem('geminiChatUsername', myUsername);
                 usernameStatus.textContent = `Username: ${myUsername}`;
                 usernameInput.disabled = true;
                 saveUsernameButton.disabled = true;
@@ -1049,6 +1066,7 @@
         /* =======================
         Initialize
         ======================= */
+        initializeUsername();
         initializePeer();
     </script>
 </body>
