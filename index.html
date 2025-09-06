@@ -137,6 +137,11 @@
             box-shadow: 0 0 8px #00ff00;
         }
 
+        .connection-indicator.unavailable {
+            background-color: #ff9500;
+            box-shadow: 0 0 8px #ff9500;
+        }
+
         .typing-indicator {
             font-size: 12px;
             opacity: 0.7;
@@ -301,6 +306,7 @@
             color: white;
             font-size: 20px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .modal-content {
@@ -728,6 +734,36 @@
             cursor: pointer;
         }
 
+        /* Glow effects */
+        @keyframes glow-violet {
+            0% { box-shadow: 0 0 5px rgba(120, 80, 200, 0.7); }
+            50% { box-shadow: 0 0 20px rgba(120, 80, 200, 0.9); }
+            100% { box-shadow: 0 0 5px rgba(120, 80, 200, 0.7); }
+        }
+
+        @keyframes glow-sapphire {
+            0% { box-shadow: 0 0 5px rgba(0, 100, 200, 0.7); }
+            50% { box-shadow: 0 0 20px rgba(0, 100, 200, 0.9); }
+            100% { box-shadow: 0 0 5px rgba(0, 100, 200, 0.7); }
+        }
+
+        @keyframes glow-red {
+            0% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.7); }
+            50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.9); }
+            100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.7); }
+        }
+
+        @keyframes glow-green {
+            0% { box-shadow: 0 0 5px rgba(0, 255, 0, 0.7); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.9); }
+            100% { box-shadow: 0 0 5px rgba(0, 255, 0, 0.7); }
+        }
+
+        .glow-violet { animation: glow-violet 2s infinite; }
+        .glow-sapphire { animation: glow-sapphire 2s infinite; }
+        .glow-red { animation: glow-red 2s infinite; }
+        .glow-green { animation: glow-green 2s infinite; }
+
         @keyframes rotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -846,7 +882,7 @@
                 <button class="modal-fullscreen-btn" data-modal="streamModal">
                     <i class="fas fa-expand"></i>
                 </button>
-                <button class="modal-close"><i class="fas fa-arrow-left"></i></button>
+                <button class="modal-close" id="streamModalClose"><i class="fas fa-arrow-left"></i></button>
             </div>
         </div>
         <div class="modal-content">
@@ -886,7 +922,7 @@
                 <button class="modal-fullscreen-btn" data-modal="videoCallModal">
                     <i class="fas fa-expand"></i>
                 </button>
-                <button class="modal-close"><i class="fas fa-arrow-left"></i></button>
+                <button class="modal-close" id="videoCallModalClose"><i class="fas fa-arrow-left"></i></button>
             </div>
         </div>
         <div class="modal-content">
@@ -913,7 +949,7 @@
                 <button class="modal-fullscreen-btn" data-modal="connectionModal">
                     <i class="fas fa-expand"></i>
                 </button>
-                <button class="modal-close"><i class="fas fa-arrow-left"></i></button>
+                <button class="modal-close" id="connectionModalClose"><i class="fas fa-arrow-left"></i></button>
             </div>
         </div>
         <div class="modal-content">
@@ -947,7 +983,7 @@
                 <button class="modal-fullscreen-btn" data-modal="filesModal">
                     <i class="fas fa-expand"></i>
                 </button>
-                <button class="modal-close"><i class="fas fa-arrow-left"></i></button>
+                <button class="modal-close" id="filesModalClose"><i class="fas fa-arrow-left"></i></button>
             </div>
         </div>
         <div class="modal-content">
@@ -1010,6 +1046,8 @@
         let myUsername = '';
         let peerUsername = '';
         let incomingCall = null;
+        let connectionStatus = 'disconnected';
+        let newMessageInModal = false;
 
         // File transfer (256KB chunks - optimized)
         const CHUNK_SIZE = 256 * 1024;
@@ -1066,6 +1104,10 @@
         const incomingCallText = document.getElementById('incomingCallText');
         const acceptCallBtn = document.getElementById('acceptCallBtn');
         const rejectCallBtn = document.getElementById('rejectCallBtn');
+        const streamModalClose = document.getElementById('streamModalClose');
+        const videoCallModalClose = document.getElementById('videoCallModalClose');
+        const connectionModalClose = document.getElementById('connectionModalClose');
+        const filesModalClose = document.getElementById('filesModalClose');
 
         // Initialize
         function init() {
@@ -1092,6 +1134,26 @@
             
             // Initialize PeerJS
             initializePeer();
+            
+            // Set initial button states
+            updateButtonGlows();
+        }
+
+        // Update button glow states
+        function updateButtonGlows() {
+            // Fullscreen button glow
+            if (!document.fullscreenElement) {
+                fullscreenBtn.classList.add('glow-violet');
+            } else {
+                fullscreenBtn.classList.remove('glow-violet');
+            }
+            
+            // Connection button glow
+            if (connectionStatus === 'disconnected' || connectionStatus === 'error') {
+                connectionBtn.classList.add('glow-red');
+            } else {
+                connectionBtn.classList.remove('glow-red');
+            }
         }
 
         // Initialize PeerJS
@@ -1127,11 +1189,16 @@
                     
                     // Open stream modal automatically
                     streamModal.classList.add('active');
+                    // Make stream button stop glowing
+                    streamBtn.classList.remove('glow-sapphire');
                 } else {
                     // For regular calls, show incoming call modal
                     incomingCall = call;
-                    incomingCallText.textContent = `${connectedPeerId || 'Peer'} is calling you`;
+                    incomingCallText.textContent = `${peerUsername || 'Peer'} is calling you`;
                     incomingCallModal.classList.add('active');
+                    
+                    // Make video call button glow
+                    videoCallBtn.classList.add('glow-sapphire');
 
                     // Set up accept/reject handlers
                     acceptCallBtn.onclick = () => {
@@ -1148,6 +1215,8 @@
                             }
                             incomingCallModal.classList.remove('active');
                             videoCallModal.classList.add('active');
+                            // Stop video call button glow
+                            videoCallBtn.classList.remove('glow-sapphire');
                         } catch (err) {
                             console.error('Error answering call:', err);
                             updateConnectionStatus('error', 'Call answer failed');
@@ -1157,6 +1226,8 @@
                     rejectCallBtn.onclick = () => {
                         call.close();
                         incomingCallModal.classList.remove('active');
+                        // Stop video call button glow
+                        videoCallBtn.classList.remove('glow-sapphire');
                     };
                 }
             });
@@ -1174,15 +1245,24 @@
 
         // Update connection status
         function updateConnectionStatus(state, message) {
+            connectionStatus = state;
             connectionStatusText.textContent = message;
+            
+            // Update connection indicator
+            connectionIndicator.classList.remove('connected', 'unavailable');
             
             if (state === 'connected') {
                 connectionIndicator.classList.add('connected');
                 connectionStatusText.style.color = '#00ff00';
+            } else if (state === 'connecting' || state === 'unavailable') {
+                connectionIndicator.classList.add('unavailable');
+                connectionStatusText.style.color = '#ff9500';
             } else {
-                connectionIndicator.classList.remove('connected');
                 connectionStatusText.style.color = '#ff3b30';
             }
+            
+            // Update button glows
+            updateButtonGlows();
         }
 
         // Setup data connection
@@ -1214,6 +1294,15 @@
                 console.error('Connection error:', err);
                 updateConnectionStatus('error', 'Connection error');
             });
+            
+            // Check for temporary connection issues
+            connection.on('iceStateChanged', state => {
+                if (state === 'disconnected' || state === 'failed') {
+                    updateConnectionStatus('unavailable', 'Connection unstable');
+                } else if (state === 'connected') {
+                    updateConnectionStatus('connected', 'Connected to ' + connection.peer);
+                }
+            });
         }
 
         function setupDataChannel() {
@@ -1231,9 +1320,23 @@
                 switch(data.type){
                     case 'chat':
                         addMessage(data.message, 'remote');
+                        
+                        // If a modal is open, make its close button glow
+                        const activeModal = document.querySelector('.modal.active');
+                        if (activeModal) {
+                            const closeBtn = activeModal.querySelector('.modal-close');
+                            if (closeBtn) {
+                                closeBtn.classList.add('glow-green');
+                                newMessageInModal = true;
+                            }
+                        }
                         break;
                     case 'typing-start':
-                        typingIndicator.textContent = `${peerUsername || 'Peer'} is typing`;
+                        if (data.message) {
+                            typingIndicator.textContent = data.message;
+                        } else {
+                            typingIndicator.textContent = `${peerUsername || 'Peer'} is typing`;
+                        }
                         typingIndicator.style.display = 'block';
                         break;
                     case 'typing-stop':
@@ -1242,11 +1345,18 @@
                     case 'username':
                         // Store peer's username
                         peerUsername = data.username;
+                        usernameDisplay.textContent = `@${peerUsername}`;
                         updateConnectionStatus('connected', `Connected to ${peerUsername}`);
+                        break;
+                    case 'file-selecting':
+                        typingIndicator.textContent = `${peerUsername || 'Peer'} is choosing file for ${data.purpose}`;
+                        typingIndicator.style.display = 'block';
                         break;
                     /* File transfer protocol */
                     case 'file-meta':
                         startReceivingFile(data.meta);
+                        // Make files button glow
+                        attachBtn.classList.add('glow-sapphire');
                         break;
                     case 'file-chunk':
                         receiveFileChunk(data.id, data.seq, data.total, data.chunk);
@@ -1255,13 +1365,15 @@
                         finalizeReceivedFile(data.id);
                         // Open files modal automatically when file is received
                         filesModal.classList.add('active');
+                        // Stop files button glow
+                        attachBtn.classList.remove('glow-sapphire');
                         break;
                     case 'file-progress':
                         updateSendProgressUI(data.id, data.percent);
                         break;
                     case 'stream-started':
-                        // Open stream modal automatically when peer starts streaming
-                        streamModal.classList.add('active');
+                        // Make stream button glow
+                        streamBtn.classList.add('glow-sapphire');
                         break;
                     default:
                         // ignore
@@ -1300,6 +1412,10 @@
             // Choose file button
             chooseFileBtn.addEventListener('click', () => {
                 streamFileInput.click();
+                // Notify peer that we're selecting a file
+                if (dataChannel) {
+                    dataChannel.send({ type: 'file-selecting', purpose: 'streaming' });
+                }
             });
             
             // File selection
@@ -1329,11 +1445,19 @@
             // Share downloadable files
             shareDownloadableBtn.addEventListener('click', () => {
                 downloadableFileInput.click();
+                // Notify peer that we're selecting a file
+                if (dataChannel) {
+                    dataChannel.send({ type: 'file-selecting', purpose: 'file transfer' });
+                }
             });
             
             // Share non-downloadable files
             shareNonDownloadableBtn.addEventListener('click', () => {
                 nonDownloadableFileInput.click();
+                // Notify peer that we're selecting a file
+                if (dataChannel) {
+                    dataChannel.send({ type: 'file-selecting', purpose: 'file transfer' });
+                }
             });
             
             // File input handlers
@@ -1354,26 +1478,37 @@
             // Modal buttons
             streamBtn.addEventListener('click', () => {
                 streamModal.classList.add('active');
+                // Stop stream button glow
+                streamBtn.classList.remove('glow-sapphire');
             });
 
             videoCallBtn.addEventListener('click', () => {
                 videoCallModal.classList.add('active');
+                // Stop video call button glow
+                videoCallBtn.classList.remove('glow-sapphire');
             });
 
             connectionBtn.addEventListener('click', () => {
                 connectionModal.classList.add('active');
+                // Stop connection button glow
+                connectionBtn.classList.remove('glow-red');
             });
 
             attachBtn.addEventListener('click', () => {
                 filesModal.classList.add('active');
+                // Stop files button glow
+                attachBtn.classList.remove('glow-sapphire');
             });
 
             // Close modals
             modalCloseButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', (e) => {
                     document.querySelectorAll('.modal').forEach(modal => {
                         modal.classList.remove('active');
                     });
+                    // Remove glow from close button
+                    e.currentTarget.classList.remove('glow-green');
+                    newMessageInModal = false;
                 });
             });
 
@@ -1394,6 +1529,11 @@
                 } else {
                     document.exitFullscreen();
                 }
+            });
+
+            // Listen for fullscreen changes
+            document.addEventListener('fullscreenchange', () => {
+                updateButtonGlows();
             });
 
             // Modal fullscreen functionality
@@ -1437,6 +1577,11 @@
                 // Create object URL for preview
                 const fileURL = URL.createObjectURL(file);
                 localStreamVideo.src = fileURL;
+                
+                // Stop typing indicator
+                if (dataChannel) {
+                    dataChannel.send({ type: 'typing-stop' });
+                }
             }
         }
 
@@ -1473,15 +1618,15 @@
                         setupMediaCallHandlers(call, 'stream');
                         
                         call.on('stream', rStream => {
-    remoteStreamVideo.srcObject = rStream;
-    remoteStreamVideo.play().catch(() => {});
-    // Notify peer that streaming has started
-    dataChannel.send({ type: 'stream-started' });
+                            remoteStreamVideo.srcObject = rStream;
+                            remoteStreamVideo.play().catch(() => {});
+                            // Notify peer that streaming has started
+                            dataChannel.send({ type: 'stream-started' });
 
-    // Apply bandwidth prioritization for file streaming too
-    prioritizeBandwidth(call.peerConnection, 'video');
-    prioritizeBandwidth(call.peerConnection, 'audio');
-});
+                            // Apply bandwidth prioritization for file streaming too
+                            prioritizeBandwidth(call.peerConnection, 'video');
+                            prioritizeBandwidth(call.peerConnection, 'audio');
+                        });
                         
                         call.on('close', stopStreaming);
                         
@@ -1553,13 +1698,13 @@
                 }
 
                 localStream = await navigator.mediaDevices.getUserMedia({
-  video: { 
-    width: { ideal: 1920 }, 
-    height: { ideal: 1080 }, 
-    frameRate: { ideal: 60, max: 60 } 
-  },
-  audio: true
-});
+                    video: { 
+                        width: { ideal: 1920 }, 
+                        height: { ideal: 1080 }, 
+                        frameRate: { ideal: 60, max: 60 } 
+                    },
+                    audio: true
+                });
                 localVideo.srcObject = localStream;
                 startCall('media');
                 endCallBtn.disabled = false;
@@ -1639,38 +1784,38 @@
         }
 
         function prioritizeBandwidth(pc, kind = 'video') {
-    if (!pc) return;
-    try {
-        const senders = pc.getSenders ? pc.getSenders() : [];
-        senders.forEach(sender => {
-            if (!sender || !sender.track) return;
-            const trackKind = sender.track.kind;
-            if ((kind === 'video' && trackKind === 'video') || (kind === 'audio' && trackKind === 'audio')) {
-                const params = sender.getParameters ? sender.getParameters() : null;
-                if (params && params.encodings && params.encodings.length) {
-                    params.encodings.forEach(enc => {
-                        if (trackKind === 'video') {
-                            // Adaptive video bitrate (1 Mbps → 5 Mbps)
-                            enc.minBitrate = 1_000_000;   // fallback for weak networks
-                            enc.maxBitrate = 5_000_000;   // cap for strong networks
-                            enc.priority = 'high';
-                        } else if (trackKind === 'audio') {
-                            // Adaptive audio bitrate (32 kbps → 128 kbps)
-                            enc.minBitrate = 32_000;
-                            enc.maxBitrate = 128_000;
-                            enc.priority = 'high';
+            if (!pc) return;
+            try {
+                const senders = pc.getSenders ? pc.getSenders() : [];
+                senders.forEach(sender => {
+                    if (!sender || !sender.track) return;
+                    const trackKind = sender.track.kind;
+                    if ((kind === 'video' && trackKind === 'video') || (kind === 'audio' && trackKind === 'audio')) {
+                        const params = sender.getParameters ? sender.getParameters() : null;
+                        if (params && params.encodings && params.encodings.length) {
+                            params.encodings.forEach(enc => {
+                                if (trackKind === 'video') {
+                                    // Adaptive video bitrate (1 Mbps → 5 Mbps)
+                                    enc.minBitrate = 1_000_000;   // fallback for weak networks
+                                    enc.maxBitrate = 5_000_000;   // cap for strong networks
+                                    enc.priority = 'high';
+                                } else if (trackKind === 'audio') {
+                                    // Adaptive audio bitrate (32 kbps → 128 kbps)
+                                    enc.minBitrate = 32_000;
+                                    enc.maxBitrate = 128_000;
+                                    enc.priority = 'high';
+                                }
+                            });
+                            try {
+                                sender.setParameters(params).catch(()=>{});
+                            } catch(e){}
                         }
-                    });
-                    try {
-                        sender.setParameters(params).catch(()=>{});
-                    } catch(e){}
-                }
+                    }
+                });
+            } catch (e) {
+                console.warn('Adaptive bandwidth prioritization not fully supported by browser', e);
             }
-        });
-    } catch (e) {
-        console.warn('Adaptive bandwidth prioritization not fully supported by browser', e);
-    }
-}
+        }
 
         // End call
         function endCall() {
@@ -1701,6 +1846,11 @@
             const files = Array.from(e.target.files || []);
             files.forEach(f => sendFileAsChunks(f, 'downloadable'));
             e.target.value = '';
+            
+            // Stop typing indicator
+            if (dataChannel) {
+                dataChannel.send({ type: 'typing-stop' });
+            }
         }
 
         // Handle non-downloadable file selection
@@ -1712,6 +1862,11 @@
             const files = Array.from(e.target.files || []);
             files.forEach(f => sendFileAsChunks(f, 'non-downloadable'));
             e.target.value = '';
+            
+            // Stop typing indicator
+            if (dataChannel) {
+                dataChannel.send({ type: 'typing-stop' });
+            }
         }
 
         // File transfer functions
@@ -2004,6 +2159,10 @@
             dataChannel = null;
             connectedPeerId = null;
             peerUsername = '';
+            usernameDisplay.textContent = `@${myUsername}`;
+            
+            // Update button glows
+            updateButtonGlows();
         }
 
         // Add message to chat (only for actual chat messages)
