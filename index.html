@@ -907,7 +907,7 @@
                 <div class="video-box">
                     <div class="video-title">Remote Stream</div>
                     <div class="video-wrapper">
-                        <video id="remoteStreamVideo" class="stream-video" controls autoplay playsinline></video>
+                        <video id="remoteStreamVideo" class="stream-video" autoplay playsinline></video>
                     </div>
                 </div>
             </div>
@@ -1622,10 +1622,6 @@
                             remoteStreamVideo.play().catch(() => {});
                             // Notify peer that streaming has started
                             dataChannel.send({ type: 'stream-started' });
-
-                            // Apply bandwidth prioritization for file streaming too
-                            prioritizeBandwidth(call.peerConnection, 'video');
-                            prioritizeBandwidth(call.peerConnection, 'audio');
                         });
                         
                         call.on('close', stopStreaming);
@@ -1745,16 +1741,6 @@
             const call = peer.call(connection.peer, localStream, { metadata: { type: type === 'stream' ? 'stream' : 'media' } });
             mediaCall = call;
             setupMediaCallHandlers(call, 'media');
-
-            call.on('stream', () => {
-                prioritizeBandwidth(call.peerConnection, 'video');
-                prioritizeBandwidth(call.peerConnection, 'audio');
-            });
-
-            call.on('error', err => {
-                console.error('Call error:', err);
-                updateConnectionStatus('error', 'Media error');
-            });
         }
 
         function setupMediaCallHandlers(call, kind = 'media') {
@@ -1781,40 +1767,6 @@
                 if (kind === 'media') endCall();
                 else stopStreaming();
             });
-        }
-
-        function prioritizeBandwidth(pc, kind = 'video') {
-            if (!pc) return;
-            try {
-                const senders = pc.getSenders ? pc.getSenders() : [];
-                senders.forEach(sender => {
-                    if (!sender || !sender.track) return;
-                    const trackKind = sender.track.kind;
-                    if ((kind === 'video' && trackKind === 'video') || (kind === 'audio' && trackKind === 'audio')) {
-                        const params = sender.getParameters ? sender.getParameters() : null;
-                        if (params && params.encodings && params.encodings.length) {
-                            params.encodings.forEach(enc => {
-                                if (trackKind === 'video') {
-                                    // Adaptive video bitrate (1 Mbps → 5 Mbps)
-                                    enc.minBitrate = 1_000_000;   // fallback for weak networks
-                                    enc.maxBitrate = 5_000_000;   // cap for strong networks
-                                    enc.priority = 'high';
-                                } else if (trackKind === 'audio') {
-                                    // Adaptive audio bitrate (32 kbps → 128 kbps)
-                                    enc.minBitrate = 32_000;
-                                    enc.maxBitrate = 128_000;
-                                    enc.priority = 'high';
-                                }
-                            });
-                            try {
-                                sender.setParameters(params).catch(()=>{});
-                            } catch(e){}
-                        }
-                    }
-                });
-            } catch (e) {
-                console.warn('Adaptive bandwidth prioritization not fully supported by browser', e);
-            }
         }
 
         // End call
