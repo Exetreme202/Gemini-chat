@@ -205,6 +205,17 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        .welcome-message {
+            align-self: center;
+            text-align: center;
+            background: rgba(120, 80, 200, 0.2);
+            border: 1px solid rgba(120, 80, 200, 0.3);
+            padding: 15px 20px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            animation: messageAppear 0.5s forwards;
+        }
+
         .timestamp {
             font-size: 10px;
             opacity: 0.6;
@@ -265,69 +276,68 @@
             background: rgba(120, 80, 200, 0.5);
         }
 
-        /* Modal styles */
-        .modal {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+        /* Connection panel styles */
+        .connection-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
         }
 
-        .modal.active {
-            opacity: 1;
-            pointer-events: all;
+        .connection-panel.active {
+            display: block;
         }
 
-        .modal-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+        .panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 15px;
         }
 
-        .modal-title {
+        .panel-title {
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
         }
 
-        .modal-close {
+        .panel-close {
             background: none;
             border: none;
             color: white;
-            font-size: 20px;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
 
-        .modal-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .form-group {
+            margin-bottom: 15px;
         }
 
-        .modal-actions {
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .panel-actions {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
             margin-top: 15px;
             justify-content: center;
         }
 
-        .modal-btn {
-            padding: 12px 20px;
+        .panel-btn {
+            padding: 10px 15px;
             border-radius: 8px;
             border: none;
             cursor: pointer;
@@ -339,8 +349,21 @@
             transition: background 0.3s ease;
         }
 
-        .modal-btn:hover {
+        .panel-btn:hover {
             background: rgba(120, 80, 200, 0.5);
+        }
+
+        /* Video call panel */
+        .video-call-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .video-call-panel.active {
+            display: block;
         }
 
         .video-container {
@@ -387,8 +410,8 @@
         /* Video Call Layout */
         .video-call-container {
             position: relative;
-            width: 70vw;
-            height: 80vh;
+            width: 100%;
+            height: 40vh;
             margin: 20px 0;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
@@ -428,106 +451,34 @@
             object-fit: contain;
         }
 
-        .connection-status {
-            margin-top: 15px;
-            padding: 8px 12px;
-            border-radius: 6px;
+        /* Stream panel */
+        .stream-panel {
             background: rgba(255, 255, 255, 0.05);
-            font-size: 14px;
-        }
-
-        .developer-credit {
-            margin-top: 10px;
-            text-align: center;
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .form-group {
+            border-radius: 12px;
+            padding: 15px;
             margin-bottom: 15px;
-            width: 100%;
+            display: none;
         }
 
-        .form-group label {
+        .stream-panel.active {
             display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-            opacity: 0.8;
         }
 
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Files panel */
+        .files-panel {
             background: rgba(255, 255, 255, 0.05);
-            color: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
         }
 
-        .stream-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-            width: 100%;
-            align-items: center;
-        }
-
-        .stream-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .files-container {
-            margin-top: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 10px;
-            width: 100%;
-        }
-
-        .file-item {
-            padding: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 14px;
-        }
-
-        .file-item:last-child {
-            border-bottom: none;
-        }
-
-        .save-btn {
-            margin-top: 10px;
-            width: 100%;
-        }
-
-        .modal-fullscreen-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .modal-fullscreen-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .files-panel.active {
+            display: block;
         }
 
         .file-input {
             display: none;
-        }
-
-        .modal-header-right {
-            display: flex;
-            gap: 10px;
         }
 
         .selected-file-info {
@@ -539,64 +490,20 @@
             text-align: center;
         }
 
-        .transfer-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
-            width: 100%;
-        }
-
-        .transfer-item {
-            padding: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .transfer-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 6px;
-        }
-
-        .transfer-name {
-            font-weight: bold;
-            word-break: break-all;
-            font-size: 14px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 999px;
-            overflow: hidden;
-        }
-
-        .progress {
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .progress[data-type="send"] {
-            background: #4CAF50;
-        }
-
-        .progress[data-type="recv"] {
-            background: #2196F3;
-        }
-
         .file-link {
             display: inline-block;
             margin-top: 6px;
             text-decoration: underline;
-            color: #2196F3;
             cursor: pointer;
             font-size: 12px;
+        }
+
+        .file-link.downloadable {
+            color: #2196F3;
+        }
+
+        .file-link.non-downloadable {
+            color: #FF9800;
         }
 
         /* File Preview Modal */
@@ -624,58 +531,86 @@
 
         .preview-content {
             max-width: 90vw;
-            max-height: 80vh;
+            max-height: 75vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
         }
 
         .preview-content img {
             max-width: 100%;
-            max-height: 80vh;
+            max-height: 75vh;
             object-fit: contain;
         }
 
         .preview-content video {
             max-width: 100%;
-            max-height: 80vh;
+            max-height: 75vh;
             object-fit: contain;
             background: #000;
         }
 
-        .player-controls {
+        .video-controls-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 15px;
-            width: 100%;
-        }
-
-        .player-controls button {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
+            background: rgba(0, 0, 0, 0.6);
             padding: 8px 15px;
             border-radius: 20px;
-            cursor: pointer;
+            z-index: 10;
+            width: auto;
+            min-width: 180px;
         }
 
-        .player-controls input[type="range"] {
-            flex: 1;
-            height: 5px;
+        .video-controls button {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-controls input[type="range"] {
+            width: 100px;
+            height: 4px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             outline: none;
         }
 
         .back-btn {
-            margin-top: 15px;
-            background: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            z-index: 10;
         }
 
         /* Incoming Call Modal */
@@ -734,17 +669,124 @@
             cursor: pointer;
         }
 
+        /* Small file modal */
+        .file-modal {
+            position: absolute;
+            bottom: 70px;
+            right: 20px;
+            width: 250px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
+            z-index: 20;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .file-modal.active {
+            display: flex;
+        }
+
+        .file-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .file-modal-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .file-modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .file-modal-btn {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: rgba(120, 80, 200, 0.3);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .file-modal-btn:hover {
+            background: rgba(120, 80, 200, 0.5);
+        }
+
+        /* Remote stream panel */
+        .remote-stream-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .remote-stream-panel.active {
+            display: block;
+        }
+
+        /* Progress bar styles */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: rgba(120, 80, 200, 0.5);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 11px;
+            margin-top: 4px;
+            opacity: 0.8;
+            text-align: right;
+        }
+
+        .file-status {
+            font-size: 11px;
+            margin-top: 2px;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        /* Developer text */
+        .developer-text {
+            text-align: center;
+            font-size: 10px;
+            opacity: 0.6;
+            margin-top: 15px;
+        }
+
         /* Glow effects */
         @keyframes glow-violet {
             0% { box-shadow: 0 0 5px rgba(120, 80, 200, 0.7); }
             50% { box-shadow: 0 0 20px rgba(120, 80, 200, 0.9); }
             100% { box-shadow: 0 0 5px rgba(120, 80, 200, 0.7); }
-        }
-
-        @keyframes glow-sapphire {
-            0% { box-shadow: 0 0 5px rgba(0, 100, 200, 0.7); }
-            50% { box-shadow: 0 0 20px rgba(0, 100, 200, 0.9); }
-            100% { box-shadow: 0 0 5px rgba(0, 100, 200, 0.7); }
         }
 
         @keyframes glow-red {
@@ -753,16 +795,8 @@
             100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.7); }
         }
 
-        @keyframes glow-green {
-            0% { box-shadow: 0 0 5px rgba(0, 255, 0, 0.7); }
-            50% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.9); }
-            100% { box-shadow: 0 0 5px rgba(0, 255, 0, 0.7); }
-        }
-
         .glow-violet { animation: glow-violet 2s infinite; }
-        .glow-sapphire { animation: glow-sapphire 2s infinite; }
         .glow-red { animation: glow-red 2s infinite; }
-        .glow-green { animation: glow-green 2s infinite; }
 
         @keyframes rotate {
             0% { transform: rotate(0deg); }
@@ -800,17 +834,31 @@
             }
             
             .video-call-container {
-                width: 85vw;
-                height: 60vh;
+                height: 30vh;
             }
             
             .local-video-container {
                 width: 30vw;
-                height: 20vh;
+                height: 15vh;
             }
             
             .message {
                 max-width: 85%;
+            }
+
+            .file-modal {
+                width: 200px;
+                right: 10px;
+            }
+            
+            .video-controls {
+                bottom: 10px;
+                padding: 6px 12px;
+                min-width: 160px;
+            }
+            
+            .video-controls input[type="range"] {
+                width: 80px;
             }
         }
     </style>
@@ -858,150 +906,131 @@
         </div>
         
         <div class="chat-messages" id="chatMessages">
-            <div class="message bot">
-                Welcome to Gemini Chat! Set your username, exchange your ID and connect to a peer to start chatting.
-                <div class="timestamp" id="currentTime"></div>
+            <!-- Welcome Message -->
+            <div class="welcome-message" id="welcomeMessage">
+                <h3>Welcome to GEMINI CHAT</h3>
+                <p>Connect with peer to start chatting, streaming, sharing files, and video calling</p>
+                <p>Click the <i class="fas fa-plug"></i> button to get started</p>
+            </div>
+            
+            <!-- Connection Panel -->
+            <div class="connection-panel" id="connectionPanel">
+                <div class="panel-header">
+                    <div class="panel-title">Connection Settings</div>
+                    <button class="panel-close" id="connectionPanelClose"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" id="usernameInput" placeholder="Enter username">
+                    <button class="panel-btn" id="saveUsernameBtn" style="margin-top: 8px; width: 100%;">
+                        <i class="fas fa-save"></i> Save Username
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label>Room ID</label>
+                    <input type="text" class="form-control" id="roomIdInput" placeholder="Enter room ID">
+                </div>
+                <div class="panel-actions">
+                    <button class="panel-btn" id="createRoomBtn"><i class="fas fa-plus"></i> Create Room</button>
+                    <button class="panel-btn" id="copyRoomIdBtn"><i class="fas fa-copy"></i> Copy ID</button>
+                    <button class="panel-btn" id="joinRoomBtn"><i class="fas fa-link"></i> Join Room</button>
+                </div>
+                <div class="connection-status">
+                    Status: <span id="connectionStatusText">Disconnected</span>
+                </div>
+                <div class="developer-text">
+                    Developed by Jijo
+                </div>
+            </div>
+            
+            <!-- Video Call Panel -->
+            <div class="video-call-panel" id="videoCallPanel">
+                <div class="panel-header">
+                    <div class="panel-title">Video Call</div>
+                    <button class="panel-close" id="videoCallPanelClose"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="panel-actions">
+                    <button class="panel-btn" id="startVideoCallBtn"><i class="fas fa-video"></i> Start Video Call</button>
+                    <button class="panel-btn" id="endCallBtn"><i class="fas fa-phone-slash"></i> End Call</button>
+                </div>
+                
+                <div class="video-call-container">
+                    <video class="remote-video" id="remoteVideo" autoplay playsinline></video>
+                    <div class="local-video-container">
+                        <video class="local-video" id="localVideo" muted autoplay playsinline></video>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stream Panel -->
+            <div class="stream-panel" id="streamPanel">
+                <div class="panel-header">
+                    <div class="panel-title">Stream Controls</div>
+                    <button class="panel-close" id="streamPanelClose"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="stream-controls">
+                    <input type="file" id="videoFileInput" class="file-input" accept="video/*">
+                    <button class="panel-btn" id="chooseFileBtn">
+                        <i class="fas fa-folder-open"></i> Choose Video File
+                    </button>
+                    <div class="selected-file-info" id="selectedFileInfo">No file selected</div>
+                    <div class="panel-actions">
+                        <button class="panel-btn" id="startVideoStreamBtn"><i class="fas fa-play"></i> Start Stream</button>
+                        <button class="panel-btn" id="stopStreamBtn"><i class="fas fa-stop"></i> Stop Stream</button>
+                    </div>
+                </div>
+                <div class="video-container">
+                    <div class="video-box">
+                        <div class="video-title">Local Stream</div>
+                        <div class="video-wrapper">
+                            <video id="localStreamedVideo" class="stream-video" controls></video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Remote Stream Panel -->
+            <div class="remote-stream-panel" id="remoteStreamPanel">
+                <div class="panel-header">
+                    <div class="panel-title">Stream from <span id="streamPeerName"></span></div>
+                    <div>
+                        <button class="panel-btn" id="remoteStreamFullscreenBtn"><i class="fas fa-expand"></i></button>
+                        <button class="panel-close" id="remoteStreamPanelClose"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="video-container">
+                    <div class="video-box">
+                        <div class="video-title">Remote Stream</div>
+                        <div class="video-wrapper">
+                            <video id="remoteStreamedVideo" class="stream-video" autoplay playsinline></video>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
         <div class="chat-input-container">
-            <input type="text" class="chat-input" placeholder="Type a message..." id="messageInput" disabled>
+            <input type="text" class="chat-input" placeholder="Type a message..." id="chatInput" disabled>
             <div class="input-buttons">
                 <button class="input-btn attach-btn" id="attachBtn"><i class="fas fa-paperclip"></i></button>
-                <button class="input-btn send-btn" id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button>
+                <button class="input-btn send-btn" id="sendChatBtn" disabled><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
-    </div>
-
-    <!-- Modals -->
-    <!-- Stream Modal -->
-    <div class="modal" id="streamModal">
-        <div class="modal-header">
-            <div class="modal-title">Stream Controls</div>
-            <div class="modal-header-right">
-                <button class="modal-fullscreen-btn" data-modal="streamModal">
-                    <i class="fas fa-expand"></i>
-                </button>
-                <button class="modal-close" id="streamModalClose"><i class="fas fa-arrow-left"></i></button>
+        
+        <!-- Small file modal -->
+        <div class="file-modal" id="fileModal">
+            <div class="file-modal-header">
+                <div class="file-modal-title">Send File</div>
+                <button class="file-modal-close" id="fileModalClose"><i class="fas fa-times"></i></button>
             </div>
-        </div>
-        <div class="modal-content">
-            <div class="stream-controls">
-                <input type="file" id="streamFileInput" class="file-input" accept="video/*">
-                <button class="modal-btn" id="chooseFileBtn">
-                    <i class="fas fa-folder-open"></i> Choose Video File
-                </button>
-                <div class="selected-file-info" id="selectedFileInfo">No file selected</div>
-                <div class="stream-buttons">
-                    <button class="modal-btn" id="startStreamBtn" disabled><i class="fas fa-play"></i> Start Stream</button>
-                    <button class="modal-btn" id="stopStreamBtn" disabled><i class="fas fa-stop"></i> Stop Stream</button>
-                </div>
-            </div>
-            <div class="video-container">
-                <div class="video-box">
-                    <div class="video-title">Local Stream</div>
-                    <div class="video-wrapper">
-                        <video id="localStreamVideo" class="stream-video" controls></video>
-                    </div>
-                </div>
-                <div class="video-box">
-                    <div class="video-title">Remote Stream</div>
-                    <div class="video-wrapper">
-                        <video id="remoteStreamVideo" class="stream-video" autoplay playsinline></video>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Video Call Modal -->
-    <div class="modal" id="videoCallModal">
-        <div class="modal-header">
-            <div class="modal-title">Video Call</div>
-            <div class="modal-header-right">
-                <button class="modal-fullscreen-btn" data-modal="videoCallModal">
-                    <i class="fas fa-expand"></i>
-                </button>
-                <button class="modal-close" id="videoCallModalClose"><i class="fas fa-arrow-left"></i></button>
-            </div>
-        </div>
-        <div class="modal-content">
-            <div class="modal-actions">
-                <button class="modal-btn" id="startVideoCallBtn"><i class="fas fa-video"></i> Start Video Call</button>
-                <button class="modal-btn" id="startVoiceCallBtn"><i class="fas fa-phone"></i> Start Voice Call</button>
-                <button class="modal-btn" id="endCallBtn" disabled><i class="fas fa-phone-slash"></i> End Call</button>
-            </div>
-            
-            <div class="video-call-container">
-                <video class="remote-video" id="remoteVideo" autoplay playsinline></video>
-                <div class="local-video-container">
-                    <video class="local-video" id="localVideo" muted autoplay playsinline></video>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Connection Modal -->
-    <div class="modal" id="connectionModal">
-        <div class="modal-header">
-            <div class="modal-title">Connection Settings</div>
-            <div class="modal-header-right">
-                <button class="modal-fullscreen-btn" data-modal="connectionModal">
-                    <i class="fas fa-expand"></i>
-                </button>
-                <button class="modal-close" id="connectionModalClose"><i class="fas fa-arrow-left"></i></button>
-            </div>
-        </div>
-        <div class="modal-content">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" class="form-control" id="usernameInput" placeholder="Enter username">
-                <button class="modal-btn save-btn" id="saveUsernameBtn"><i class="fas fa-save"></i> Save Username</button>
-            </div>
-            <div class="form-group">
-                <label>Your ID</label>
-                <input type="text" class="form-control" id="myIdInput" value="Generating..." readonly>
-                <button class="modal-btn" id="copyIdBtn" style="margin-top: 8px;"><i class="fas fa-copy"></i> Copy ID</button>
-            </div>
-            <div class="form-group">
-                <label>Connect to ID</label>
-                <input type="text" class="form-control" id="peerIdInput" placeholder="Enter connection ID">
-                <button class="modal-btn" id="connectToPeerBtn" style="margin-top: 8px;"><i class="fas fa-link"></i> Connect</button>
-            </div>
-            <div class="connection-status">
-                Status: <span id="connectionStatusText">Disconnected</span>
-            </div>
-            <div class="developer-credit">Developed by Jijo</div>
-        </div>
-    </div>
-
-    <!-- Files Modal -->
-    <div class="modal" id="filesModal">
-        <div class="modal-header">
-            <div class="modal-title">Share Files</div>
-            <div class="modal-header-right">
-                <button class="modal-fullscreen-btn" data-modal="filesModal">
-                    <i class="fas fa-expand"></i>
-                </button>
-                <button class="modal-close" id="filesModalClose"><i class="fas fa-arrow-left"></i></button>
-            </div>
-        </div>
-        <div class="modal-content">
-            <div class="modal-actions">
-                <input type="file" id="downloadableFileInput" class="file-input" multiple>
-                <button class="modal-btn" id="shareDownloadableBtn">
-                    <i class="fas fa-download"></i> Share Downloadable Files
-                </button>
-                
-                <input type="file" id="nonDownloadableFileInput" class="file-input" accept="image/*,video/*" multiple>
-                <button class="modal-btn" id="shareNonDownloadableBtn">
-                    <i class="fas fa-file"></i> Share Non-Downloadable Files
-                </button>
-            </div>
-            <h3 style="margin-top: 20px; width: 100%;">Transfers & Received Files</h3>
-            <div class="transfer-list" id="transferList">
-                <div class="transfer-item">No active transfers</div>
-            </div>
+            <input type="file" id="downloadableFileInput" class="file-input" multiple>
+            <button class="file-modal-btn" id="shareDownloadableBtn">
+                <i class="fas fa-download"></i> Share Downloadable File
+            </button>
+            <input type="file" id="nonDownloadableFileInput" class="file-input" accept="image/*,video/*" multiple>
+            <button class="file-modal-btn" id="shareNonDownloadableBtn">
+                <i class="fas fa-file"></i> Share Non-Downloadable File
+            </button>
         </div>
     </div>
 
@@ -1009,8 +1038,8 @@
     <div class="preview-modal" id="previewModal">
         <div class="preview-content" id="previewContent">
             <!-- Content will be filled dynamically -->
+            <button class="back-btn" id="previewBackBtn"><i class="fas fa-times"></i></button>
         </div>
-        <button class="back-btn" id="previewBackBtn">Back</button>
     </div>
 
     <!-- Incoming Call Modal -->
@@ -1026,1098 +1055,72 @@
     </div>
 
     <script>
-        // ======================= WebRTC Configuration =======================
-        const config = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:stun3.l.google.com:19302' },
-                { urls: 'stun:stun4.l.google.com:19302' }
-            ]
-        };
-
-        // WebRTC Variables
-        let peer, connection, dataChannel;
-        let localStream = null, remoteStream = null;
-        let mediaCall = null, streamCall = null;
-        let isCaller = false, connectedPeerId = null, typingTimer = null;
-        let capturedMediaStream = null;
+        /***** Global Variables *****/
+        let isOfferer = null;
+        let dcPeer = null;
+        let dataChannel = null;
+        let videoCallPeer = null;
+        let videoStreamPeer = null;
+        let peer = null;
+        let signalingConn = null;
+        let isStreamSender = false;
         let myUsername = '';
         let peerUsername = '';
-        let incomingCall = null;
         let connectionStatus = 'disconnected';
-        let newMessageInModal = false;
+        let typingTimer = null;
+        let currentlyPlayingMedia = null; // Track currently playing media
 
-        // File transfer (256KB chunks - optimized)
+        // ICE Servers for cross-network communication
+        const iceServers = [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
+          { urls: 'stun:stun4.l.google.com:19302' }
+        ];
+
+        // File transfer (256KB chunks)
         const CHUNK_SIZE = 256 * 1024;
-        const sendingTransfers = new Map();
-        const receivingTransfers = new Map();
+        const fileTransfers = new Map();
 
-        // DOM Elements
-        const chatMessages = document.getElementById('chatMessages');
-        const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const attachBtn = document.getElementById('attachBtn');
-        const streamBtn = document.getElementById('streamBtn');
-        const videoCallBtn = document.getElementById('videoCallBtn');
-        const connectionBtn = document.getElementById('connectionBtn');
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        const streamModal = document.getElementById('streamModal');
-        const videoCallModal = document.getElementById('videoCallModal');
-        const connectionModal = document.getElementById('connectionModal');
-        const filesModal = document.getElementById('filesModal');
-        const glassContainer = document.querySelector('.glass-container');
-        const modalCloseButtons = document.querySelectorAll('.modal-close');
-        const typingIndicator = document.getElementById('typingIndicator');
-        const remoteVideo = document.getElementById('remoteVideo');
-        const localVideo = document.getElementById('localVideo');
-        const modalFullscreenButtons = document.querySelectorAll('.modal-fullscreen-btn');
-        const usernameInput = document.getElementById('usernameInput');
-        const usernameDisplay = document.getElementById('usernameDisplay');
-        const saveUsernameBtn = document.getElementById('saveUsernameBtn');
-        const chooseFileBtn = document.getElementById('chooseFileBtn');
-        const streamFileInput = document.getElementById('streamFileInput');
-        const startStreamBtn = document.getElementById('startStreamBtn');
-        const stopStreamBtn = document.getElementById('stopStreamBtn');
-        const localStreamVideo = document.getElementById('localStreamVideo');
-        const remoteStreamVideo = document.getElementById('remoteStreamVideo');
-        const selectedFileInfo = document.getElementById('selectedFileInfo');
-        const myIdInput = document.getElementById('myIdInput');
-        const copyIdBtn = document.getElementById('copyIdBtn');
-        const peerIdInput = document.getElementById('peerIdInput');
-        const connectToPeerBtn = document.getElementById('connectToPeerBtn');
-        const connectionStatusText = document.getElementById('connectionStatusText');
-        const connectionIndicator = document.getElementById('connectionIndicator');
-        const startVideoCallBtn = document.getElementById('startVideoCallBtn');
-        const startVoiceCallBtn = document.getElementById('startVoiceCallBtn');
-        const endCallBtn = document.getElementById('endCallBtn');
-        const shareDownloadableBtn = document.getElementById('shareDownloadableBtn');
-        const shareNonDownloadableBtn = document.getElementById('shareNonDownloadableBtn');
-        const downloadableFileInput = document.getElementById('downloadableFileInput');
-        const nonDownloadableFileInput = document.getElementById('nonDownloadableFileInput');
-        const transferList = document.getElementById('transferList');
-        const previewModal = document.getElementById('previewModal');
-        const previewContent = document.getElementById('previewContent');
-        const previewBackBtn = document.getElementById('previewBackBtn');
-        const incomingCallModal = document.getElementById('incomingCallModal');
-        const incomingCallText = document.getElementById('incomingCallText');
-        const acceptCallBtn = document.getElementById('acceptCallBtn');
-        const rejectCallBtn = document.getElementById('rejectCallBtn');
-        const streamModalClose = document.getElementById('streamModalClose');
-        const videoCallModalClose = document.getElementById('videoCallModalClose');
-        const connectionModalClose = document.getElementById('connectionModalClose');
-        const filesModalClose = document.getElementById('filesModalClose');
-
-        // Initialize
-        function init() {
-            // Start gradient animation
-            cycleColors();
-            
-            // Hide typing indicator initially
-            typingIndicator.style.display = 'none';
-            
-            // Remove controls from video call elements
-            remoteVideo.removeAttribute('controls');
-            localVideo.removeAttribute('controls');
-            
-            // Set current time for welcome message
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('currentTime').textContent = timeString;
-            
-            // Load saved username
-            loadUsername();
-            
-            // Setup event listeners
-            setupEventListeners();
-            
-            // Initialize PeerJS
-            initializePeer();
-            
-            // Set initial button states
-            updateButtonGlows();
+        /***** Utility Functions *****/
+        function updateConnectionStatus(status, message = '') {
+          const elem = document.getElementById("connectionStatusText");
+          const indicator = document.getElementById("connectionIndicator");
+          const connectionBtn = document.getElementById("connectionBtn");
+          const fullscreenBtn = document.getElementById("fullscreenBtn");
+          
+          connectionStatus = status;
+          elem.innerText = message || status;
+          
+          // Update connection indicator
+          indicator.classList.remove("connected", "unavailable");
+          
+          if (status.toLowerCase() === "connected") {
+            elem.style.color = "green";
+            indicator.classList.add("connected");
+            connectionBtn.classList.remove("glow-red");
+          } else if (status.toLowerCase() === "connecting") {
+            elem.style.color = "blue";
+            indicator.classList.add("unavailable");
+            connectionBtn.classList.remove("glow-red");
+          } else if (status.toLowerCase() === "disconnected") {
+            elem.style.color = "red";
+            connectionBtn.classList.add("glow-red");
+          } else if (status.toLowerCase().includes("failed")) {
+            elem.style.color = "orange";
+            indicator.classList.add("unavailable");
+            connectionBtn.classList.add("glow-red");
+          }
+          
+          // Update fullscreen button glow
+          if (!document.fullscreenElement) {
+            fullscreenBtn.classList.add("glow-violet");
+          } else {
+            fullscreenBtn.classList.remove("glow-violet");
+          }
         }
-
-        // Update button glow states
-        function updateButtonGlows() {
-            // Fullscreen button glow
-            if (!document.fullscreenElement) {
-                fullscreenBtn.classList.add('glow-violet');
-            } else {
-                fullscreenBtn.classList.remove('glow-violet');
-            }
-            
-            // Connection button glow
-            if (connectionStatus === 'disconnected' || connectionStatus === 'error') {
-                connectionBtn.classList.add('glow-red');
-            } else {
-                connectionBtn.classList.remove('glow-red');
-            }
-        }
-
-        // Initialize PeerJS
-        function initializePeer() {
-            peer = new Peer({ config, debug: 2 });
-
-            peer.on('open', id => {
-                myIdInput.value = id;
-                updateConnectionStatus('disconnected', 'Ready to connect');
-                copyIdBtn.disabled = false;
-            });
-
-            peer.on('connection', conn => {
-                if (connection && connection.open) { 
-                    conn.close(); 
-                    return; 
-                }
-                connectedPeerId = conn.peer;
-                setupDataConnection(conn);
-                peerIdInput.value = conn.peer;
-                connectToPeerBtn.disabled = true;
-            });
-
-            // Incoming calls
-            peer.on('call', call => {
-                const callType = call.metadata && call.metadata.type ? call.metadata.type : 'media';
-                
-                if (callType === 'stream') {
-                    // Automatically accept stream calls without showing incoming call modal
-                    call.answer(null); // No media stream needed for receiving stream
-                    streamCall = call;
-                    setupMediaCallHandlers(call, 'stream');
-                    
-                    // Open stream modal automatically
-                    streamModal.classList.add('active');
-                    // Make stream button stop glowing
-                    streamBtn.classList.remove('glow-sapphire');
-                } else {
-                    // For regular calls, show incoming call modal
-                    incomingCall = call;
-                    incomingCallText.textContent = `${peerUsername || 'Peer'} is calling you`;
-                    incomingCallModal.classList.add('active');
-                    
-                    // Make video call button glow
-                    videoCallBtn.classList.add('glow-sapphire');
-
-                    // Set up accept/reject handlers
-                    acceptCallBtn.onclick = () => {
-                        try {
-                            if (callType === 'media') {
-                                if (streamCall) {
-                                    try { streamCall.close(); } catch(e) {}
-                                    streamCall = null;
-                                    stopCapturedMediaStream();
-                                }
-                                call.answer(localStream || undefined);
-                                mediaCall = call;
-                                setupMediaCallHandlers(call, 'media');
-                            }
-                            incomingCallModal.classList.remove('active');
-                            videoCallModal.classList.add('active');
-                            // Stop video call button glow
-                            videoCallBtn.classList.remove('glow-sapphire');
-                        } catch (err) {
-                            console.error('Error answering call:', err);
-                            updateConnectionStatus('error', 'Call answer failed');
-                        }
-                    };
-
-                    rejectCallBtn.onclick = () => {
-                        call.close();
-                        incomingCallModal.classList.remove('active');
-                        // Stop video call button glow
-                        videoCallBtn.classList.remove('glow-sapphire');
-                    };
-                }
-            });
-
-            peer.on('disconnected', () => {
-                updateConnectionStatus('disconnected', 'Peer disconnected');
-                resetConnectionState();
-            });
-
-            peer.on('error', err => {
-                console.error('PeerJS error:', err);
-                updateConnectionStatus('error', 'Error: ' + (err && err.type ? err.type : err));
-            });
-        }
-
-        // Update connection status
-        function updateConnectionStatus(state, message) {
-            connectionStatus = state;
-            connectionStatusText.textContent = message;
-            
-            // Update connection indicator
-            connectionIndicator.classList.remove('connected', 'unavailable');
-            
-            if (state === 'connected') {
-                connectionIndicator.classList.add('connected');
-                connectionStatusText.style.color = '#00ff00';
-            } else if (state === 'connecting' || state === 'unavailable') {
-                connectionIndicator.classList.add('unavailable');
-                connectionStatusText.style.color = '#ff9500';
-            } else {
-                connectionStatusText.style.color = '#ff3b30';
-            }
-            
-            // Update button glows
-            updateButtonGlows();
-        }
-
-        // Setup data connection
-        function setupDataConnection(conn) {
-            connection = conn;
-            connection.on('open', () => {
-                dataChannel = connection;
-                updateConnectionStatus('connected', 'Connected to ' + connection.peer);
-                messageInput.disabled = false;
-                sendBtn.disabled = false;
-                startStreamBtn.disabled = false;
-                connectedPeerId = connection.peer;
-
-                // Send our username to the peer
-                if (myUsername) {
-                    dataChannel.send({ type: 'username', username: myUsername });
-                }
-                
-                // Close connection modal automatically
-                connectionModal.classList.remove('active');
-                
-                setupDataChannel();
-            });
-            connection.on('close', () => {
-                updateConnectionStatus('disconnected', 'Connection closed');
-                resetConnectionState();
-            });
-            connection.on('error', err => {
-                console.error('Connection error:', err);
-                updateConnectionStatus('error', 'Connection error');
-            });
-            
-            // Check for temporary connection issues
-            connection.on('iceStateChanged', state => {
-                if (state === 'disconnected' || state === 'failed') {
-                    updateConnectionStatus('unavailable', 'Connection unstable');
-                } else if (state === 'connected') {
-                    updateConnectionStatus('connected', 'Connected to ' + connection.peer);
-                }
-            });
-        }
-
-        function setupDataChannel() {
-            if (!dataChannel) return;
-            dataChannel.on('data', handleDataMessage);
-            try {
-                if (dataChannel._dc) dataChannel._dc.binaryType = 'arraybuffer';
-            } catch(e){}
-        }
-
-        // Handle incoming data messages
-        function handleDataMessage(data) {
-            if (!data) return;
-            try {
-                switch(data.type){
-                    case 'chat':
-                        addMessage(data.message, 'remote');
-                        
-                        // If a modal is open, make its close button glow
-                        const activeModal = document.querySelector('.modal.active');
-                        if (activeModal) {
-                            const closeBtn = activeModal.querySelector('.modal-close');
-                            if (closeBtn) {
-                                closeBtn.classList.add('glow-green');
-                                newMessageInModal = true;
-                            }
-                        }
-                        break;
-                    case 'typing-start':
-                        if (data.message) {
-                            typingIndicator.textContent = data.message;
-                        } else {
-                            typingIndicator.textContent = `${peerUsername || 'Peer'} is typing`;
-                        }
-                        typingIndicator.style.display = 'block';
-                        break;
-                    case 'typing-stop':
-                        typingIndicator.style.display = 'none';
-                        break;
-                    case 'username':
-                        // Store peer's username
-                        peerUsername = data.username;
-                        usernameDisplay.textContent = `@${peerUsername}`;
-                        updateConnectionStatus('connected', `Connected to ${peerUsername}`);
-                        break;
-                    case 'file-selecting':
-                        typingIndicator.textContent = `${peerUsername || 'Peer'} is choosing file for ${data.purpose}`;
-                        typingIndicator.style.display = 'block';
-                        break;
-                    /* File transfer protocol */
-                    case 'file-meta':
-                        startReceivingFile(data.meta);
-                        // Make files button glow
-                        attachBtn.classList.add('glow-sapphire');
-                        break;
-                    case 'file-chunk':
-                        receiveFileChunk(data.id, data.seq, data.total, data.chunk);
-                        break;
-                    case 'file-complete':
-                        finalizeReceivedFile(data.id);
-                        // Open files modal automatically when file is received
-                        filesModal.classList.add('active');
-                        // Stop files button glow
-                        attachBtn.classList.remove('glow-sapphire');
-                        break;
-                    case 'file-progress':
-                        updateSendProgressUI(data.id, data.percent);
-                        break;
-                    case 'stream-started':
-                        // Make stream button glow
-                        streamBtn.classList.add('glow-sapphire');
-                        break;
-                    default:
-                        // ignore
-                        break;
-                }
-            } catch (err) {
-                console.error('Error handling data message', err);
-            }
-        }
-
-        // Load username from localStorage
-        function loadUsername() {
-            const savedUsername = localStorage.getItem('geminiChatUsername');
-            if (savedUsername) {
-                usernameInput.value = savedUsername;
-                myUsername = savedUsername;
-                usernameDisplay.textContent = `@${savedUsername}`;
-            }
-        }
-
-        // Save username to localStorage
-        function saveUsername() {
-            const username = usernameInput.value.trim();
-            if (username) {
-                localStorage.setItem('geminiChatUsername', username);
-                myUsername = username;
-                usernameDisplay.textContent = `@${username}`;
-            }
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Save username button
-            saveUsernameBtn.addEventListener('click', saveUsername);
-            
-            // Choose file button
-            chooseFileBtn.addEventListener('click', () => {
-                streamFileInput.click();
-                // Notify peer that we're selecting a file
-                if (dataChannel) {
-                    dataChannel.send({ type: 'file-selecting', purpose: 'streaming' });
-                }
-            });
-            
-            // File selection
-            streamFileInput.addEventListener('change', handleFileSelection);
-            
-            // Start stream button
-            startStreamBtn.addEventListener('click', startStreaming);
-            
-            // Stop stream button
-            stopStreamBtn.addEventListener('click', stopStreaming);
-            
-            // Copy ID button
-            copyIdBtn.addEventListener('click', copyIdToClipboard);
-            
-            // Connect to peer button
-            connectToPeerBtn.addEventListener('click', connectToPeer);
-            
-            // Start video call button
-            startVideoCallBtn.addEventListener('click', startVideoCall);
-            
-            // Start voice call button
-            startVoiceCallBtn.addEventListener('click', startVoiceCall);
-            
-            // End call button
-            endCallBtn.addEventListener('click', endCall);
-            
-            // Share downloadable files
-            shareDownloadableBtn.addEventListener('click', () => {
-                downloadableFileInput.click();
-                // Notify peer that we're selecting a file
-                if (dataChannel) {
-                    dataChannel.send({ type: 'file-selecting', purpose: 'file transfer' });
-                }
-            });
-            
-            // Share non-downloadable files
-            shareNonDownloadableBtn.addEventListener('click', () => {
-                nonDownloadableFileInput.click();
-                // Notify peer that we're selecting a file
-                if (dataChannel) {
-                    dataChannel.send({ type: 'file-selecting', purpose: 'file transfer' });
-                }
-            });
-            
-            // File input handlers
-            downloadableFileInput.addEventListener('change', handleDownloadableFileSelect);
-            nonDownloadableFileInput.addEventListener('change', handleNonDownloadableFileSelect);
-            
-            // Send message
-            sendBtn.addEventListener('click', sendMessage);
-            messageInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-            
-            // Typing indicator
-            messageInput.addEventListener('input', handleTyping);
-            
-            // Modal buttons
-            streamBtn.addEventListener('click', () => {
-                streamModal.classList.add('active');
-                // Stop stream button glow
-                streamBtn.classList.remove('glow-sapphire');
-            });
-
-            videoCallBtn.addEventListener('click', () => {
-                videoCallModal.classList.add('active');
-                // Stop video call button glow
-                videoCallBtn.classList.remove('glow-sapphire');
-            });
-
-            connectionBtn.addEventListener('click', () => {
-                connectionModal.classList.add('active');
-                // Stop connection button glow
-                connectionBtn.classList.remove('glow-red');
-            });
-
-            attachBtn.addEventListener('click', () => {
-                filesModal.classList.add('active');
-                // Stop files button glow
-                attachBtn.classList.remove('glow-sapphire');
-            });
-
-            // Close modals
-            modalCloseButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.modal').forEach(modal => {
-                        modal.classList.remove('active');
-                    });
-                    // Remove glow from close button
-                    e.currentTarget.classList.remove('glow-green');
-                    newMessageInModal = false;
-                });
-            });
-
-            // Preview back button
-            previewBackBtn.addEventListener('click', () => {
-                previewModal.classList.remove('active');
-                // Stop video if playing
-                const video = previewContent.querySelector('video');
-                if (video) {
-                    video.pause();
-                }
-            });
-
-            // Fullscreen functionality
-            fullscreenBtn.addEventListener('click', () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                } else {
-                    document.exitFullscreen();
-                }
-            });
-
-            // Listen for fullscreen changes
-            document.addEventListener('fullscreenchange', () => {
-                updateButtonGlows();
-            });
-
-            // Modal fullscreen functionality
-            modalFullscreenButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const modalId = e.currentTarget.getAttribute('data-modal');
-                    const modal = document.getElementById(modalId);
-                    
-                    if (!document.fullscreenElement) {
-                        modal.requestFullscreen().catch(err => {
-                            console.error(`Error attempting to enable fullscreen: ${err.message}`);
-                        });
-                    } else {
-                        document.exitFullscreen();
-                    }
-                });
-            });
-
-            // Adjust container height for mobile keyboard
-            messageInput.addEventListener('focus', () => {
-                if (window.innerWidth < 768) {
-                    glassContainer.style.height = '60vh';
-                }
-            });
-
-            messageInput.addEventListener('blur', () => {
-                // Don't reset height if a modal is open
-                if (window.innerWidth < 768 && !document.querySelector('.modal.active')) {
-                    glassContainer.style.height = '100vh';
-                }
-            });
-        }
-
-        // Handle file selection for streaming
-        function handleFileSelection(e) {
-            if (e.target.files && e.target.files[0]) {
-                const file = e.target.files[0];
-                selectedFileInfo.textContent = `Selected: ${file.name}`;
-                startStreamBtn.disabled = false;
-                
-                // Create object URL for preview
-                const fileURL = URL.createObjectURL(file);
-                localStreamVideo.src = fileURL;
-                
-                // Stop typing indicator
-                if (dataChannel) {
-                    dataChannel.send({ type: 'typing-stop' });
-                }
-            }
-        }
-
-        // Start streaming
-        async function startStreaming() {
-            if (!connection) {
-                return;
-            }
-            
-            const file = streamFileInput.files[0];
-            if (!file) {
-                return;
-            }
-
-            try {
-                const fileURL = URL.createObjectURL(file);
-                localStreamVideo.src = fileURL;
-                
-                localStreamVideo.onloadedmetadata = async () => {
-                    try {
-                        await localStreamVideo.play();
-                    } catch(e){}
-
-                    if (!localStreamVideo.captureStream) { 
-                        return;
-                    }
-                    
-                    try {
-                        stopCapturedMediaStream();
-                        capturedMediaStream = localStreamVideo.captureStream();
-                        
-                        const call = peer.call(connection.peer, capturedMediaStream, { metadata: { type: 'stream' } });
-                        streamCall = call;
-                        setupMediaCallHandlers(call, 'stream');
-                        
-                        call.on('stream', rStream => {
-                            remoteStreamVideo.srcObject = rStream;
-                            remoteStreamVideo.play().catch(() => {});
-                            // Notify peer that streaming has started
-                            dataChannel.send({ type: 'stream-started' });
-                        });
-                        
-                        call.on('close', stopStreaming);
-                        
-                        startStreamBtn.disabled = true;
-                        stopStreamBtn.disabled = false;
-                    } catch (err) {
-                        console.error('Start stream error', err);
-                        stopCapturedMediaStream();
-                    }
-                };
-            } catch (err) {
-                console.error('Stream error:', err);
-            }
-        }
-
-        // Stop streaming
-        function stopStreaming() {
-            if (streamCall) {
-                try{ streamCall.close(); } catch(e){}
-                streamCall = null;
-            }
-            stopCapturedMediaStream();
-            try { localStreamVideo.pause(); } catch(e){}
-            localStreamVideo.src = '';
-            remoteStreamVideo.srcObject = null;
-            startStreamBtn.disabled = false;
-            stopStreamBtn.disabled = true;
-        }
-
-        function stopCapturedMediaStream() {
-            if (capturedMediaStream) {
-                try { capturedMediaStream.getTracks().forEach(t=>t.stop()); } catch(e){}
-                capturedMediaStream = null;
-            }
-        }
-
-        // Copy ID to clipboard
-        function copyIdToClipboard() {
-            const id = myIdInput.value;
-            navigator.clipboard.writeText(id).then(() => {
-                // No longer adding chat message for this action
-            });
-        }
-
-        // Connect to peer
-        function connectToPeer() {
-            const peerId = peerIdInput.value.trim();
-            if (!peerId) {
-                return;
-            }
-            if (!myUsername) {
-                return;
-            }
-            
-            updateConnectionStatus('connecting', 'Connecting to ' + peerId);
-            connectedPeerId = peerId;
-            const conn = peer.connect(peerId, { reliable: true });
-            setupDataConnection(conn);
-            connectToPeerBtn.disabled = true;
-        }
-
-        // Start video call
-        async function startVideoCall() {
-            try {
-                if (streamCall) {
-                    try { streamCall.close(); } catch(e){}
-                    streamCall = null;
-                    stopCapturedMediaStream();
-                }
-
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
-                        width: { ideal: 1920 }, 
-                        height: { ideal: 1080 }, 
-                        frameRate: { ideal: 60, max: 60 } 
-                    },
-                    audio: true
-                });
-                localVideo.srcObject = localStream;
-                startCall('media');
-                endCallBtn.disabled = false;
-            } catch(e) { 
-                console.error(e);
-            }
-        }
-
-        // Start voice call
-        async function startVoiceCall() {
-            try {
-                if (streamCall) {
-                    try { streamCall.close(); } catch(e){}
-                    streamCall = null;
-                    stopCapturedMediaStream();
-                }
-
-                localStream = await navigator.mediaDevices.getUserMedia({video:false, audio:true});
-                startCall('media');
-                endCallBtn.disabled = false;
-            } catch(e) { 
-                console.error(e);
-            }
-        }
-
-        function startCall(type='media') {
-            if (!connection) {
-                return;
-            }
-            
-            isCaller = true;
-
-            if (mediaCall) {
-                try { mediaCall.close(); } catch(e){}
-                mediaCall = null;
-            }
-
-            const call = peer.call(connection.peer, localStream, { metadata: { type: type === 'stream' ? 'stream' : 'media' } });
-            mediaCall = call;
-            setupMediaCallHandlers(call, 'media');
-        }
-
-        function setupMediaCallHandlers(call, kind = 'media') {
-            call.on('stream', stream => {
-                if (kind === 'media') {
-                    remoteStream = stream;
-                    remoteVideo.srcObject = stream;
-                } else if (kind === 'stream') {
-                    remoteStreamVideo.srcObject = stream;
-                }
-            });
-
-            call.on('close', () => {
-                if (kind === 'media') {
-                    endCall();
-                } else if (kind === 'stream') {
-                    stopStreaming();
-                }
-            });
-
-            call.on('error', err => {
-                console.error(kind + ' call error:', err);
-                updateConnectionStatus('error', `${kind} media error`);
-                if (kind === 'media') endCall();
-                else stopStreaming();
-            });
-        }
-
-        // End call
-        function endCall() {
-            if (mediaCall) {
-                try{ mediaCall.close(); } catch(e){}
-                mediaCall = null;
-            }
-            if (localStream) {
-                localStream.getTracks().forEach(t => t.stop());
-                localStream = null;
-                localVideo.srcObject = null;
-            }
-            if (remoteStream) {
-                try{ remoteStream.getTracks().forEach(t=>t.stop()); } catch(e){}
-                remoteStream = null;
-                remoteVideo.srcObject = null;
-            }
-            endCallBtn.disabled = true;
-            videoCallModal.classList.remove('active');
-        }
-
-        // Handle downloadable file selection
-        function handleDownloadableFileSelect(e) {
-            if (!dataChannel) {
-                return;
-            }
-            
-            const files = Array.from(e.target.files || []);
-            files.forEach(f => sendFileAsChunks(f, 'downloadable'));
-            e.target.value = '';
-            
-            // Stop typing indicator
-            if (dataChannel) {
-                dataChannel.send({ type: 'typing-stop' });
-            }
-        }
-
-        // Handle non-downloadable file selection
-        function handleNonDownloadableFileSelect(e) {
-            if (!dataChannel) {
-                return;
-            }
-            
-            const files = Array.from(e.target.files || []);
-            files.forEach(f => sendFileAsChunks(f, 'non-downloadable'));
-            e.target.value = '';
-            
-            // Stop typing indicator
-            if (dataChannel) {
-                dataChannel.send({ type: 'typing-stop' });
-            }
-        }
-
-        // File transfer functions
-        function uuid() {
-            return 'f-' + Math.random().toString(36).slice(2) + '-' + Date.now().toString(36);
-        }
-
-        function humanSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
-            return (bytes/1048576).toFixed(1) + ' MB';
-        }
-
-        function createTransferUI(id, name, size, type) {
-            const wrap = document.createElement('div');
-            wrap.className = 'transfer-item';
-            wrap.id = `xfer-${id}`;
-
-            const top = document.createElement('div');
-            top.className = 'transfer-top';
-
-            const nameEl = document.createElement('div');
-            nameEl.className = 'transfer-name';
-            nameEl.textContent = `${name} (${humanSize(size)})`;
-            top.appendChild(nameEl);
-
-            const pctEl = document.createElement('div');
-            pctEl.id = `pct-${id}`;
-            pctEl.textContent = '0%';
-            top.appendChild(pctEl);
-
-            const bar = document.createElement('div');
-            bar.className = 'progress-bar';
-            const prog = document.createElement('div');
-            prog.className = 'progress';
-            prog.dataset.type = type;
-            prog.style.width = '0%';
-            bar.appendChild(prog);
-
-            wrap.appendChild(top);
-            wrap.appendChild(bar);
-
-            // Clear "no active transfers" message if it exists
-            if (transferList.children.length === 1 && 
-                transferList.children[0].textContent === 'No active transfers') {
-                transferList.innerHTML = '';
-            }
-            
-            transferList.appendChild(wrap);
-            return {wrap, pctEl, prog};
-        }
-
-        function updateProgressUI(id, percent) {
-            const pctEl = document.getElementById(`pct-${id}`);
-            const prog = document.querySelector(`#xfer-${id} .progress`);
-            if (pctEl) pctEl.textContent = `${percent}%`;
-            if (prog) prog.style.width = `${percent}%`;
-        }
-
-        function wait(ms) { 
-            return new Promise(r => setTimeout(r, ms)); 
-        }
-
-        async function sendFileAsChunks(file, category) {
-            const id = uuid();
-            const meta = { id, name: file.name, size: file.size, mime: file.type || 'application/octet-stream', category };
-            const ui = createTransferUI(id, file.name, file.size, 'send');
-
-            sendingTransfers.set(id, { file, offset: 0, total: file.size, name: file.name, size: file.size, mime: meta.mime, category, ui });
-
-            try { 
-                dataChannel.send({ type: 'file-meta', meta }); 
-            } catch(e) { 
-                console.error('send meta failed', e); 
-            }
-
-            const reader = new FileReader();
-            let offset = 0;
-            let seq = 0;
-            const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-
-            function readSlice(o) { 
-                const slice = file.slice(o, Math.min(o + CHUNK_SIZE, file.size)); 
-                reader.readAsArrayBuffer(slice); 
-            }
-
-            reader.onload = async () => {
-                const chunk = reader.result;
-                try {
-                    dataChannel.send({ type:'file-chunk', id, seq, total: totalChunks, chunk });
-                } catch (err) {
-                    try {
-                        const blob = new Blob([chunk]);
-                        const text = await blobToBase64(blob);
-                        dataChannel.send({ type:'file-chunk', id, seq, total: totalChunks, chunkB64: text });
-                    } catch(e) {
-                        console.error('Failed to send chunk', e);
-                    }
-                }
-
-                offset += chunk.byteLength;
-                seq += 1;
-                
-                const percent = Math.min(100, Math.floor((offset / file.size) * 100));
-                updateProgressUI(id, percent);
-                
-                if (offset < file.size) {
-                    const adaptiveDelay = Math.min(40, Math.max(8, Math.floor((CHUNK_SIZE / 1024) / 6)));
-                    await wait(adaptiveDelay);
-                    readSlice(offset);
-                } else {
-                    try { 
-                        dataChannel.send({ type:'file-complete', id }); 
-                    } catch(e) { 
-                        console.error('send complete err', e); 
-                    }
-                }
-            };
-
-            readSlice(0);
-        }
-
-        function blobToBase64(blob) { 
-            return new Promise((res, rej) => {
-                const r = new FileReader();
-                r.onload = () => res(r.result.split(',')[1]);
-                r.onerror = rej;
-                r.readAsDataURL(blob);
-            }); 
-        }
-
-        function startReceivingFile(meta) {
-            const { id, name, size, category } = meta;
-            const ui = createTransferUI(id, name, size, 'recv');
-            receivingTransfers.set(id, { chunks: [], received: 0, total: size, totalChunks: Math.ceil(size / CHUNK_SIZE), meta, ui });
-        }
-
-        async function receiveFileChunk(id, seq, total, chunk) {
-            const rcv = receivingTransfers.get(id);
-            if (!rcv) return;
-
-            if (chunk) {
-                try {
-                    const arr = new Uint8Array(chunk);
-                    rcv.chunks[seq] = arr;
-                    rcv.received += arr.byteLength;
-                } catch (e) {}
-            }
-
-            const pct = Math.min(100, Math.floor((rcv.received / rcv.total) * 100));
-            updateProgressUI(id, pct);
-
-            try { 
-                dataChannel.send({ type: 'file-progress', id, percent: pct }); 
-            } catch(e){}
-
-            // Check if we've received all chunks
-            const receivedChunks = rcv.chunks.filter(chunk => chunk !== undefined).length;
-            if (receivedChunks === rcv.totalChunks || rcv.received >= rcv.total) {
-                finalizeReceivedFile(id);
-            }
-        }
-
-        function updateSendProgressUI(id, percent) {
-            updateProgressUI(id, Math.max(0, Math.min(100, Math.floor(percent))));
-        }
-
-        async function finalizeReceivedFile(id) {
-            const rcv = receivingTransfers.get(id);
-            if (!rcv) return;
-
-            // Verify we have all chunks
-            const ordered = [];
-            for (let i = 0; i < rcv.totalChunks; i++) {
-                if (rcv.chunks[i]) {
-                    ordered.push(rcv.chunks[i]);
-                } else {
-                    console.error('Missing chunk:', i, 'for file:', id);
-                    return;
-                }
-            }
-
-            // Check if we have the correct amount of data
-            if (rcv.received !== rcv.total) {
-                console.error('File size mismatch for:', id, 'Received:', rcv.received, 'Expected:', rcv.total);
-                return;
-            }
-
-            const blob = new Blob(ordered, { type: rcv.meta.mime });
-            const url = URL.createObjectURL(blob);
-
-            const parent = document.getElementById(`xfer-${id}`);
-            if (!parent) return;
-
-            const line = document.createElement('div');
-            line.style.marginTop = '6px';
-
-            const link = document.createElement('a');
-            link.className = 'file-link';
-            
-            if (rcv.meta.category === 'downloadable') {
-                link.textContent = 'Download file';
-                link.href = url;
-                link.download = rcv.meta.name || 'file';
-            } else {
-                link.textContent = 'Open preview';
-                link.href = 'javascript:void(0)';
-                link.addEventListener('click', () => openPreviewModal(rcv.meta.name, url, rcv.meta.mime));
-            }
-
-            line.appendChild(link);
-            parent.appendChild(line);
-
-            updateProgressUI(id, 100);
-            receivingTransfers.delete(id);
-        }
-
-        function openPreviewModal(name, url, mime) {
-            previewContent.innerHTML = '';
-            
-            if (mime.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = url;
-                img.alt = name;
-                previewContent.appendChild(img);
-            } else if (mime.startsWith('video/')) {
-                const video = document.createElement('video');
-                video.src = url;
-                video.id = 'previewVideo';
-                
-                const controls = document.createElement('div');
-                controls.className = 'player-controls';
-                
-                const playBtn = document.createElement('button');
-                playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                playBtn.addEventListener('click', () => {
-                    if (video.paused) {
-                        video.play();
-                        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                    } else {
-                        video.pause();
-                        playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                    }
-                });
-                
-                const seeker = document.createElement('input');
-                seeker.type = 'range';
-                seeker.value = 0;
-                seeker.addEventListener('input', () => {
-                    if (video.duration) {
-                        video.currentTime = (seeker.value / 100) * video.duration;
-                    }
-                });
-                
-                video.addEventListener('timeupdate', () => {
-                    if (video.duration) {
-                        seeker.value = (video.currentTime / video.duration) * 100;
-                    }
-                });
-                
-                video.addEventListener('ended', () => {
-                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                    seeker.value = 0;
-                });
-                
-                controls.appendChild(playBtn);
-                controls.appendChild(seeker);
-                
-                previewContent.appendChild(video);
-                previewContent.appendChild(controls);
-            }
-            
-            previewModal.classList.add('active');
-        }
-
-        // Reset connection state
-        function resetConnectionState() {
-            messageInput.disabled = true;
-            sendBtn.disabled = true;
-            startStreamBtn.disabled = true;
-            stopStreamBtn.disabled = true;
-            connectToPeerBtn.disabled = false;
-            typingIndicator.style.display = 'none';
-            endCall();
-            stopStreaming();
-            try {
-                if (connection && connection.close) connection.close();
-            } catch(e){}
-            connection = null;
-            dataChannel = null;
-            connectedPeerId = null;
-            peerUsername = '';
-            usernameDisplay.textContent = `@${myUsername}`;
-            
-            // Update button glows
-            updateButtonGlows();
-        }
-
-        // Add message to chat (only for actual chat messages)
+        
         function addMessage(text, type = 'bot') {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type === 'user' ? 'user' : 'bot'}`;
@@ -2131,7 +1134,7 @@
                 <div class="timestamp">${timeString}</div>
             `;
             
-            chatMessages.appendChild(messageDiv);
+            document.getElementById("chatMessages").appendChild(messageDiv);
             
             // Animate message
             setTimeout(() => {
@@ -2139,33 +1142,1101 @@
             }, 10);
             
             // Scroll to bottom
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            document.getElementById("chatMessages").scrollTop = document.getElementById("chatMessages").scrollHeight;
         }
-
-        // Send message
-        function sendMessage() {
-            const message = messageInput.value.trim();
-            if (message && dataChannel) {
-                try {
-                    dataChannel.send({type:'chat', message});
-                    addMessage(message, 'user');
-                    messageInput.value = '';
-                } catch (err) {
-                    console.error('Send message failed', err);
-                }
+        
+        function updateTypingIndicator(text) {
+            const indicator = document.getElementById("typingIndicator");
+            if (text) {
+                indicator.textContent = text;
+                indicator.style.display = 'block';
+            } else {
+                indicator.style.display = 'none';
             }
         }
+        
+        function scrollToTop() {
+            document.getElementById("chatMessages").scrollTop = 0;
+        }
 
-        // Handle typing indicator
+        // Close all panels
+        function closeAllPanels() {
+            document.getElementById("connectionPanel").classList.remove("active");
+            document.getElementById("videoCallPanel").classList.remove("active");
+            document.getElementById("streamPanel").classList.remove("active");
+            document.getElementById("remoteStreamPanel").classList.remove("active");
+        }
+
+        /***** Setup for Data Channel with ICE servers *****/
+        function setupDataChannelConnection() {
+          dcPeer = new RTCPeerConnection({ iceServers: iceServers });
+          
+          // Set up ICE candidate handling - send candidates immediately as they're discovered
+          dcPeer.onicecandidate = event => {
+            if (event.candidate && signalingConn && signalingConn.open) {
+              sendSignalingMessage({ type: "candidate", candidate: event.candidate });
+            }
+          };
+          
+          if (isOfferer) {
+            dataChannel = dcPeer.createDataChannel("chat");
+            setupDataChannel();
+            
+            // Create offer immediately and send it
+            dcPeer.createOffer().then(offer => {
+              return dcPeer.setLocalDescription(offer);
+            }).then(() => {
+              // Send the offer immediately without waiting for all ICE candidates
+              if (signalingConn && signalingConn.open) {
+                sendSignalingMessage({ type: "offer", sdp: dcPeer.localDescription });
+              }
+            }).catch(error => {
+              console.error("Error creating data channel offer:", error);
+              updateConnectionStatus("Failed", "Error creating offer");
+            });
+          } else {
+            dcPeer.ondatachannel = event => {
+              dataChannel = event.channel;
+              setupDataChannel();
+            };
+          }
+        }
+        
+        function setupDataChannel() {
+          dataChannel.onopen = () => {
+            updateConnectionStatus("Connected", `Connected to ${peerUsername}`);
+            document.getElementById("chatInput").disabled = false;
+            document.getElementById("sendChatBtn").disabled = false;
+            
+            // Send username to peer
+            if (myUsername) {
+                dataChannel.send(JSON.stringify({ type: "username", username: myUsername }));
+            }
+            
+            // Close connection panel on successful connection
+            document.getElementById("connectionPanel").classList.remove("active");
+            
+            if (peer) {
+              peer.destroy();
+              peer = null;
+            }
+          };
+          
+          dataChannel.onclose = () => { 
+            updateConnectionStatus("Disconnected", "Connection closed"); 
+            document.getElementById("chatInput").disabled = true;
+            document.getElementById("sendChatBtn").disabled = true;
+          };
+          
+          dataChannel.onerror = () => {
+            updateConnectionStatus("Failed", "Connection error");
+          };
+          
+          dataChannel.onmessage = event => {
+            if (typeof event.data === "string") {
+                let msg = JSON.parse(event.data);
+                handleDataChannelMessage(msg);
+            } else {
+                // Binary data (ArrayBuffer)
+                receiveFileBinary(event.data);
+            }
+          };
+        }
+
+        /***** PeerJS Signaling *****/
+        function sendSignalingMessage(msg) {
+          if (signalingConn && signalingConn.open) {
+            signalingConn.send(JSON.stringify(msg));
+          }
+        }
+        
+        function handleSignalingMessage(msg) {
+          switch (msg.type) {
+            case "offer":
+              isOfferer = false;
+              setupDataChannelConnection();
+              
+              // Set remote description first
+              dcPeer.setRemoteDescription(new RTCSessionDescription(msg.sdp))
+                .then(() => {
+                  // Then create answer
+                  return dcPeer.createAnswer();
+                })
+                .then(answer => {
+                  // Set local description and send answer immediately
+                  return dcPeer.setLocalDescription(answer);
+                })
+                .then(() => {
+                  // Send the answer immediately without waiting for all ICE candidates
+                  sendSignalingMessage({ type: "answer", sdp: dcPeer.localDescription });
+                })
+                .catch(error => {
+                  console.error("Error handling offer:", error);
+                  updateConnectionStatus("Failed", "Error handling offer");
+                });
+              break;
+              
+            case "answer":
+              if (dcPeer) {
+                dcPeer.setRemoteDescription(new RTCSessionDescription(msg.sdp))
+                  .catch(error => {
+                    console.error("Error setting remote description:", error);
+                    updateConnectionStatus("Failed", "Error setting remote description");
+                  });
+              }
+              break;
+              
+            case "candidate":
+              if (dcPeer && msg.candidate) {
+                dcPeer.addIceCandidate(new RTCIceCandidate(msg.candidate))
+                  .catch(error => {
+                    console.error("Error adding received ice candidate:", error);
+                  });
+              }
+              break;
+              
+            case "end-stream":
+              document.getElementById("remoteStreamedVideo").srcObject = null;
+              document.getElementById("remoteStreamPanel").classList.remove("active");
+              break;
+              
+            default:
+              console.log("Unknown signaling message:", msg.type);
+          }
+        }
+
+        /***** Automatic Signaling (PeerJS) *****/
+        function createRoom() {
+          peer = new Peer({
+            config: { 'iceServers': iceServers }
+          });
+          
+          peer.on('open', id => {
+            document.getElementById("roomIdInput").value = id;
+            updateConnectionStatus("Ready", "Room created with ID: " + id);
+            isOfferer = true;
+          });
+          
+          peer.on('connection', conn => {
+            signalingConn = conn;
+            signalingConn.on('data', data => { handleSignalingMessage(JSON.parse(data)); });
+            signalingConn.on('open', () => {
+              updateConnectionStatus("Connecting", "Signaling connection established");
+              setupDataChannelConnection();
+            });
+            
+            signalingConn.on('close', () => {
+                updateConnectionStatus("Disconnected", "Signaling connection closed");
+            });
+            
+            signalingConn.on('error', err => {
+                console.error('Signaling connection error:', err);
+                updateConnectionStatus("Failed", "Signaling error: " + err.type);
+            });
+          });
+          
+          peer.on('error', err => {
+            console.error('PeerJS error:', err);
+            updateConnectionStatus("Failed", "PeerJS error: " + err.type);
+          });
+        }
+        
+        function copyRoomId() {
+          const roomId = document.getElementById("roomIdInput").value;
+          navigator.clipboard.writeText(roomId);
+          updateConnectionStatus("Copied", "Room ID copied to clipboard");
+          setTimeout(() => {
+            if (peer) {
+              updateConnectionStatus("Ready", "Room created with ID: " + roomId);
+            } else {
+              updateConnectionStatus("Disconnected", "Not connected");
+            }
+          }, 2000);
+        }
+        
+        function joinRoom() {
+          const roomId = document.getElementById("roomIdInput").value;
+          if (!roomId) return alert("Please enter a Room ID to join.");
+          
+          peer = new Peer({
+            config: { 'iceServers': iceServers }
+          });
+          
+          peer.on('open', id => {
+            updateConnectionStatus("Connecting", "Your ID: " + id);
+            signalingConn = peer.connect(roomId);
+            
+            signalingConn.on('open', () => {
+              updateConnectionStatus("Connecting", "Connected to room " + roomId);
+            });
+            
+            signalingConn.on('data', data => { 
+                handleSignalingMessage(JSON.parse(data)); 
+            });
+            
+            signalingConn.on('close', () => {
+                updateConnectionStatus("Disconnected", "Connection to room closed");
+            });
+            
+            signalingConn.on('error', err => {
+              console.error('Signaling connection error:', err);
+              updateConnectionStatus("Failed", "Error connecting to room: " + roomId);
+            });
+          });
+          
+          peer.on('error', err => {
+            console.error('PeerJS error:', err);
+            updateConnectionStatus("Failed", "PeerJS error: " + err.type);
+          });
+        }
+
+        /***** Data Channel Message Handling *****/
+        function handleDataChannelMessage(msg) {
+          switch (msg.type) {
+            case "chat":
+              addMessage(msg.message, "peer");
+              break;
+              
+            case "username":
+              // Store peer's username
+              peerUsername = msg.username;
+              document.getElementById("usernameDisplay").textContent = `@${peerUsername}`;
+              updateConnectionStatus("Connected", `Connected to ${peerUsername}`);
+              break;
+              
+            case "typing-start":
+              if (msg.message) {
+                updateTypingIndicator(msg.message);
+              } else {
+                updateTypingIndicator(`${peerUsername || 'Peer'} is typing...`);
+              }
+              break;
+              
+            case "typing-stop":
+              updateTypingIndicator("");
+              break;
+              
+            case "file-selecting":
+              updateTypingIndicator(`${peerUsername || 'Peer'} is choosing file for ${msg.purpose}`);
+              break;
+              
+            case "file-meta":
+              startReceivingFile(msg);
+              break;
+              
+            case "file-chunk":
+              receiveFileChunk(msg);
+              break;
+              
+            case "file-end":
+              finalizeReceivedFile(msg.id);
+              break;
+              
+            case "video-offer":
+              handleVideoOffer(msg.sdp);
+              break;
+              
+            case "video-answer":
+              handleVideoAnswer(msg.sdp);
+              break;
+              
+            case "video-candidate":
+              if (videoCallPeer) { 
+                videoCallPeer.addIceCandidate(new RTCIceCandidate(msg.candidate))
+                  .catch(error => {
+                    console.error("Error adding video ice candidate:", error);
+                  }); 
+              }
+              break;
+              
+            case "stream-offer":
+              handleStreamOffer(msg.sdp);
+              break;
+              
+            case "stream-answer":
+              handleStreamAnswer(msg.sdp);
+              break;
+              
+            case "stream-candidate":
+              if (videoStreamPeer) { 
+                videoStreamPeer.addIceCandidate(new RTCIceCandidate(msg.candidate))
+                  .catch(error => {
+                    console.error("Error adding stream ice candidate:", error);
+                  }); 
+              }
+              break;
+              
+            case "call-request":
+              document.getElementById("incomingCallText").textContent = `${peerUsername || 'Peer'} is calling you`;
+              document.getElementById("incomingCallModal").classList.add("active");
+              break;
+              
+            case "call-response":
+              if (msg.accepted) {
+                startVideoCallCaller();
+              }
+              break;
+              
+            case "end-stream":
+              document.getElementById("remoteStreamedVideo").srcObject = null;
+              document.getElementById("remoteStreamPanel").classList.remove("active");
+              break;
+              
+            default:
+              console.log("Unknown message type:", msg.type);
+          }
+        }
+
+        /***** Combined Chat & File Transfer *****/
+        function sendChatMessage() {
+          const input = document.getElementById("chatInput");
+          const text = input.value;
+          if (dataChannel && dataChannel.readyState === "open") {
+            dataChannel.send(JSON.stringify({ type: "chat", message: text }));
+            addMessage(text, "user");
+            input.value = "";
+          }
+        }
+        
         function handleTyping() {
             if (!dataChannel) return;
             try {
-                dataChannel.send({type:'typing-start'});
+                dataChannel.send(JSON.stringify({type: 'typing-start'}));
                 if (typingTimer) clearTimeout(typingTimer);
                 typingTimer = setTimeout(() => {
-                    dataChannel.send({type:'typing-stop'});
+                    dataChannel.send(JSON.stringify({type: 'typing-stop'}));
                 }, 1000);
             } catch(e){}
+        }
+        
+        /***** File transfer functions (fixed to use ArrayBuffer + Blob) *****/
+        function uuid() {
+            return 'f-' + Math.random().toString(36).slice(2) + '-' + Date.now().toString(36);
+        }
+
+        function humanSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+            return (bytes/1048576).toFixed(1) + ' MB';
+        }
+
+        function sendFile(file, category) {
+            if (!file) return;
+
+            const id = uuid();
+            const meta = { 
+                type: "file-meta", 
+                id: id, 
+                name: file.name, 
+                size: file.size, 
+                mime: file.type || 'application/octet-stream', 
+                category: category 
+            };
+
+            // Add message to chat for the file being sent
+            const messageDiv = addFileMessage(file.name, category, "user", id, true);
+            
+            // Stop typing indicator when file transfer begins
+            updateTypingIndicator("");
+            if (dataChannel) {
+                dataChannel.send(JSON.stringify({type: 'typing-stop'}));
+            }
+
+            // Store file transfer info
+            fileTransfers.set(id, {
+                file: file,
+                offset: 0,
+                total: file.size,
+                name: file.name,
+                category: category,
+                messageDiv: messageDiv
+            });
+
+            // Send file metadata
+            dataChannel.send(JSON.stringify(meta));
+
+            // Start sending chunks
+            sendNextChunk(id);
+        }
+
+        function sendNextChunk(id) {
+            const transfer = fileTransfers.get(id);
+            if (!transfer) return;
+
+            const chunk = transfer.file.slice(transfer.offset, transfer.offset + CHUNK_SIZE);
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                // Send raw ArrayBuffer directly
+                dataChannel.send(reader.result);
+
+                transfer.offset += chunk.size;
+                
+                // Update progress
+                const progress = Math.round((transfer.offset / transfer.total) * 100);
+                updateFileProgress(id, progress);
+
+                if (transfer.offset < transfer.total) {
+                    setTimeout(() => sendNextChunk(id), 20); // throttle slightly
+                } else {
+                    // Send end of file message
+                    dataChannel.send(JSON.stringify({ type: "file-end", id: id }));
+                    // Update status to "Sent"
+                    updateFileStatus(id, "Sent");
+                    fileTransfers.delete(id);
+                }
+            };
+
+            reader.readAsArrayBuffer(chunk);
+        }
+
+        function addFileMessage(name, category, sender, id, isSending = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender === 'user' ? 'user' : 'bot'}`;
+            messageDiv.id = `file-msg-${id}`;
+
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            let htmlContent = `
+                ${isSending ? 'Sending: ' : 'Receiving: '}${name}
+                <div class="timestamp">${timeString}</div>
+            `;
+            
+            // Add progress bar for both sender and receiver
+            htmlContent += `
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar-${id}"></div>
+                </div>
+                <div class="progress-text" id="progress-text-${id}">0%</div>
+                <div class="file-status" id="file-status-${id}">${isSending ? 'Sending...' : 'Receiving...'}</div>
+            `;
+
+            messageDiv.innerHTML = htmlContent;
+
+            document.getElementById("chatMessages").appendChild(messageDiv);
+
+            setTimeout(() => {
+                messageDiv.style.animation = 'messageAppear 0.5s forwards';
+            }, 10);
+
+            document.getElementById("chatMessages").scrollTop = document.getElementById("chatMessages").scrollHeight;
+
+            return messageDiv;
+        }
+
+        function updateFileProgress(id, progress) {
+            const progressBar = document.getElementById(`progress-bar-${id}`);
+            const progressText = document.getElementById(`progress-text-${id}`);
+            
+            if (progressBar) progressBar.style.width = `${progress}%`;
+            if (progressText) progressText.textContent = `${progress}%`;
+        }
+
+        function updateFileStatus(id, status) {
+            const statusElement = document.getElementById(`file-status-${id}`);
+            if (statusElement) {
+                statusElement.textContent = status;
+            }
+        }
+
+        function startReceivingFile(meta) {
+            const { id, name, size, mime, category } = meta;
+
+            // Add message to chat for the file being received
+            const messageDiv = addFileMessage(name, category, "bot", id, false);
+
+            // Store transfer info
+            fileTransfers.set(id, {
+                name: name,
+                size: size,
+                mime: mime,
+                category: category,
+                chunks: [],
+                received: 0,
+                messageDiv: messageDiv
+            });
+        }
+
+        // Handle incoming binary chunks
+        function receiveFileBinary(buffer) {
+            // Find the last active transfer (simple approach)
+            const lastTransferId = Array.from(fileTransfers.keys()).slice(-1)[0];
+            const transfer = fileTransfers.get(lastTransferId);
+            if (!transfer) return;
+
+            transfer.chunks.push(buffer);
+            transfer.received += buffer.byteLength;
+            
+            // Update progress for received file
+            const progress = Math.round((transfer.received / transfer.size) * 100);
+            updateFileProgress(lastTransferId, progress);
+
+            if (transfer.received >= transfer.size) {
+                finalizeReceivedFile(lastTransferId);
+            }
+        }
+
+        function finalizeReceivedFile(id) {
+            const transfer = fileTransfers.get(id);
+            if (!transfer) return;
+
+            const blob = new Blob(transfer.chunks, { type: transfer.mime });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+
+            if (transfer.category === 'downloadable') {
+                link.download = transfer.name;
+                link.className = 'file-link downloadable';
+                link.textContent = 'Download file';
+                setTimeout(() => link.click(), 100);
+            } else {
+                link.className = 'file-link non-downloadable';
+                link.textContent = 'Preview file';
+                link.onclick = (e) => {
+                    e.preventDefault(); // stop opening a new tab
+                    openPreviewModal(transfer.name, url, transfer.mime);
+                    return false;
+                };
+            }
+
+            transfer.messageDiv.appendChild(link);
+            
+            // Update status to "Received"
+            updateFileStatus(id, "Received");
+
+            fileTransfers.delete(id);
+        }
+
+        /***** Preview Modal Functions *****/
+        function openPreviewModal(name, url, mime) {
+            const previewContent = document.getElementById("previewContent");
+            
+            // Stop any currently playing media
+            if (currentlyPlayingMedia) {
+                if (currentlyPlayingMedia.pause) currentlyPlayingMedia.pause();
+                if (currentlyPlayingMedia.parentNode) {
+                    currentlyPlayingMedia.parentNode.removeChild(currentlyPlayingMedia);
+                }
+                currentlyPlayingMedia = null;
+            }
+            
+            // Clear previous content
+            previewContent.innerHTML = '';
+            
+            if (mime.startsWith('image/')) {
+                // For images
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = name;
+                previewContent.appendChild(img);
+                currentlyPlayingMedia = img;
+            } else if (mime.startsWith('video/')) {
+                // For videos
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'video-controls-container';
+                
+                const video = document.createElement('video');
+                video.src = url;
+                video.controls = false;
+                video.id = 'previewVideo';
+                videoContainer.appendChild(video);
+                currentlyPlayingMedia = video;
+                
+                // Create custom controls
+                const controls = document.createElement('div');
+                controls.className = 'video-controls';
+                
+                const playPauseBtn = document.createElement('button');
+                playPauseBtn.id = 'playPauseBtn';
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                
+                const seekBar = document.createElement('input');
+                seekBar.type = 'range';
+                seekBar.id = 'seekBar';
+                seekBar.value = 0;
+                seekBar.max = 100;
+                
+                controls.appendChild(playPauseBtn);
+                controls.appendChild(seekBar);
+                videoContainer.appendChild(controls);
+                
+                previewContent.appendChild(videoContainer);
+                
+                // Set up video controls
+                playPauseBtn.addEventListener('click', function() {
+                    if (video.paused) {
+                        video.play();
+                        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    } else {
+                        video.pause();
+                        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                });
+                
+                video.addEventListener('timeupdate', function() {
+                    const value = (100 / video.duration) * video.currentTime;
+                    seekBar.value = value;
+                });
+                
+                seekBar.addEventListener('input', function() {
+                    const time = video.duration * (seekBar.value / 100);
+                    video.currentTime = time;
+                });
+                
+                // Auto play the video
+                video.play().then(() => {
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                }).catch(err => {
+                    console.log("Autoplay prevented:", err);
+                });
+            }
+            
+            // Add back button
+            const backBtn = document.createElement('button');
+            backBtn.className = 'back-btn';
+            backBtn.innerHTML = '<i class="fas fa-times"></i>';
+            backBtn.onclick = () => {
+                document.getElementById("previewModal").classList.remove("active");
+                // Stop video if playing
+                if (currentlyPlayingMedia && currentlyPlayingMedia.pause) {
+                    currentlyPlayingMedia.pause();
+                }
+                currentlyPlayingMedia = null;
+            };
+            previewContent.appendChild(backBtn);
+            
+            // Show the modal
+            document.getElementById("previewModal").classList.add("active");
+        }
+
+        /***** Video Call Functions with ICE servers *****/
+        async function startVideoCallRequest() {
+          if (!dataChannel || dataChannel.readyState !== "open") { 
+              return; 
+          }
+          dataChannel.send(JSON.stringify({ type: "call-request" }));
+          scrollToTop();
+        }
+        
+        async function startVideoCallCaller() {
+          if (videoCallPeer) { videoCallPeer.close(); videoCallPeer = null; }
+          const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .catch(err => {
+              console.error("Error accessing media devices:", err);
+              return null;
+            });
+          
+          if (!localStream) return;
+          
+          document.getElementById("localVideo").srcObject = localStream;
+          videoCallPeer = new RTCPeerConnection({ iceServers: iceServers });
+          
+          // Set up ICE candidate handling - send candidates immediately
+          videoCallPeer.onicecandidate = event => {
+            if (event.candidate && dataChannel && dataChannel.readyState === "open") {
+              dataChannel.send(JSON.stringify({ type: "video-candidate", candidate: event.candidate }));
+            }
+          };
+          
+          localStream.getTracks().forEach(track => videoCallPeer.addTrack(track, localStream));
+          videoCallPeer.ontrack = event => {
+            document.getElementById("remoteVideo").srcObject = event.streams[0];
+          };
+          videoCallPeer.onconnectionstatechange = () => {
+            console.log("Video call connection state:", videoCallPeer.connectionState);
+            if (videoCallPeer.connectionState === 'disconnected') {
+                endCall();
+            }
+          };
+          
+          // Create offer and send it immediately
+          const offer = await videoCallPeer.createOffer();
+          await videoCallPeer.setLocalDescription(offer);
+          dataChannel.send(JSON.stringify({ type: "video-offer", sdp: videoCallPeer.localDescription }));
+          
+          // Show video call panel
+          document.getElementById("videoCallPanel").classList.add("active");
+          scrollToTop();
+        }
+        
+        async function prepareVideoCallForCallee() {
+          if (videoCallPeer) { videoCallPeer.close(); videoCallPeer = null; }
+          const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .catch(err => {
+              console.error("Error accessing media devices:", err);
+              return null;
+            });
+          
+          if (!localStream) return;
+          
+          document.getElementById("localVideo").srcObject = localStream;
+          videoCallPeer = new RTCPeerConnection({ iceServers: iceServers });
+          
+          // Set up ICE candidate handling - send candidates immediately
+          videoCallPeer.onicecandidate = event => {
+            if (event.candidate && dataChannel && dataChannel.readyState === "open") {
+              dataChannel.send(JSON.stringify({ type: "video-candidate", candidate: event.candidate }));
+            }
+          };
+          
+          localStream.getTracks().forEach(track => videoCallPeer.addTrack(track, localStream));
+          videoCallPeer.ontrack = event => {
+            document.getElementById("remoteVideo").srcObject = event.streams[0];
+          };
+          videoCallPeer.onconnectionstatechange = () => {
+            console.log("Video call connection state:", videoCallPeer.connectionState);
+            if (videoCallPeer.connectionState === 'disconnected') {
+                endCall();
+            }
+          };
+        }
+        
+        function endCall() {
+          if (videoCallPeer) { 
+              videoCallPeer.close(); 
+              videoCallPeer = null; 
+          }
+          const localVideo = document.getElementById("localVideo");
+          if (localVideo.srcObject) {
+            localVideo.srcObject.getTracks().forEach(track => track.stop());
+            localVideo.srcObject = null;
+          }
+          document.getElementById("remoteVideo").srcObject = null;
+          document.getElementById("videoCallPanel").classList.remove("active");
+        }
+        
+        async function handleVideoOffer(sdp) {
+          await videoCallPeer.setRemoteDescription(new RTCSessionDescription(sdp));
+          const answer = await videoCallPeer.createAnswer();
+          await videoCallPeer.setLocalDescription(answer);
+          dataChannel.send(JSON.stringify({ type: "video-answer", sdp: videoCallPeer.localDescription }));
+        }
+        
+        async function handleVideoAnswer(sdp) {
+          if (videoCallPeer) { 
+            await videoCallPeer.setRemoteDescription(new RTCSessionDescription(sdp)); 
+          }
+        }
+
+        /***** Video Streaming Functions with ICE servers *****/
+        async function startVideoStream() {
+          if (!dataChannel || dataChannel.readyState !== "open") { 
+              return; 
+          }
+          const fileInput = document.getElementById("videoFileInput");
+          const file = fileInput.files[0];
+          if (!file) return;
+          isStreamSender = true;
+          if (videoStreamPeer) { videoStreamPeer.close(); videoStreamPeer = null; }
+          const localStreamedVideo = document.getElementById("localStreamedVideo");
+          if (localStreamedVideo.srcObject) {
+            localStreamedVideo.srcObject.getTracks().forEach(track => track.stop());
+          }
+          const fileURL = URL.createObjectURL(file);
+          localStreamedVideo.src = fileURL;
+          localStreamedVideo.muted = false;
+          localStreamedVideo.load();
+          await new Promise(resolve => { localStreamedVideo.onloadedmetadata = resolve; });
+          await localStreamedVideo.play();
+          const stream = localStreamedVideo.captureStream();
+          videoStreamPeer = new RTCPeerConnection({ iceServers: iceServers });
+          
+          // Set up ICE candidate handling - send candidates immediately
+          videoStreamPeer.onicecandidate = event => {
+            if (event.candidate && dataChannel && dataChannel.readyState === "open") {
+              dataChannel.send(JSON.stringify({ type: "stream-candidate", candidate: event.candidate }));
+            }
+          };
+          
+          stream.getTracks().forEach(track => videoStreamPeer.addTrack(track, stream));
+          videoStreamPeer.onconnectionstatechange = () => {
+            console.log("Stream connection state:", videoStreamPeer.connectionState);
+          };
+          
+          // Create offer and send it immediately
+          const offer = await videoStreamPeer.createOffer();
+          await videoStreamPeer.setLocalDescription(offer);
+          dataChannel.send(JSON.stringify({ type: "stream-offer", sdp: videoStreamPeer.localDescription }));
+          
+          // Show stream panel
+          document.getElementById("streamPanel").classList.add("active");
+          scrollToTop();
+        }
+        
+        function stopStream() {
+          if (isStreamSender) {
+            if (videoStreamPeer) { 
+                videoStreamPeer.close(); 
+                videoStreamPeer = null; 
+            }
+            const localStreamedVideo = document.getElementById("localStreamedVideo");
+            if (localStreamedVideo.srcObject) {
+              localStreamedVideo.srcObject.getTracks().forEach(track => track.stop());
+              localStreamedVideo.srcObject = null;
+            }
+            dataChannel.send(JSON.stringify({ type: "end-stream" }));
+            isStreamSender = false;
+          }
+          
+          // Clear remote stream and close panel
+          document.getElementById("remoteStreamedVideo").srcObject = null;
+          document.getElementById("remoteStreamPanel").classList.remove("active");
+          
+          // Close stream panel
+          document.getElementById("streamPanel").classList.remove("active");
+        }
+        
+        async function handleStreamOffer(sdp) {
+          if (videoStreamPeer) { videoStreamPeer.close(); videoStreamPeer = null; }
+          videoStreamPeer = new RTCPeerConnection({ iceServers: iceServers });
+          
+          // Set up ICE candidate handling - send candidates immediately
+          videoStreamPeer.onicecandidate = event => {
+            if (event.candidate && dataChannel && dataChannel.readyState === "open") {
+              dataChannel.send(JSON.stringify({ type: "stream-candidate", candidate: event.candidate }));
+            }
+          };
+          
+          videoStreamPeer.ontrack = event => {
+            document.getElementById("remoteStreamedVideo").srcObject = event.streams[0];
+            document.getElementById("streamPeerName").textContent = peerUsername || 'Peer';
+            document.getElementById("remoteStreamPanel").classList.add("active");
+            scrollToTop();
+          };
+          videoStreamPeer.onconnectionstatechange = () => {
+            console.log("Stream connection state:", videoStreamPeer.connectionState);
+          };
+          
+          await videoStreamPeer.setRemoteDescription(new RTCSessionDescription(sdp));
+          const answer = await videoStreamPeer.createAnswer();
+          await videoStreamPeer.setLocalDescription(answer);
+          dataChannel.send(JSON.stringify({ type: "stream-answer", sdp: videoStreamPeer.localDescription }));
+        }
+        
+        async function handleStreamAnswer(sdp) {
+          if (videoStreamPeer) { 
+            await videoStreamPeer.setRemoteDescription(new RTCSessionDescription(sdp)); 
+          }
+        }
+
+        function closeRemoteStream() {
+          document.getElementById("remoteStreamedVideo").srcObject = null;
+          document.getElementById("remoteStreamPanel").classList.remove("active");
+        }
+        
+        function toggleRemoteStreamFullscreen() {
+          const remoteVideo = document.getElementById("remoteStreamedVideo");
+          if (remoteVideo.requestFullscreen) {
+            remoteVideo.requestFullscreen();
+          } else if (remoteVideo.webkitRequestFullscreen) {
+            remoteVideo.webkitRequestFullscreen();
+          } else if (remoteVideo.msRequestFullscreen) {
+            remoteVideo.msRequestFullscreen();
+          } else if (remoteVideo.mozRequestFullScreen) {
+            remoteVideo.mozRequestFullScreen();
+          }
+        }
+
+        /***** UI Setup and Event Listeners *****/
+        function setupEventListeners() {
+          // Save username button
+          document.getElementById("saveUsernameBtn").addEventListener("click", saveUsername);
+          
+          // Create room button
+          document.getElementById("createRoomBtn").addEventListener("click", createRoom);
+          
+          // Copy room ID button
+          document.getElementById("copyRoomIdBtn").addEventListener("click", copyRoomId);
+          
+          // Join room button
+          document.getElementById("joinRoomBtn").addEventListener("click", joinRoom);
+          
+          // Send chat message
+          document.getElementById("sendChatBtn").addEventListener("click", sendChatMessage);
+          document.getElementById("chatInput").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+              sendChatMessage();
+            }
+          });
+          
+          // Typing indicator
+          document.getElementById("chatInput").addEventListener("input", handleTyping);
+          
+          // Video call buttons
+          document.getElementById("startVideoCallBtn").addEventListener("click", startVideoCallRequest);
+          document.getElementById("endCallBtn").addEventListener("click", endCall);
+          
+          // Video stream buttons
+          document.getElementById("startVideoStreamBtn").addEventListener("click", startVideoStream);
+          document.getElementById("stopStreamBtn").addEventListener("click", stopStream);
+          
+          // Choose file for streaming
+          document.getElementById("chooseFileBtn").addEventListener("click", () => {
+            document.getElementById("videoFileInput").click();
+            // Notify peer
+            if (dataChannel) {
+                dataChannel.send(JSON.stringify({ type: "file-selecting", purpose: "streaming" }));
+            }
+          });
+          
+          document.getElementById("videoFileInput").addEventListener("change", (e) => {
+            if (e.target.files && e.target.files[0]) {
+              const file = e.target.files[0];
+              document.getElementById("selectedFileInfo").textContent = `Selected: ${file.name}`;
+              // Stop typing indicator
+              if (dataChannel) {
+                  dataChannel.send(JSON.stringify({ type: "typing-stop" }));
+              }
+            }
+          });
+          
+          // Header buttons - close other panels when opening one
+          document.getElementById("connectionBtn").addEventListener("click", () => {
+            closeAllPanels();
+            document.getElementById("connectionPanel").classList.toggle("active");
+            // Hide welcome message when connection button is clicked
+            document.getElementById("welcomeMessage").style.display = 'none';
+            scrollToTop();
+          });
+          
+          document.getElementById("videoCallBtn").addEventListener("click", () => {
+            closeAllPanels();
+            document.getElementById("videoCallPanel").classList.toggle("active");
+            scrollToTop();
+          });
+          
+          document.getElementById("streamBtn").addEventListener("click", () => {
+            closeAllPanels();
+            document.getElementById("streamPanel").classList.toggle("active");
+            scrollToTop();
+          });
+          
+          document.getElementById("attachBtn").addEventListener("click", () => {
+            document.getElementById("fileModal").classList.toggle("active");
+          });
+          
+          // Close buttons
+          document.getElementById("connectionPanelClose").addEventListener("click", () => {
+            document.getElementById("connectionPanel").classList.remove("active");
+          });
+          
+          document.getElementById("videoCallPanelClose").addEventListener("click", () => {
+            document.getElementById("videoCallPanel").classList.remove("active");
+          });
+          
+          document.getElementById("streamPanelClose").addEventListener("click", () => {
+            document.getElementById("streamPanel").classList.remove("active");
+          });
+          
+          document.getElementById("remoteStreamPanelClose").addEventListener("click", closeRemoteStream);
+          
+          // Fullscreen button for remote stream
+          document.getElementById("remoteStreamFullscreenBtn").addEventListener("click", toggleRemoteStreamFullscreen);
+          
+          document.getElementById("fileModalClose").addEventListener("click", () => {
+            document.getElementById("fileModal").classList.remove("active");
+          });
+          
+          // File sharing buttons
+          document.getElementById("shareDownloadableBtn").addEventListener("click", () => {
+            document.getElementById("downloadableFileInput").click();
+            // Notify peer
+            if (dataChannel) {
+                dataChannel.send(JSON.stringify({ type: "file-selecting", purpose: "file transfer" }));
+            }
+          });
+          
+          document.getElementById("shareNonDownloadableBtn").addEventListener("click", () => {
+            document.getElementById("nonDownloadableFileInput").click();
+            // Notify peer
+            if (dataChannel) {
+                dataChannel.send(JSON.stringify({ type: "file-selecting", purpose: "file transfer" }));
+            }
+          });
+          
+          // File input handlers
+          document.getElementById("downloadableFileInput").addEventListener("change", (e) => {
+            const files = Array.from(e.target.files || []);
+            files.forEach(f => sendFile(f, 'downloadable'));
+            e.target.value = '';
+            document.getElementById("fileModal").classList.remove("active");
+          });
+          
+          document.getElementById("nonDownloadableFileInput").addEventListener("change", (e) => {
+            const files = Array.from(e.target.files || []);
+            files.forEach(f => sendFile(f, 'non-downloadable'));
+            e.target.value = '';
+            document.getElementById("fileModal").classList.remove("active");
+          });
+          
+          // Incoming call buttons
+          document.getElementById("acceptCallBtn").addEventListener("click", () => {
+            document.getElementById("incomingCallModal").classList.remove("active");
+            dataChannel.send(JSON.stringify({ type: "call-response", accepted: true }));
+            prepareVideoCallForCallee();
+            // Show video call panel
+            document.getElementById("videoCallPanel").classList.add("active");
+            scrollToTop();
+          });
+          
+          document.getElementById("rejectCallBtn").addEventListener("click", () => {
+            document.getElementById("incomingCallModal").classList.remove("active");
+            dataChannel.send(JSON.stringify({ type: "call-response", accepted: false }));
+          });
+          
+          // Preview back button
+          document.getElementById("previewBackBtn").addEventListener("click", () => {
+            document.getElementById("previewModal").classList.remove("active");
+            // Stop video if playing
+            if (currentlyPlayingMedia && currentlyPlayingMedia.pause) {
+                currentlyPlayingMedia.pause();
+            }
+            currentlyPlayingMedia = null;
+          });
+          
+          // Fullscreen functionality
+          document.getElementById("fullscreenBtn").addEventListener("click", () => {
+            if (!document.fullscreenElement) {
+              document.documentElement.requestFullscreen().then(() => {
+                document.getElementById("fullscreenBtn").classList.remove("glow-violet");
+              });
+            } else {
+              document.exitFullscreen().then(() => {
+                document.getElementById("fullscreenBtn").classList.add("glow-violet");
+              });
+            }
+          });
+          
+          // Listen for fullscreen changes
+          document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+              document.getElementById("fullscreenBtn").classList.add("glow-violet");
+            }
+          });
+        }
+
+        // Load username from localStorage
+        function loadUsername() {
+          const savedUsername = localStorage.getItem('geminiChatUsername');
+          if (savedUsername) {
+            document.getElementById("usernameInput").value = savedUsername;
+            myUsername = savedUsername;
+            document.getElementById("usernameDisplay").textContent = `@${savedUsername}`;
+          }
+        }
+
+        // Save username to localStorage
+        function saveUsername() {
+          const username = document.getElementById("usernameInput").value.trim();
+          if (username) {
+            localStorage.setItem('geminiChatUsername', username);
+            myUsername = username;
+            document.getElementById("usernameDisplay").textContent = `@${username}`;
+            addMessage("Username saved successfully!", "bot");
+          }
         }
 
         // Gradient animation
@@ -2173,18 +2244,33 @@
         let index = 0;
 
         function cycleColors() {
-            const current = sets[index];
-            const next = sets[(index + 1) % sets.length];
+          const current = sets[index];
+          const next = sets[(index + 1) % sets.length];
 
-            current.style.opacity = "1";
-            next.style.opacity = "0";
+          current.style.opacity = "1";
+          next.style.opacity = "0";
 
-            setTimeout(() => {
-                current.style.opacity = "0";
-                next.style.opacity = "1";
-                index = (index + 1) % sets.length;
-                setTimeout(cycleColors, 5000);
-            }, 30000);
+          setTimeout(() => {
+            current.style.opacity = "0";
+            next.style.opacity = "1";
+            index = (index + 1) % sets.length;
+            setTimeout(cycleColors, 5000);
+          }, 30000);
+        }
+
+        // Initialize the app
+        function init() {
+          // Start gradient animation
+          cycleColors();
+          
+          // Load saved username
+          loadUsername();
+          
+          // Setup event listeners
+          setupEventListeners();
+          
+          // Set initial connection status
+          updateConnectionStatus("Disconnected", "Not connected");
         }
 
         // Initialize the app
