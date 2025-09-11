@@ -399,6 +399,7 @@
             background: #000;
             border-radius: 8px;
             overflow: hidden;
+            position: relative;
         }
 
         .stream-video {
@@ -411,7 +412,7 @@
         .video-call-container {
             position: relative;
             width: 100%;
-            height: 40vh;
+            height: 80vh;
             margin: 20px 0;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
@@ -567,7 +568,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0);
             padding: 8px 15px;
             border-radius: 20px;
             z-index: 10;
@@ -782,6 +783,24 @@
             margin-top: 15px;
         }
 
+        /* Fullscreen overlay button for remote stream */
+        .fullscreen-overlay-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
         /* Glow effects */
         @keyframes glow-violet {
             0% { box-shadow: 0 0 5px rgba(120, 80, 200, 0.7); }
@@ -834,7 +853,7 @@
             }
             
             .video-call-container {
-                height: 30vh;
+                height: 60vh;
             }
             
             .local-video-container {
@@ -938,6 +957,7 @@
                 <div class="connection-status">
                     Status: <span id="connectionStatusText">Disconnected</span>
                 </div>
+                
                 <div class="developer-text">
                     Developed by Jijo
                 </div>
@@ -993,16 +1013,14 @@
             <div class="remote-stream-panel" id="remoteStreamPanel">
                 <div class="panel-header">
                     <div class="panel-title">Stream from <span id="streamPeerName"></span></div>
-                    <div>
-                        <button class="panel-btn" id="remoteStreamFullscreenBtn"><i class="fas fa-expand"></i></button>
-                        <button class="panel-close" id="remoteStreamPanelClose"><i class="fas fa-times"></i></button>
-                    </div>
+                    <button class="panel-close" id="remoteStreamPanelClose"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="video-container">
                     <div class="video-box">
                         <div class="video-title">Remote Stream</div>
                         <div class="video-wrapper">
                             <video id="remoteStreamedVideo" class="stream-video" autoplay playsinline></video>
+                            <button class="fullscreen-overlay-btn" id="remoteStreamFullscreenBtn"><i class="fas fa-expand"></i></button>
                         </div>
                     </div>
                 </div>
@@ -1080,7 +1098,8 @@
         ];
 
         // File transfer (256KB chunks)
-        const CHUNK_SIZE = 256 * 1024;
+        const CHUNK_SIZE = 256 * 1024; // 256KB chunks
+        const BUFFER_THRESHOLD = 4 * CHUNK_SIZE; // 1MB buffer threshold
         const fileTransfers = new Map();
 
         /***** Utility Functions *****/
@@ -1424,8 +1443,8 @@
               startReceivingFile(msg);
               break;
               
-            case "file-chunk":
-              receiveFileChunk(msg);
+            case "file-progress-update":
+              updateFileProgress(msg.id, msg.progress);
               break;
               
             case "file-end":
@@ -1509,7 +1528,7 @@
             } catch(e){}
         }
         
-        /***** File transfer functions (fixed to use ArrayBuffer + Blob) *****/
+        /***** File transfer functions (with backpressure control) *****/
         function uuid() {
             return 'f-' + Math.random().toString(36).slice(2) + '-' + Date.now().toString(36);
         }
@@ -1567,27 +1586,41 @@
             const reader = new FileReader();
 
             reader.onload = () => {
-                // Send raw ArrayBuffer directly
-                dataChannel.send(reader.result);
-
-                transfer.offset += chunk.size;
-                
-                // Update progress
-                const progress = Math.round((transfer.offset / transfer.total) * 100);
-                updateFileProgress(id, progress);
-
-                if (transfer.offset < transfer.total) {
-                    setTimeout(() => sendNextChunk(id), 20); // throttle slightly
+                // Check backpressure
+                if (dataChannel.bufferedAmount > BUFFER_THRESHOLD) {
+                    // Wait for buffer to drain
+                    dataChannel.onbufferedamountlow = () => {
+                        dataChannel.onbufferedamountlow = null;
+                        sendChunk(id, reader.result, chunk.size);
+                    };
                 } else {
-                    // Send end of file message
-                    dataChannel.send(JSON.stringify({ type: "file-end", id: id }));
-                    // Update status to "Sent"
-                    updateFileStatus(id, "Sent");
-                    fileTransfers.delete(id);
+                    // Send immediately
+                    sendChunk(id, reader.result, chunk.size);
                 }
             };
 
             reader.readAsArrayBuffer(chunk);
+        }
+
+        function sendChunk(id, chunkData, chunkSize) {
+            const transfer = fileTransfers.get(id);
+            if (!transfer) return;
+
+            // Send raw ArrayBuffer directly
+            dataChannel.send(chunkData);
+
+            transfer.offset += chunkSize;
+
+            if (transfer.offset < transfer.total) {
+                // Continue sending next chunk
+                sendNextChunk(id);
+            } else {
+                // Send end of file message
+                dataChannel.send(JSON.stringify({ type: "file-end", id: id }));
+                // Update status to "Sent"
+                updateFileStatus(id, "Sent");
+                fileTransfers.delete(id);
+            }
         }
 
         function addFileMessage(name, category, sender, id, isSending = false) {
@@ -1671,6 +1704,15 @@
             // Update progress for received file
             const progress = Math.round((transfer.received / transfer.size) * 100);
             updateFileProgress(lastTransferId, progress);
+            
+            // Send progress update back to sender
+            if (dataChannel && dataChannel.readyState === "open") {
+                dataChannel.send(JSON.stringify({
+                    type: "file-progress-update",
+                    id: lastTransferId,
+                    progress: progress
+                }));
+            }
 
             if (transfer.received >= transfer.size) {
                 finalizeReceivedFile(lastTransferId);
@@ -2004,6 +2046,7 @@
             document.getElementById("remoteStreamedVideo").srcObject = event.streams[0];
             document.getElementById("streamPeerName").textContent = peerUsername || 'Peer';
             document.getElementById("remoteStreamPanel").classList.add("active");
+            
             scrollToTop();
           };
           videoStreamPeer.onconnectionstatechange = () => {
