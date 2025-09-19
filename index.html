@@ -7,6 +7,38 @@
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Updated CSS for PTT button */
+        .push-to-talk-btn {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 165, 0, 0.3);
+            border: 2px solid rgba(255, 165, 0, 0.5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.3s ease;
+        }
+        
+        .push-to-talk-btn.active {
+            background: rgba(255, 165, 0, 0.8);
+            box-shadow: 0 0 15px orange, 0 0 30px orange;
+            animation: pulse-orange 1.5s infinite;
+        }
+        
+        @keyframes pulse-orange {
+            0% { box-shadow: 0 0 5px orange, 0 0 10px orange; }
+            50% { box-shadow: 0 0 20px orange, 0 0 40px orange; }
+            100% { box-shadow: 0 0 5px orange, 0 0 10px orange; }
+        }
+        
+        /* Keep all previous CSS styles, they remain unchanged */
         * {
             margin: 0;
             padding: 0;
@@ -180,6 +212,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            position: relative; /* Added for PTT positioning */
         }
 
         .message {
@@ -497,6 +530,7 @@
             text-decoration: underline;
             cursor: pointer;
             font-size: 12px;
+            color: #2196F3;
         }
 
         .file-link.downloadable {
@@ -587,6 +621,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            opacity: 0.8;
         }
 
         .video-controls input[type="range"] {
@@ -650,6 +685,7 @@
             display: flex;
             gap: 15px;
             margin-top: 20px;
+            justify-content: center;
         }
 
         .accept-call {
@@ -879,6 +915,13 @@
             .video-controls input[type="range"] {
                 width: 80px;
             }
+            
+            .push-to-talk-btn {
+                bottom: 15px;
+                left: 55VW;
+                width: 40px;
+                height: 40px;
+            }
         }
     </style>
 </head>
@@ -1035,6 +1078,9 @@
             </div>
         </div>
         
+        <!-- Push-to-Talk Button -->
+        <button class="push-to-talk-btn" id="pushToTalkBtn"><i class="fas fa-microphone"></i></button>
+        
         <!-- Small file modal -->
         <div class="file-modal" id="fileModal">
             <div class="file-modal-header">
@@ -1087,6 +1133,14 @@
         let connectionStatus = 'disconnected';
         let typingTimer = null;
         let currentlyPlayingMedia = null; // Track currently playing media
+        let pingInterval = null; // For continuous ping
+        let lastPingTime = null; // Track last ping time
+        let pongTimeout = null; // Track pong timeout
+        let reconnectAttempts = 0; // Track reconnection attempts
+        let maxReconnectAttempts = 5; // Maximum reconnection attempts
+        let isPTTActive = false; // Push-to-Talk state
+        let pttAudioStream = null; // Push-to-Talk audio stream
+        let pttPeerConnection = null; // Separate peer connection for PTT
 
         // ICE Servers for cross-network communication
         const iceServers = [
@@ -1212,6 +1266,7 @@
             }).catch(error => {
               console.error("Error creating data channel offer:", error);
               updateConnectionStatus("Failed", "Error creating offer");
+              updateTypingIndicator("Error creating offer");
             });
           } else {
             dcPeer.ondatachannel = event => {
@@ -1235,9 +1290,13 @@
             // Close connection panel on successful connection
             document.getElementById("connectionPanel").classList.remove("active");
             
+            // Start pinging for connection health
+            startPingPong();
+            
             if (peer) {
-              peer.destroy();
-              peer = null;
+              // Don't destroy peer, keep it for reconnection
+              // peer.destroy();
+              // peer = null;
             }
           };
           
@@ -1245,10 +1304,20 @@
             updateConnectionStatus("Disconnected", "Connection closed"); 
             document.getElementById("chatInput").disabled = true;
             document.getElementById("sendChatBtn").disabled = true;
+            stopPingPong();
+            updateTypingIndicator("Connection closed. Attempting to reconnect...");
+            
+            // Attempt to reconnect
+            attemptReconnection();
           };
           
           dataChannel.onerror = () => {
             updateConnectionStatus("Failed", "Connection error");
+            stopPingPong();
+            updateTypingIndicator("Connection error. Attempting to reconnect...");
+            
+            // Attempt to reconnect
+            attemptReconnection();
           };
           
           dataChannel.onmessage = event => {
@@ -1260,6 +1329,69 @@
                 receiveFileBinary(event.data);
             }
           };
+        }
+
+        /***** Ping-Pong for Connection Health *****/
+        function startPingPong() {
+            // Clear any existing interval
+            if (pingInterval) clearInterval(pingInterval);
+            if (pongTimeout) clearTimeout(pongTimeout);
+            
+            // Send ping every 5 seconds
+            pingInterval = setInterval(() => {
+                if (dataChannel && dataChannel.readyState === "open") {
+                    lastPingTime = Date.now();
+                    dataChannel.send(JSON.stringify({ type: "ping", timestamp: lastPingTime }));
+                    
+                    // Set timeout to check for pong response
+                    pongTimeout = setTimeout(() => {
+                        updateConnectionStatus("Unstable", "No response from peer");
+                        updateTypingIndicator("Connection unstable: no response from peer");
+                    }, 5000);
+                }
+            }, 5000);
+        }
+        
+        function stopPingPong() {
+            if (pingInterval) {
+                clearInterval(pingInterval);
+                pingInterval = null;
+            }
+            if (pongTimeout) {
+                clearTimeout(pongTimeout);
+                pongTimeout = null;
+            }
+        }
+
+        /***** Auto-Reconnection Logic *****/
+        function attemptReconnection() {
+            if (reconnectAttempts >= maxReconnectAttempts) {
+                updateTypingIndicator("Failed to reconnect after multiple attempts");
+                return;
+            }
+            
+            reconnectAttempts++;
+            updateTypingIndicator(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
+            
+            // Wait a bit before attempting to reconnect
+            setTimeout(() => {
+                if (isOfferer) {
+                    // If we were the offerer, try to reconnect to our own room
+                    createRoom(true);
+                } else {
+                    // If we were the answerer, try to reconnect to the room
+                    const roomId = document.getElementById("roomIdInput").value;
+                    if (roomId) {
+                        joinRoom(true);
+                    } else {
+                        updateTypingIndicator("Cannot reconnect: no room ID saved");
+                    }
+                }
+            }, 2000 * reconnectAttempts); // Exponential backoff
+        }
+        
+        function resetReconnectionAttempts() {
+            reconnectAttempts = 0;
         }
 
         /***** PeerJS Signaling *****/
@@ -1292,6 +1424,7 @@
                 .catch(error => {
                   console.error("Error handling offer:", error);
                   updateConnectionStatus("Failed", "Error handling offer");
+                  updateTypingIndicator("Error handling offer");
                 });
               break;
               
@@ -1301,6 +1434,7 @@
                   .catch(error => {
                     console.error("Error setting remote description:", error);
                     updateConnectionStatus("Failed", "Error setting remote description");
+                    updateTypingIndicator("Error setting remote description");
                   });
               }
               break;
@@ -1325,7 +1459,12 @@
         }
 
         /***** Automatic Signaling (PeerJS) *****/
-        function createRoom() {
+        function createRoom(isReconnect = false) {
+          if (peer && !isReconnect) {
+            peer.destroy();
+            peer = null;
+          }
+          
           peer = new Peer({
             config: { 'iceServers': iceServers }
           });
@@ -1334,6 +1473,10 @@
             document.getElementById("roomIdInput").value = id;
             updateConnectionStatus("Ready", "Room created with ID: " + id);
             isOfferer = true;
+            
+            if (isReconnect) {
+                updateTypingIndicator("Room recreated. Share the ID with your peer to reconnect.");
+            }
           });
           
           peer.on('connection', conn => {
@@ -1341,22 +1484,27 @@
             signalingConn.on('data', data => { handleSignalingMessage(JSON.parse(data)); });
             signalingConn.on('open', () => {
               updateConnectionStatus("Connecting", "Signaling connection established");
+              updateTypingIndicator("Signaling connection established");
               setupDataChannelConnection();
+              resetReconnectionAttempts();
             });
             
             signalingConn.on('close', () => {
                 updateConnectionStatus("Disconnected", "Signaling connection closed");
+                updateTypingIndicator("Signaling connection closed");
             });
             
             signalingConn.on('error', err => {
                 console.error('Signaling connection error:', err);
                 updateConnectionStatus("Failed", "Signaling error: " + err.type);
+                updateTypingIndicator("Signaling error: " + err.type);
             });
           });
           
           peer.on('error', err => {
             console.error('PeerJS error:', err);
             updateConnectionStatus("Failed", "PeerJS error: " + err.type);
+            updateTypingIndicator("PeerJS error: " + err.type);
           });
         }
         
@@ -1373,9 +1521,14 @@
           }, 2000);
         }
         
-        function joinRoom() {
+        function joinRoom(isReconnect = false) {
           const roomId = document.getElementById("roomIdInput").value;
           if (!roomId) return alert("Please enter a Room ID to join.");
+          
+          if (peer && !isReconnect) {
+            peer.destroy();
+            peer = null;
+          }
           
           peer = new Peer({
             config: { 'iceServers': iceServers }
@@ -1383,10 +1536,13 @@
           
           peer.on('open', id => {
             updateConnectionStatus("Connecting", "Your ID: " + id);
+            updateTypingIndicator("Connecting to room...");
             signalingConn = peer.connect(roomId);
             
             signalingConn.on('open', () => {
               updateConnectionStatus("Connecting", "Connected to room " + roomId);
+              updateTypingIndicator("Connected to room " + roomId);
+              resetReconnectionAttempts();
             });
             
             signalingConn.on('data', data => { 
@@ -1395,17 +1551,20 @@
             
             signalingConn.on('close', () => {
                 updateConnectionStatus("Disconnected", "Connection to room closed");
+                updateTypingIndicator("Connection to room closed");
             });
             
             signalingConn.on('error', err => {
               console.error('Signaling connection error:', err);
               updateConnectionStatus("Failed", "Error connecting to room: " + roomId);
+              updateTypingIndicator("Error connecting to room: " + roomId);
             });
           });
           
           peer.on('error', err => {
             console.error('PeerJS error:', err);
             updateConnectionStatus("Failed", "PeerJS error: " + err.type);
+            updateTypingIndicator("PeerJS error: " + err.type);
           });
         }
 
@@ -1499,6 +1658,47 @@
             case "end-stream":
               document.getElementById("remoteStreamedVideo").srcObject = null;
               document.getElementById("remoteStreamPanel").classList.remove("active");
+              break;
+              
+            case "ping":
+              // Respond to ping with pong
+              if (dataChannel && dataChannel.readyState === "open") {
+                dataChannel.send(JSON.stringify({ type: "pong", timestamp: msg.timestamp }));
+              }
+              break;
+              
+            case "pong":
+              // Ping response received - connection is healthy
+              if (pongTimeout) {
+                clearTimeout(pongTimeout);
+                pongTimeout = null;
+              }
+              updateConnectionStatus("Connected", `Connected to ${peerUsername}`);
+              break;
+              
+            case "ptt-audio-offer":
+              handlePTTAudioOffer(msg.sdp);
+              break;
+              
+            case "ptt-audio-answer":
+              handlePTTAudioAnswer(msg.sdp);
+              break;
+              
+            case "ptt-audio-candidate":
+              if (pttPeerConnection) { 
+                pttPeerConnection.addIceCandidate(new RTCIceCandidate(msg.candidate))
+                  .catch(error => {
+                    console.error("Error adding PTT audio ice candidate:", error);
+                  }); 
+              }
+              break;
+              
+            case "ptt-status":
+              if (msg.active) {
+                updateTypingIndicator(`${peerUsername} is now broadcasting audio`);
+              } else {
+                updateTypingIndicator(`${peerUsername} stopped broadcasting audio`);
+              }
               break;
               
             default:
@@ -1611,6 +1811,12 @@
 
             transfer.offset += chunkSize;
 
+            // Calculate progress
+            const progress = Math.round((transfer.offset / transfer.total) * 100);
+            
+            // Update progress for sent file
+            updateFileProgress(id, progress);
+            
             if (transfer.offset < transfer.total) {
                 // Continue sending next chunk
                 sendNextChunk(id);
@@ -1678,6 +1884,9 @@
 
             // Add message to chat for the file being received
             const messageDiv = addFileMessage(name, category, "bot", id, false);
+
+            // Update progress to 0% immediately
+            updateFileProgress(id, 0);
 
             // Store transfer info
             fileTransfers.set(id, {
@@ -2083,19 +2292,139 @@
           }
         }
 
+        /***** Push-to-Talk Audio Functions *****/
+        async function togglePushToTalk() {
+            const pttBtn = document.getElementById("pushToTalkBtn");
+            
+            if (!isPTTActive) {
+                // Activate PTT
+                try {
+                    pttAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                    
+                    // Create a new peer connection for PTT
+                    pttPeerConnection = new RTCPeerConnection({ iceServers: iceServers });
+                    
+                    // Add audio track to the connection
+                    pttAudioStream.getAudioTracks().forEach(track => {
+                        pttPeerConnection.addTrack(track, pttAudioStream);
+                    });
+                    
+                    // Set up ICE candidate handling
+                    pttPeerConnection.onicecandidate = event => {
+                        if (event.candidate && dataChannel && dataChannel.readyState === "open") {
+                            dataChannel.send(JSON.stringify({ 
+                                type: "ptt-audio-candidate", 
+                                candidate: event.candidate 
+                            }));
+                        }
+                    };
+                    
+                    // Create offer and send it
+                    const offer = await pttPeerConnection.createOffer();
+                    await pttPeerConnection.setLocalDescription(offer);
+                    
+                    if (dataChannel && dataChannel.readyState === "open") {
+                        dataChannel.send(JSON.stringify({ 
+                            type: "ptt-audio-offer", 
+                            sdp: pttPeerConnection.localDescription 
+                        }));
+                        
+                        // Notify peer that PTT is active
+                        dataChannel.send(JSON.stringify({ 
+                            type: "ptt-status", 
+                            active: true 
+                        }));
+                    }
+                    
+                    // Update UI
+                    pttBtn.classList.add("active");
+                    isPTTActive = true;
+                    updateTypingIndicator("You are now broadcasting audio");
+                    
+                } catch (error) {
+                    console.error("Error starting push-to-talk:", error);
+                    updateTypingIndicator("Failed to start audio broadcast: " + error.message);
+                }
+            } else {
+                // Deactivate PTT
+                if (pttPeerConnection) {
+                    pttPeerConnection.close();
+                    pttPeerConnection = null;
+                }
+                
+                if (pttAudioStream) {
+                    pttAudioStream.getTracks().forEach(track => track.stop());
+                    pttAudioStream = null;
+                }
+                
+                // Notify peer that PTT is inactive
+                if (dataChannel && dataChannel.readyState === "open") {
+                    dataChannel.send(JSON.stringify({ 
+                        type: "ptt-status", 
+                        active: false 
+                    }));
+                }
+                
+                // Update UI
+                pttBtn.classList.remove("active");
+                isPTTActive = false;
+                updateTypingIndicator("You stopped broadcasting audio");
+            }
+        }
+        
+        async function handlePTTAudioOffer(sdp) {
+            if (!pttPeerConnection) {
+                pttPeerConnection = new RTCPeerConnection({ iceServers: iceServers });
+                
+                // Set up remote audio track
+                pttPeerConnection.ontrack = event => {
+                    const audio = new Audio();
+                    audio.srcObject = event.streams[0];
+                    audio.play().catch(e => console.log("Audio play failed:", e));
+                };
+                
+                // Set up ICE candidate handling
+                pttPeerConnection.onicecandidate = event => {
+                    if (event.candidate && dataChannel && dataChannel.readyState === "open") {
+                        dataChannel.send(JSON.stringify({ 
+                            type: "ptt-audio-candidate", 
+                            candidate: event.candidate 
+                        }));
+                    }
+                };
+            }
+            
+            await pttPeerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
+            const answer = await pttPeerConnection.createAnswer();
+            await pttPeerConnection.setLocalDescription(answer);
+            
+            if (dataChannel && dataChannel.readyState === "open") {
+                dataChannel.send(JSON.stringify({ 
+                    type: "ptt-audio-answer", 
+                    sdp: pttPeerConnection.localDescription 
+                }));
+            }
+        }
+        
+        async function handlePTTAudioAnswer(sdp) {
+            if (pttPeerConnection) {
+                await pttPeerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
+            }
+        }
+
         /***** UI Setup and Event Listeners *****/
         function setupEventListeners() {
           // Save username button
           document.getElementById("saveUsernameBtn").addEventListener("click", saveUsername);
           
           // Create room button
-          document.getElementById("createRoomBtn").addEventListener("click", createRoom);
+          document.getElementById("createRoomBtn").addEventListener("click", () => createRoom(false));
           
           // Copy room ID button
           document.getElementById("copyRoomIdBtn").addEventListener("click", copyRoomId);
           
           // Join room button
-          document.getElementById("joinRoomBtn").addEventListener("click", joinRoom);
+          document.getElementById("joinRoomBtn").addEventListener("click", () => joinRoom(false));
           
           // Send chat message
           document.getElementById("sendChatBtn").addEventListener("click", sendChatMessage);
@@ -2160,6 +2489,9 @@
           document.getElementById("attachBtn").addEventListener("click", () => {
             document.getElementById("fileModal").classList.toggle("active");
           });
+          
+          // Push-to-Talk button
+          document.getElementById("pushToTalkBtn").addEventListener("click", togglePushToTalk);
           
           // Close buttons
           document.getElementById("connectionPanelClose").addEventListener("click", () => {
@@ -2278,7 +2610,7 @@
             localStorage.setItem('geminiChatUsername', username);
             myUsername = username;
             document.getElementById("usernameDisplay").textContent = `@${username}`;
-            addMessage("Username saved successfully!", "bot");
+            updateTypingIndicator("Username saved successfully!");
           }
         }
 
