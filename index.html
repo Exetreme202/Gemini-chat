@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GEMINI CHAT</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Updated CSS for PTT button */
@@ -38,139 +36,6 @@
             0% { box-shadow: 0 0 5px orange, 0 0 10px orange; }
             50% { box-shadow: 0 0 20px orange, 0 0 40px orange; }
             100% { box-shadow: 0 0 5px orange, 0 0 10px orange; }
-        }
-        
-        /* QR Code Styles - Simplified */
-        .qr-code-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-        }
-        
-        #qrCode {
-            width: 150px;
-            height: 150px;
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-        
-        /* QR Scanner Modal - Zoomed in */
-        .qr-scanner-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        
-        .qr-scanner-modal.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-        
-        .scanner-container {
-            width: 300px;
-            height: 300px;
-            position: relative;
-            border: 2px solid white;
-            border-radius: 12px;
-            overflow: hidden;
-            background: black;
-            transform: scale(1.2); /* Zoom in the scanner */
-        }
-        
-        #qrScanner {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .scanner-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            border: 2px solid #00ff00;
-            box-sizing: border-box;
-            animation: scanner-pulse 2s infinite;
-        }
-        
-        @keyframes scanner-pulse {
-            0% { border-color: #00ff00; }
-            50% { border-color: rgba(0, 255, 0, 0.5); }
-            100% { border-color: #00ff00; }
-        }
-        
-        .scanner-controls {
-            margin-top: 30px; /* Increased margin due to zoom */
-            display: flex;
-            gap: 15px;
-        }
-        
-        .scanner-btn {
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .scan-cancel {
-            background: rgba(200, 0, 0, 0.3);
-            color: white;
-        }
-        
-        .scanner-status {
-            margin-top: 15px;
-            color: white;
-            text-align: center;
-        }
-        
-        /* Connection Panel Grid Layout */
-        .connection-buttons-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .grid-btn {
-            padding: 12px 8px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            background: rgba(120, 80, 200, 0.3);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            transition: background 0.3s ease;
-            font-size: 14px;
-            min-height: 50px;
-        }
-        
-        .grid-btn:hover {
-            background: rgba(120, 80, 200, 0.5);
         }
         
         /* Keep all previous CSS styles, they remain unchanged */
@@ -497,11 +362,28 @@
             color: white;
         }
 
-        .developer-text {
-            text-align: center;
-            font-size: 10px;
-            opacity: 0.6;
+        .panel-actions {
+            display: flex;
+            gap: 10px;
             margin-top: 15px;
+            justify-content: center;
+        }
+
+        .panel-btn {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: rgba(120, 80, 200, 0.3);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .panel-btn:hover {
+            background: rgba(120, 80, 200, 0.5);
         }
 
         /* Video call panel */
@@ -929,6 +811,14 @@
             font-style: italic;
         }
 
+        /* Developer text */
+        .developer-text {
+            text-align: center;
+            font-size: 10px;
+            opacity: 0.6;
+            margin-top: 15px;
+        }
+
         /* Fullscreen overlay button for remote stream */
         .fullscreen-overlay-btn {
             position: absolute;
@@ -1032,25 +922,6 @@
                 width: 40px;
                 height: 40px;
             }
-            
-            .qr-code-container {
-                padding: 10px;
-            }
-            
-            #qrCode {
-                width: 120px;
-                height: 120px;
-            }
-            
-            .scanner-container {
-                width: 250px;
-                height: 250px;
-                transform: scale(1.1); /* Slightly less zoom on mobile */
-            }
-            
-            .connection-buttons-grid {
-                grid-template-columns: 1fr 1fr;
-            }
         }
     </style>
 </head>
@@ -1113,7 +984,7 @@
                 <div class="form-group">
                     <label>Username</label>
                     <input type="text" class="form-control" id="usernameInput" placeholder="Enter username">
-                    <button class="grid-btn" id="saveUsernameBtn" style="margin-top: 8px; width: 100%;">
+                    <button class="panel-btn" id="saveUsernameBtn" style="margin-top: 8px; width: 100%;">
                         <i class="fas fa-save"></i> Save Username
                     </button>
                 </div>
@@ -1121,21 +992,11 @@
                     <label>Room ID</label>
                     <input type="text" class="form-control" id="roomIdInput" placeholder="Enter room ID">
                 </div>
-                
-                <!-- Connection Buttons Grid -->
-                <div class="connection-buttons-grid">
-                    <button class="grid-btn" id="createRoomBtn"><i class="fas fa-plus"></i> Create Room</button>
-                    <button class="grid-btn" id="copyRoomIdBtn"><i class="fas fa-copy"></i> Copy ID</button>
-                    <button class="grid-btn" id="joinRoomBtn"><i class="fas fa-link"></i> Join Room</button>
-                    <button class="grid-btn" id="scanQRCodeBtn"><i class="fas fa-qrcode"></i> Scan QR</button>
+                <div class="panel-actions">
+                    <button class="panel-btn" id="createRoomBtn"><i class="fas fa-plus"></i> Create Room</button>
+                    <button class="panel-btn" id="copyRoomIdBtn"><i class="fas fa-copy"></i> Copy ID</button>
+                    <button class="panel-btn" id="joinRoomBtn"><i class="fas fa-link"></i> Join Room</button>
                 </div>
-                
-                <!-- QR Code Container -->
-                <div class="qr-code-container" id="qrCodeContainer" style="display: none;">
-                    <div class="panel-title">Room QR Code</div>
-                    <canvas id="qrCode"></canvas>
-                </div>
-                
                 <div class="connection-status">
                     Status: <span id="connectionStatusText">Disconnected</span>
                 </div>
@@ -1152,8 +1013,8 @@
                     <button class="panel-close" id="videoCallPanelClose"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="panel-actions">
-                    <button class="grid-btn" id="startVideoCallBtn"><i class="fas fa-video"></i> Start Video Call</button>
-                    <button class="grid-btn" id="endCallBtn"><i class="fas fa-phone-slash"></i> End Call</button>
+                    <button class="panel-btn" id="startVideoCallBtn"><i class="fas fa-video"></i> Start Video Call</button>
+                    <button class="panel-btn" id="endCallBtn"><i class="fas fa-phone-slash"></i> End Call</button>
                 </div>
                 
                 <div class="video-call-container">
@@ -1172,13 +1033,13 @@
                 </div>
                 <div class="stream-controls">
                     <input type="file" id="videoFileInput" class="file-input" accept="video/*">
-                    <button class="grid-btn" id="chooseFileBtn">
+                    <button class="panel-btn" id="chooseFileBtn">
                         <i class="fas fa-folder-open"></i> Choose Video File
                     </button>
                     <div class="selected-file-info" id="selectedFileInfo">No file selected</div>
                     <div class="panel-actions">
-                        <button class="grid-btn" id="startVideoStreamBtn"><i class="fas fa-play"></i> Start Stream</button>
-                        <button class="grid-btn" id="stopStreamBtn"><i class="fas fa-stop"></i> Stop Stream</button>
+                        <button class="panel-btn" id="startVideoStreamBtn"><i class="fas fa-play"></i> Start Stream</button>
+                        <button class="panel-btn" id="stopStreamBtn"><i class="fas fa-stop"></i> Stop Stream</button>
                     </div>
                 </div>
                 <div class="video-container">
@@ -1257,18 +1118,6 @@
         </div>
     </div>
 
-    <!-- QR Scanner Modal -->
-    <div class="qr-scanner-modal" id="qrScannerModal">
-        <div class="scanner-container">
-            <video id="qrScanner" autoplay playsinline></video>
-            <div class="scanner-overlay"></div>
-        </div>
-        <div class="scanner-status" id="scannerStatus">Point camera at a QR code</div>
-        <div class="scanner-controls">
-            <button class="scanner-btn scan-cancel" id="scanCancelBtn"><i class="fas fa-times"></i> Cancel</button>
-        </div>
-    </div>
-
     <script>
         /***** Global Variables *****/
         let isOfferer = null;
@@ -1292,9 +1141,6 @@
         let isPTTActive = false; // Push-to-Talk state
         let pttAudioStream = null; // Push-to-Talk audio stream
         let pttPeerConnection = null; // Separate peer connection for PTT
-        let qrScannerStream = null; // For QR code scanner
-        let scannedRoomId = ''; // Store scanned room ID
-        let autoConnectTimer = null; // Timer for auto-connect after QR scan
 
         // ICE Servers for cross-network communication
         const iceServers = [
@@ -1334,7 +1180,7 @@
           } else if (status.toLowerCase() === "disconnected") {
             elem.style.color = "red";
             connectionBtn.classList.add("glow-red");
-          } else if (status.toLowerCase().includes("unstable")) {
+          } else if (status.toLowerCase().includes("failed")) {
             elem.style.color = "orange";
             indicator.classList.add("unavailable");
             connectionBtn.classList.add("glow-red");
@@ -1419,7 +1265,8 @@
               }
             }).catch(error => {
               console.error("Error creating data channel offer:", error);
-              updateConnectionStatus("Unstable", "Error creating offer");
+              updateConnectionStatus("Failed", "Error creating offer");
+              updateTypingIndicator("Error creating offer");
             });
           } else {
             dcPeer.ondatachannel = event => {
@@ -1445,6 +1292,12 @@
             
             // Start pinging for connection health
             startPingPong();
+            
+            if (peer) {
+              // Don't destroy peer, keep it for reconnection
+              // peer.destroy();
+              // peer = null;
+            }
           };
           
           dataChannel.onclose = () => { 
@@ -1452,14 +1305,16 @@
             document.getElementById("chatInput").disabled = true;
             document.getElementById("sendChatBtn").disabled = true;
             stopPingPong();
+            updateTypingIndicator("Connection closed. Attempting to reconnect...");
             
             // Attempt to reconnect
             attemptReconnection();
           };
           
           dataChannel.onerror = () => {
-            updateConnectionStatus("Unstable", "Connection error");
+            updateConnectionStatus("Failed", "Connection error");
             stopPingPong();
+            updateTypingIndicator("Connection error. Attempting to reconnect...");
             
             // Attempt to reconnect
             attemptReconnection();
@@ -1491,6 +1346,7 @@
                     // Set timeout to check for pong response
                     pongTimeout = setTimeout(() => {
                         updateConnectionStatus("Unstable", "No response from peer");
+                        updateTypingIndicator("Connection unstable: no response from peer");
                     }, 5000);
                 }
             }, 5000);
@@ -1510,11 +1366,12 @@
         /***** Auto-Reconnection Logic *****/
         function attemptReconnection() {
             if (reconnectAttempts >= maxReconnectAttempts) {
-                updateConnectionStatus("Disconnected", "Failed to reconnect");
+                updateTypingIndicator("Failed to reconnect after multiple attempts");
                 return;
             }
             
             reconnectAttempts++;
+            updateTypingIndicator(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
             
             // Wait a bit before attempting to reconnect
             setTimeout(() => {
@@ -1527,7 +1384,7 @@
                     if (roomId) {
                         joinRoom(true);
                     } else {
-                        updateConnectionStatus("Disconnected", "Cannot reconnect: no room ID");
+                        updateTypingIndicator("Cannot reconnect: no room ID saved");
                     }
                 }
             }, 2000 * reconnectAttempts); // Exponential backoff
@@ -1566,7 +1423,8 @@
                 })
                 .catch(error => {
                   console.error("Error handling offer:", error);
-                  updateConnectionStatus("Unstable", "Error handling offer");
+                  updateConnectionStatus("Failed", "Error handling offer");
+                  updateTypingIndicator("Error handling offer");
                 });
               break;
               
@@ -1575,7 +1433,8 @@
                 dcPeer.setRemoteDescription(new RTCSessionDescription(msg.sdp))
                   .catch(error => {
                     console.error("Error setting remote description:", error);
-                    updateConnectionStatus("Unstable", "Error setting remote description");
+                    updateConnectionStatus("Failed", "Error setting remote description");
+                    updateTypingIndicator("Error setting remote description");
                   });
               }
               break;
@@ -1615,8 +1474,9 @@
             updateConnectionStatus("Ready", "Room created with ID: " + id);
             isOfferer = true;
             
-            // Generate and display QR code
-            generateQRCode(id);
+            if (isReconnect) {
+                updateTypingIndicator("Room recreated. Share the ID with your peer to reconnect.");
+            }
           });
           
           peer.on('connection', conn => {
@@ -1624,23 +1484,27 @@
             signalingConn.on('data', data => { handleSignalingMessage(JSON.parse(data)); });
             signalingConn.on('open', () => {
               updateConnectionStatus("Connecting", "Signaling connection established");
+              updateTypingIndicator("Signaling connection established");
               setupDataChannelConnection();
               resetReconnectionAttempts();
             });
             
             signalingConn.on('close', () => {
                 updateConnectionStatus("Disconnected", "Signaling connection closed");
+                updateTypingIndicator("Signaling connection closed");
             });
             
             signalingConn.on('error', err => {
                 console.error('Signaling connection error:', err);
-                updateConnectionStatus("Unstable", "Signaling error: " + err.type);
+                updateConnectionStatus("Failed", "Signaling error: " + err.type);
+                updateTypingIndicator("Signaling error: " + err.type);
             });
           });
           
           peer.on('error', err => {
             console.error('PeerJS error:', err);
-            updateConnectionStatus("Unstable", "PeerJS error: " + err.type);
+            updateConnectionStatus("Failed", "PeerJS error: " + err.type);
+            updateTypingIndicator("PeerJS error: " + err.type);
           });
         }
         
@@ -1672,10 +1536,12 @@
           
           peer.on('open', id => {
             updateConnectionStatus("Connecting", "Your ID: " + id);
+            updateTypingIndicator("Connecting to room...");
             signalingConn = peer.connect(roomId);
             
             signalingConn.on('open', () => {
               updateConnectionStatus("Connecting", "Connected to room " + roomId);
+              updateTypingIndicator("Connected to room " + roomId);
               resetReconnectionAttempts();
             });
             
@@ -1685,17 +1551,20 @@
             
             signalingConn.on('close', () => {
                 updateConnectionStatus("Disconnected", "Connection to room closed");
+                updateTypingIndicator("Connection to room closed");
             });
             
             signalingConn.on('error', err => {
               console.error('Signaling connection error:', err);
-              updateConnectionStatus("Unstable", "Error connecting to room: " + roomId);
+              updateConnectionStatus("Failed", "Error connecting to room: " + roomId);
+              updateTypingIndicator("Error connecting to room: " + roomId);
             });
           });
           
           peer.on('error', err => {
             console.error('PeerJS error:', err);
-            updateConnectionStatus("Unstable", "PeerJS error: " + err.type);
+            updateConnectionStatus("Failed", "PeerJS error: " + err.type);
+            updateTypingIndicator("PeerJS error: " + err.type);
           });
         }
 
@@ -1716,6 +1585,8 @@
             case "typing-start":
               if (msg.message) {
                 updateTypingIndicator(msg.message);
+              } else {
+                updateTypingIndicator(`${peerUsername || 'Peer'} is typing...`);
               }
               break;
               
@@ -1822,10 +1693,11 @@
               }
               break;
               
-            case "ptt-force-deactivate":
-              // Deactivate PTT if active
-              if (isPTTActive) {
-                deactivatePTT();
+            case "ptt-status":
+              if (msg.active) {
+                updateTypingIndicator(`${peerUsername} is now broadcasting audio`);
+              } else {
+                updateTypingIndicator(`${peerUsername} stopped broadcasting audio`);
               }
               break;
               
@@ -2328,7 +2200,7 @@
             if (event.candidate && dataChannel && dataChannel.readyState === "open") {
               dataChannel.send(JSON.stringify({ type: "stream-candidate", candidate: event.candidate }));
             }
-            };
+          };
           
           stream.getTracks().forEach(track => videoStreamPeer.addTrack(track, stream));
           videoStreamPeer.onconnectionstatechange = () => {
@@ -2420,35 +2292,12 @@
           }
         }
 
-        /***** Push-to-Talk Audio Functions - IMPROVED *****/
-        function deactivatePTT() {
-            if (pttPeerConnection) {
-                pttPeerConnection.close();
-                pttPeerConnection = null;
-            }
-            
-            if (pttAudioStream) {
-                pttAudioStream.getTracks().forEach(track => track.stop());
-                pttAudioStream = null;
-            }
-            
-            // Update UI
-            document.getElementById("pushToTalkBtn").classList.remove("active");
-            isPTTActive = false;
-        }
-        
+        /***** Push-to-Talk Audio Functions *****/
         async function togglePushToTalk() {
             const pttBtn = document.getElementById("pushToTalkBtn");
             
             if (!isPTTActive) {
-                // First, deactivate peer's PTT if active
-                if (dataChannel && dataChannel.readyState === "open") {
-                    dataChannel.send(JSON.stringify({ 
-                        type: "ptt-force-deactivate" 
-                    }));
-                }
-                
-                // Then activate our PTT
+                // Activate PTT
                 try {
                     pttAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
                     
@@ -2479,27 +2328,51 @@
                             type: "ptt-audio-offer", 
                             sdp: pttPeerConnection.localDescription 
                         }));
+                        
+                        // Notify peer that PTT is active
+                        dataChannel.send(JSON.stringify({ 
+                            type: "ptt-status", 
+                            active: true 
+                        }));
                     }
                     
                     // Update UI
                     pttBtn.classList.add("active");
                     isPTTActive = true;
+                    updateTypingIndicator("You are now broadcasting audio");
                     
                 } catch (error) {
                     console.error("Error starting push-to-talk:", error);
+                    updateTypingIndicator("Failed to start audio broadcast: " + error.message);
                 }
             } else {
                 // Deactivate PTT
-                deactivatePTT();
+                if (pttPeerConnection) {
+                    pttPeerConnection.close();
+                    pttPeerConnection = null;
+                }
+                
+                if (pttAudioStream) {
+                    pttAudioStream.getTracks().forEach(track => track.stop());
+                    pttAudioStream = null;
+                }
+                
+                // Notify peer that PTT is inactive
+                if (dataChannel && dataChannel.readyState === "open") {
+                    dataChannel.send(JSON.stringify({ 
+                        type: "ptt-status", 
+                        active: false 
+                    }));
+                }
+                
+                // Update UI
+                pttBtn.classList.remove("active");
+                isPTTActive = false;
+                updateTypingIndicator("You stopped broadcasting audio");
             }
         }
         
         async function handlePTTAudioOffer(sdp) {
-            // Deactivate our PTT if active before accepting peer's PTT
-            if (isPTTActive) {
-                deactivatePTT();
-            }
-            
             if (!pttPeerConnection) {
                 pttPeerConnection = new RTCPeerConnection({ iceServers: iceServers });
                 
@@ -2539,126 +2412,6 @@
             }
         }
 
-        /***** QR Code Functions - SIMPLIFIED *****/
-        function generateQRCode(roomId) {
-            const qrContainer = document.getElementById("qrCodeContainer");
-            const canvas = document.getElementById("qrCode");
-            
-            // Show QR code container
-            qrContainer.style.display = "flex";
-            
-            // Clear previous QR code
-            const ctx = canvas.getContext("2d");
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Generate new QR code
-            QRCode.toCanvas(canvas, roomId, {
-                width: 150,
-                margin: 1,
-                color: {
-                    dark: "#000000",
-                    light: "#FFFFFF"
-                }
-            }, function(error) {
-                if (error) {
-                    console.error("QR code generation error:", error);
-                }
-            });
-        }
-        
-        function startQRScanner() {
-            const scannerModal = document.getElementById("qrScannerModal");
-            const video = document.getElementById("qrScanner");
-            const statusText = document.getElementById("scannerStatus");
-            
-            // Show scanner modal
-            scannerModal.classList.add("active");
-            scannedRoomId = "";
-            
-            // Access camera
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then(function(stream) {
-                qrScannerStream = stream;
-                video.srcObject = stream;
-                
-                // Start scanning for QR codes
-                const canvasElement = document.createElement("canvas");
-                const canvas = canvasElement.getContext("2d");
-                
-                function scanQRCode() {
-                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                        canvasElement.height = video.videoHeight;
-                        canvasElement.width = video.videoWidth;
-                        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-                        
-                        const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-                        const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                            inversionAttempts: "dontInvert",
-                        });
-                        
-                        if (code) {
-                            scannedRoomId = code.data;
-                            statusText.textContent = "QR code detected! Connecting...";
-                            
-                            // Auto-connect after 1 second
-                            if (autoConnectTimer) clearTimeout(autoConnectTimer);
-                            autoConnectTimer = setTimeout(() => {
-                                connectFromQRCode();
-                            }, 1000);
-                            
-                            // Draw box around QR code
-                            canvas.strokeStyle = "#00ff00";
-                            canvas.lineWidth = 4;
-                            canvas.strokeRect(code.location.topLeftCorner.x, code.location.topLeftCorner.y, 
-                                            code.location.bottomRightCorner.x - code.location.topLeftCorner.x, 
-                                            code.location.bottomRightCorner.y - code.location.topLeftCorner.y);
-                        } else {
-                            statusText.textContent = "Point camera at a QR code";
-                            if (autoConnectTimer) {
-                                clearTimeout(autoConnectTimer);
-                                autoConnectTimer = null;
-                            }
-                        }
-                    }
-                    
-                    if (scannerModal.classList.contains("active")) {
-                        requestAnimationFrame(scanQRCode);
-                    }
-                }
-                
-                scanQRCode();
-            })
-            .catch(function(error) {
-                console.error("Camera access error:", error);
-                statusText.textContent = "Cannot access camera: " + error.message;
-            });
-        }
-        
-        function stopQRScanner() {
-            const scannerModal = document.getElementById("qrScannerModal");
-            scannerModal.classList.remove("active");
-            
-            // Stop camera stream
-            if (qrScannerStream) {
-                qrScannerStream.getTracks().forEach(track => track.stop());
-                qrScannerStream = null;
-            }
-            
-            // Clear auto-connect timer
-            if (autoConnectTimer) {
-                clearTimeout(autoConnectTimer);
-                autoConnectTimer = null;
-            }
-        }
-        
-        function connectFromQRCode() {
-            if (scannedRoomId) {
-                document.getElementById("roomIdInput").value = scannedRoomId;
-                stopQRScanner();
-                joinRoom();
-            }
-        }
-
         /***** UI Setup and Event Listeners *****/
         function setupEventListeners() {
           // Save username button
@@ -2672,12 +2425,6 @@
           
           // Join room button
           document.getElementById("joinRoomBtn").addEventListener("click", () => joinRoom(false));
-          
-          // Scan QR code button
-          document.getElementById("scanQRCodeBtn").addEventListener("click", startQRScanner);
-          
-          // QR scanner actions
-          document.getElementById("scanCancelBtn").addEventListener("click", stopQRScanner);
           
           // Send chat message
           document.getElementById("sendChatBtn").addEventListener("click", sendChatMessage);
@@ -2863,6 +2610,7 @@
             localStorage.setItem('geminiChatUsername', username);
             myUsername = username;
             document.getElementById("usernameDisplay").textContent = `@${username}`;
+            updateTypingIndicator("Username saved successfully!");
           }
         }
 
