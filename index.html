@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GEMINI CHAT</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Updated CSS for PTT button */
@@ -36,6 +38,138 @@
             0% { box-shadow: 0 0 5px orange, 0 0 10px orange; }
             50% { box-shadow: 0 0 20px orange, 0 0 40px orange; }
             100% { box-shadow: 0 0 5px orange, 0 0 10px orange; }
+        }
+        
+        /* QR Code Styles */
+        .qr-code-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+        
+        #qrCode {
+            width: 150px;
+            height: 150px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .qr-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .qr-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            background: rgba(120, 80, 200, 0.3);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+        
+        .qr-btn:hover {
+            background: rgba(120, 80, 200, 0.5);
+        }
+        
+        /* QR Scanner Modal */
+        .qr-scanner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .qr-scanner-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .scanner-container {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            border: 2px solid white;
+            border-radius: 12px;
+            overflow: hidden;
+            background: black;
+        }
+        
+        #qrScanner {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: 2px solid #00ff00;
+            box-sizing: border-box;
+            animation: scanner-pulse 2s infinite;
+        }
+        
+        @keyframes scanner-pulse {
+            0% { border-color: #00ff00; }
+            50% { border-color: rgba(0, 255, 0, 0.5); }
+            100% { border-color: #00ff00; }
+        }
+        
+        .scanner-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .scanner-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .scan-cancel {
+            background: rgba(200, 0, 0, 0.3);
+            color: white;
+        }
+        
+        .scan-confirm {
+            background: rgba(0, 200, 0, 0.3);
+            color: white;
+        }
+        
+        .scanner-status {
+            margin-top: 15px;
+            color: white;
+            text-align: center;
         }
         
         /* Keep all previous CSS styles, they remain unchanged */
@@ -922,6 +1056,20 @@
                 width: 40px;
                 height: 40px;
             }
+            
+            .qr-code-container {
+                padding: 10px;
+            }
+            
+            #qrCode {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .scanner-container {
+                width: 250px;
+                height: 250px;
+            }
         }
     </style>
 </head>
@@ -996,7 +1144,19 @@
                     <button class="panel-btn" id="createRoomBtn"><i class="fas fa-plus"></i> Create Room</button>
                     <button class="panel-btn" id="copyRoomIdBtn"><i class="fas fa-copy"></i> Copy ID</button>
                     <button class="panel-btn" id="joinRoomBtn"><i class="fas fa-link"></i> Join Room</button>
+                    <button class="panel-btn" id="scanQRCodeBtn"><i class="fas fa-qrcode"></i> Scan QR</button>
                 </div>
+                
+                <!-- QR Code Container -->
+                <div class="qr-code-container" id="qrCodeContainer" style="display: none;">
+                    <div class="panel-title">Room QR Code</div>
+                    <canvas id="qrCode"></canvas>
+                    <div class="qr-actions">
+                        <button class="qr-btn" id="downloadQRBtn"><i class="fas fa-download"></i> Download</button>
+                        <button class="qr-btn" id="shareQRBtn"><i class="fas fa-share-alt"></i> Share</button>
+                    </div>
+                </div>
+                
                 <div class="connection-status">
                     Status: <span id="connectionStatusText">Disconnected</span>
                 </div>
@@ -1118,6 +1278,19 @@
         </div>
     </div>
 
+    <!-- QR Scanner Modal -->
+    <div class="qr-scanner-modal" id="qrScannerModal">
+        <div class="scanner-container">
+            <video id="qrScanner" autoplay playsinline></video>
+            <div class="scanner-overlay"></div>
+        </div>
+        <div class="scanner-status" id="scannerStatus">Point camera at a QR code</div>
+        <div class="scanner-controls">
+            <button class="scanner-btn scan-cancel" id="scanCancelBtn"><i class="fas fa-times"></i> Cancel</button>
+            <button class="scanner-btn scan-confirm" id="scanConfirmBtn" style="display: none;"><i class="fas fa-check"></i> Connect</button>
+        </div>
+    </div>
+
     <script>
         /***** Global Variables *****/
         let isOfferer = null;
@@ -1141,6 +1314,8 @@
         let isPTTActive = false; // Push-to-Talk state
         let pttAudioStream = null; // Push-to-Talk audio stream
         let pttPeerConnection = null; // Separate peer connection for PTT
+        let qrScannerStream = null; // For QR code scanner
+        let scannedRoomId = ''; // Store scanned room ID
 
         // ICE Servers for cross-network communication
         const iceServers = [
@@ -1474,6 +1649,9 @@
             updateConnectionStatus("Ready", "Room created with ID: " + id);
             isOfferer = true;
             
+            // Generate and display QR code
+            generateQRCode(id);
+            
             if (isReconnect) {
                 updateTypingIndicator("Room recreated. Share the ID with your peer to reconnect.");
             }
@@ -1698,6 +1876,14 @@
                 updateTypingIndicator(`${peerUsername} is now broadcasting audio`);
               } else {
                 updateTypingIndicator(`${peerUsername} stopped broadcasting audio`);
+              }
+              break;
+              
+            case "ptt-force-deactivate":
+              // Deactivate PTT if active
+              if (isPTTActive) {
+                deactivatePTT();
+                updateTypingIndicator("PTT deactivated by peer");
               }
               break;
               
@@ -2200,7 +2386,7 @@
             if (event.candidate && dataChannel && dataChannel.readyState === "open") {
               dataChannel.send(JSON.stringify({ type: "stream-candidate", candidate: event.candidate }));
             }
-          };
+            };
           
           stream.getTracks().forEach(track => videoStreamPeer.addTrack(track, stream));
           videoStreamPeer.onconnectionstatechange = () => {
@@ -2293,6 +2479,22 @@
         }
 
         /***** Push-to-Talk Audio Functions *****/
+        function deactivatePTT() {
+            if (pttPeerConnection) {
+                pttPeerConnection.close();
+                pttPeerConnection = null;
+            }
+            
+            if (pttAudioStream) {
+                pttAudioStream.getTracks().forEach(track => track.stop());
+                pttAudioStream = null;
+            }
+            
+            // Update UI
+            document.getElementById("pushToTalkBtn").classList.remove("active");
+            isPTTActive = false;
+        }
+        
         async function togglePushToTalk() {
             const pttBtn = document.getElementById("pushToTalkBtn");
             
@@ -2334,6 +2536,11 @@
                             type: "ptt-status", 
                             active: true 
                         }));
+                        
+                        // Send force deactivate message to peer
+                        dataChannel.send(JSON.stringify({ 
+                            type: "ptt-force-deactivate" 
+                        }));
                     }
                     
                     // Update UI
@@ -2347,15 +2554,7 @@
                 }
             } else {
                 // Deactivate PTT
-                if (pttPeerConnection) {
-                    pttPeerConnection.close();
-                    pttPeerConnection = null;
-                }
-                
-                if (pttAudioStream) {
-                    pttAudioStream.getTracks().forEach(track => track.stop());
-                    pttAudioStream = null;
-                }
+                deactivatePTT();
                 
                 // Notify peer that PTT is inactive
                 if (dataChannel && dataChannel.readyState === "open") {
@@ -2365,9 +2564,6 @@
                     }));
                 }
                 
-                // Update UI
-                pttBtn.classList.remove("active");
-                isPTTActive = false;
                 updateTypingIndicator("You stopped broadcasting audio");
             }
         }
@@ -2412,6 +2608,143 @@
             }
         }
 
+        /***** QR Code Functions *****/
+        function generateQRCode(roomId) {
+            const qrContainer = document.getElementById("qrCodeContainer");
+            const canvas = document.getElementById("qrCode");
+            
+            // Show QR code container
+            qrContainer.style.display = "flex";
+            
+            // Clear previous QR code
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Generate new QR code
+            QRCode.toCanvas(canvas, roomId, {
+                width: 150,
+                margin: 1,
+                color: {
+                    dark: "#000000",
+                    light: "#FFFFFF"
+                }
+            }, function(error) {
+                if (error) {
+                    console.error("QR code generation error:", error);
+                }
+            });
+        }
+        
+        function downloadQRCode() {
+            const canvas = document.getElementById("qrCode");
+            const link = document.createElement("a");
+            link.download = "gemini-chat-room.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        }
+        
+        function shareQRCode() {
+            const canvas = document.getElementById("qrCode");
+            
+            if (navigator.share) {
+                canvas.toBlob(function(blob) {
+                    const file = new File([blob], "gemini-chat-room.png", { type: "image/png" });
+                    
+                    navigator.share({
+                        title: "Gemini Chat Room",
+                        text: "Join my chat room using this QR code",
+                        files: [file]
+                    }).catch(error => {
+                        console.log("Sharing failed:", error);
+                    });
+                });
+            } else {
+                // Fallback to download if Web Share API is not supported
+                downloadQRCode();
+            }
+        }
+        
+        function startQRScanner() {
+            const scannerModal = document.getElementById("qrScannerModal");
+            const video = document.getElementById("qrScanner");
+            const statusText = document.getElementById("scannerStatus");
+            const confirmBtn = document.getElementById("scanConfirmBtn");
+            
+            // Show scanner modal
+            scannerModal.classList.add("active");
+            scannedRoomId = "";
+            confirmBtn.style.display = "none";
+            
+            // Access camera
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(function(stream) {
+                qrScannerStream = stream;
+                video.srcObject = stream;
+                
+                // Start scanning for QR codes
+                const canvasElement = document.createElement("canvas");
+                const canvas = canvasElement.getContext("2d");
+                
+                function scanQRCode() {
+                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                        canvasElement.height = video.videoHeight;
+                        canvasElement.width = video.videoWidth;
+                        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                        
+                        const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                            inversionAttempts: "dontInvert",
+                        });
+                        
+                        if (code) {
+                            scannedRoomId = code.data;
+                            statusText.textContent = "QR code detected!";
+                            confirmBtn.style.display = "block";
+                            
+                            // Draw box around QR code
+                            canvas.strokeStyle = "#00ff00";
+                            canvas.lineWidth = 4;
+                            canvas.strokeRect(code.location.topLeftCorner.x, code.location.topLeftCorner.y, 
+                                            code.location.bottomRightCorner.x - code.location.topLeftCorner.x, 
+                                            code.location.bottomRightCorner.y - code.location.topLeftCorner.y);
+                        } else {
+                            statusText.textContent = "Point camera at a QR code";
+                            confirmBtn.style.display = "none";
+                        }
+                    }
+                    
+                    if (scannerModal.classList.contains("active")) {
+                        requestAnimationFrame(scanQRCode);
+                    }
+                }
+                
+                scanQRCode();
+            })
+            .catch(function(error) {
+                console.error("Camera access error:", error);
+                statusText.textContent = "Cannot access camera: " + error.message;
+            });
+        }
+        
+        function stopQRScanner() {
+            const scannerModal = document.getElementById("qrScannerModal");
+            scannerModal.classList.remove("active");
+            
+            // Stop camera stream
+            if (qrScannerStream) {
+                qrScannerStream.getTracks().forEach(track => track.stop());
+                qrScannerStream = null;
+            }
+        }
+        
+        function connectFromQRCode() {
+            if (scannedRoomId) {
+                document.getElementById("roomIdInput").value = scannedRoomId;
+                stopQRScanner();
+                joinRoom();
+            }
+        }
+
         /***** UI Setup and Event Listeners *****/
         function setupEventListeners() {
           // Save username button
@@ -2425,6 +2758,17 @@
           
           // Join room button
           document.getElementById("joinRoomBtn").addEventListener("click", () => joinRoom(false));
+          
+          // Scan QR code button
+          document.getElementById("scanQRCodeBtn").addEventListener("click", startQRScanner);
+          
+          // QR code actions
+          document.getElementById("downloadQRBtn").addEventListener("click", downloadQRCode);
+          document.getElementById("shareQRBtn").addEventListener("click", shareQRCode);
+          
+          // QR scanner actions
+          document.getElementById("scanCancelBtn").addEventListener("click", stopQRScanner);
+          document.getElementById("scanConfirmBtn").addEventListener("click", connectFromQRCode);
           
           // Send chat message
           document.getElementById("sendChatBtn").addEventListener("click", sendChatMessage);
